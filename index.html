@@ -251,6 +251,10 @@
 @media(max-height:760px){#meaningOverlay .meaning-card{padding:12px 12px 14px!important}#meaningOverlay video#meaningVideo:not(.hidden){width:104px!important;height:104px!important;max-width:104px!important;max-height:104px!important;margin:2px auto 8px!important}#meaningOverlay .meaning-quote{margin:6px auto 8px!important}#meaningOverlay #meaningText{margin:6px auto 8px!important;font-size:.88rem!important;line-height:1.35!important}}
 @media(prefers-reduced-motion:reduce){#meaningOverlay video#meaningVideo:not(.hidden){animation:none!important}}
 
+
+/* Quitar el marco interior que se superpone al contenido de la ficha */
+#meaningOverlay .meaning-card:before{content:none!important;display:none!important}
+#meaningOverlay .meaning-card{background:radial-gradient(ellipse at 50% 0,#403017,#171719 58%,#101012)!important}
 </style></head><body><main><header><img class="brand-logo" src="logo-lqdd.png" alt="Logotipo oficial de LQDD"><div class="kicker">Autoconocimiento · LQDD</div><h1>Tu verdadero yo</h1><p class="subtitle">¿Eres un Lobo que lidera, un Búho que calcula o un Zorro que encuentra caminos? Responde y descubre el animal que representa tu forma de ser.</p></header>
 <div class="stats"><div class="pill">🔥 Racha: <strong id="streak">0 días</strong></div><div class="pill">🏆 Colección: <strong id="collectionCount">0 de 8</strong></div></div>
 <section class="panel" id="quiz" aria-live="polite"><div class="topline"><span id="counter"></span><span id="percent"></span></div><div class="track"><div class="fill" id="fill" style="width:10%"></div></div><div class="kicker" style="margin-bottom:10px">¿Qué animal eres?</div><h2 id="question">Preparando el test…</h2><div class="answers" id="answers"></div><p class="note">Las preguntas y respuestas cambian de orden entre partidas. Test orientativo de reflexión personal.</p></section>
