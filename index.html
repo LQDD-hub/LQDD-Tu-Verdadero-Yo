@@ -255,6 +255,11 @@
 /* Quitar el marco interior que se superpone al contenido de la ficha */
 #meaningOverlay .meaning-card:before{content:none!important;display:none!important}
 #meaningOverlay .meaning-card{background:radial-gradient(ellipse at 50% 0,#403017,#171719 58%,#101012)!important}
+
+/* El botón activa el vídeo a pantalla completa dentro de la ficha, sin recortar al animal */
+#meaningOverlay video#meaningVideo:not(.hidden){width:min(100%,360px)!important;height:auto!important;aspect-ratio:9/16!important;max-width:360px!important;max-height:52dvh!important;min-width:0!important;min-height:0!important;object-fit:contain!important;object-position:center center!important;background:#050505!important;border:2px solid var(--gold)!important;border-radius:12px!important;box-sizing:border-box!important}
+#meaningOverlay video#meaningVideo:not(.hidden):fullscreen{width:auto!important;height:100vh!important;max-width:100vw!important;max-height:100vh!important;aspect-ratio:auto!important;object-fit:contain!important;background:#000!important;border:0!important;border-radius:0!important}
+#meaningOverlay video#meaningVideo:not(.hidden)::-webkit-media-controls{display:flex!important}
 </style></head><body><main><header><img class="brand-logo" src="logo-lqdd.png" alt="Logotipo oficial de LQDD"><div class="kicker">Autoconocimiento · LQDD</div><h1>Tu verdadero yo</h1><p class="subtitle">¿Eres un Lobo que lidera, un Búho que calcula o un Zorro que encuentra caminos? Responde y descubre el animal que representa tu forma de ser.</p></header>
 <div class="stats"><div class="pill">🔥 Racha: <strong id="streak">0 días</strong></div><div class="pill">🏆 Colección: <strong id="collectionCount">0 de 8</strong></div></div>
 <section class="panel" id="quiz" aria-live="polite"><div class="topline"><span id="counter"></span><span id="percent"></span></div><div class="track"><div class="fill" id="fill" style="width:10%"></div></div><div class="kicker" style="margin-bottom:10px">¿Qué animal eres?</div><h2 id="question">Preparando el test…</h2><div class="answers" id="answers"></div><p class="note">Las preguntas y respuestas cambian de orden entre partidas. Test orientativo de reflexión personal.</p></section>
