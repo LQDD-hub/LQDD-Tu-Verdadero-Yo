@@ -103,6 +103,16 @@
 
 .result-video.hidden,.meaning-video.hidden{display:none!important}
 .meaning-video{display:block;width:min(100%,560px);height:auto;aspect-ratio:9/16;max-height:58dvh;object-fit:contain;margin:6px auto 14px;border:1px solid #8c6a2b;border-radius:10px}
+
+/* Ajuste móvil final: icono compacto y texto siempre accesible */
+.result-video,.meaning-video{width:88px!important;height:88px!important;min-height:88px!important;max-height:88px!important;aspect-ratio:1/1!important;object-fit:cover!important;border-radius:50%!important;border:2px solid var(--gold)!important;margin:8px auto 12px!important;padding:0!important;display:block}
+.meaning-card{width:min(500px,100%)!important;height:calc(100dvh - 24px)!important;max-height:calc(100dvh - 24px)!important;overflow-y:auto!important;padding:14px!important;border-radius:20px!important}
+.meaning-overlay{align-items:center!important;padding:12px!important;overflow:hidden!important}
+.meaning-card h2{font-size:clamp(1.45rem,5.5vw,2rem)!important;margin:8px 0 12px!important;line-height:1.15!important}
+.meaning-card .meaning-quote{font-size:clamp(1rem,4vw,1.25rem)!important;line-height:1.45!important;margin:10px auto 14px!important}
+.meaning-card p{line-height:1.55!important}
+.meaning-title-animal{width:38px!important;height:38px!important}
+#result .result-video{width:96px!important;height:96px!important;min-height:96px!important;max-height:96px!important;margin:8px auto 12px!important}
 </style></head><body><main><header><img class="brand-logo" src="logo-lqdd.png" alt="Logotipo oficial de LQDD"><div class="kicker">Autoconocimiento · LQDD</div><h1>Tu verdadero yo</h1><p class="subtitle">¿Eres un Lobo que lidera, un Búho que calcula o un Zorro que encuentra caminos? Responde y descubre el animal que representa tu forma de ser.</p></header>
 <div class="stats"><div class="pill">🔥 Racha: <strong id="streak">0 días</strong></div><div class="pill">🏆 Colección: <strong id="collectionCount">0 de 8</strong></div></div>
 <section class="panel" id="quiz" aria-live="polite"><div class="topline"><span id="counter"></span><span id="percent"></span></div><div class="track"><div class="fill" id="fill" style="width:10%"></div></div><div class="kicker" style="margin-bottom:10px">¿Qué animal eres?</div><h2 id="question">Preparando el test…</h2><div class="answers" id="answers"></div><p class="note">Las preguntas y respuestas cambian de orden entre partidas. Test orientativo de reflexión personal.</p></section>
