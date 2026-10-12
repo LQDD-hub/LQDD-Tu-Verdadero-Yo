@@ -41,7 +41,7 @@ function start(){i=0;score={leader:0,strategist:0,guardian:0,creator:0};chosen=[
 function render(){$("counter").textContent="Pregunta "+(i+1)+" de "+qs.length;$("percent").textContent=Math.round((i+1)/qs.length*100)+" %";$("fill").style.width=((i+1)/qs.length*100)+"%";$("question").textContent=qs[i].q;$("answers").replaceChildren();qs[i].a.forEach(([label,type])=>{let b=document.createElement("button");b.className="answer";b.textContent=label;b.type="button";b.onclick=()=>{score[type]++;chosen.push(type);i++;if(i<qs.length)render();else finish()};$("answers").append(b)})}
 const animalSounds={
 leader:"https://commons.wikimedia.org/wiki/Special:Redirect/file/Wolf_howls.ogg",
-strategist:"https://commons.wikimedia.org/wiki/Special:Redirect/file/Cape_Eagle_Owl_(Bubo_capensis)_(W1CDR0001437_BD2).ogg",
+strategist:"https://commons.wikimedia.org/wiki/Special:Redirect/file/American_Barn_Owl_Screech.flac",
 guardian:"https://commons.wikimedia.org/wiki/Special:Redirect/file/Bear_growl.ogg",
 creator:"https://commons.wikimedia.org/wiki/Special:Redirect/file/Red_Fox_(Vulpes_vulpes)_(W1CDR0001529_BD12).ogg",
 visionary:"https://commons.wikimedia.org/wiki/Special:Redirect/file/Bald_Eagle_Yellowstone_National_Park.ogg",
