@@ -87,8 +87,19 @@ document.body.appendChild(layer);setTimeout(()=>layer.remove(),2800);
 function playAnimalSound(key){
 if(resultAnimalAudio){resultAnimalAudio.pause();resultAnimalAudio.currentTime=0;resultAnimalAudio=null}
 const url=animalSounds[key];if(!url)return;
-const audio=new Audio();resultAnimalAudio=audio;audio.src=url;audio.preload="auto";audio.volume=1;
-audio.addEventListener("canplay",()=>{if(resultAnimalAudio===audio)audio.play().catch(()=>{})},{once:true});
+// Reproducir llamadas más contundentes y graves sin convertirlas en sonido ambiental.
+const soundSettings={
+leader:{rate:.78,volume:1},       // aullido de lobo, más profundo
+strategist:{rate:.72,volume:1},   // llamada grave de búho
+guardian:{rate:.72,volume:1},    // gruñido de oso
+creator:{rate:.82,volume:1},      // vocalización de zorro
+visionary:{rate:.82,volume:1},    // chillido de águila, algo más robusto
+protector:{rate:.74,volume:1},    // rugido de león
+inventor:{rate:.78,volume:1},     // graznido de cuervo
+freeSpirit:{rate:.92,volume:1}    // silbidos y chasquidos de delfín
+};
+const settings=soundSettings[key]||{rate:.8,volume:1};
+const audio=new Audio();resultAnimalAudio=audio;audio.src=url;audio.preload="auto";audio.volume=settings.volume;audio.playbackRate=settings.rate;audio.defaultPlaybackRate=settings.rate;
 audio.addEventListener("error",()=>{if(resultAnimalAudio===audio)resultAnimalAudio=null},{once:true});
 audio.load();
 audio.play().then(()=>{setTimeout(()=>{if(resultAnimalAudio===audio){audio.pause();audio.currentTime=0}},4500)}).catch(()=>{});
