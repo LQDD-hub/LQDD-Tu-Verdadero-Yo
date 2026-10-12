@@ -66,14 +66,14 @@ let qs=[],i=0,score={},chosen=[],last=null;
 function start(){i=0;score={leader:0,strategist:0,guardian:0,creator:0};chosen=[];qs=shuffle(questions).map(q=>({...q,a:shuffle(q.a)}));$("result").classList.add("hidden");$("quiz").classList.remove("hidden");render()}
 function render(){$("counter").textContent="Pregunta "+(i+1)+" de "+qs.length;$("percent").textContent=Math.round((i+1)/qs.length*100)+" %";$("fill").style.width=((i+1)/qs.length*100)+"%";$("question").textContent=qs[i].q;$("answers").replaceChildren();qs[i].a.forEach(([label,type])=>{let b=document.createElement("button");b.className="answer";b.textContent=label;b.type="button";b.onclick=()=>{score[type]++;chosen.push(type);i++;if(i<qs.length)render();else finish()};$("answers").append(b)})}
 const animalSounds={
-leader:"https://commons.wikimedia.org/wiki/Special:Redirect/file/Wolf_howls.ogg",
-strategist:"https://commons.wikimedia.org/wiki/Special:Redirect/file/American_Barn_Owl_Screech.flac",
-guardian:"https://commons.wikimedia.org/wiki/Special:Redirect/file/Bear_growl.ogg",
-creator:"https://commons.wikimedia.org/wiki/Special:Redirect/file/Red_Fox_(Vulpes_vulpes)_(W1CDR0001529_BD12).ogg",
+leader:"https://sfxmint.com/dl/wolf-howl-02.mp3",
+strategist:"https://sfxmint.com/dl/animal-owl-01.mp3",
+guardian:"https://sfxmint.com/dl/bear-growl-01.mp3",
+creator:"https://sfxmint.com/dl/growth-e821d044b2ea1967205ba97b-part-1-v2.mp3",
 visionary:"https://commons.wikimedia.org/wiki/Special:Redirect/file/Bald_Eagle_Yellowstone_National_Park.ogg",
-protector:"https://commons.wikimedia.org/wiki/Special:Redirect/file/Lion_raring-sound1TamilNadu178.ogg",
-inventor:"https://commons.wikimedia.org/wiki/Special:Redirect/file/Common_Raven.ogg",
-freeSpirit:"https://commons.wikimedia.org/wiki/Special:Redirect/file/Whales_and_Dolphins_whale_nature_sounds_songs_nueva_esparta.ogg"
+protector:"https://sfxmint.com/dl/lion-roar-02.mp3",
+inventor:"https://sfxmint.com/dl/crow-call-sequence-01.mp3",
+freeSpirit:"https://sfxmint.com/dl/short-dolphin-style-call-01.mp3"
 };
 let resultAnimalAudio=null;
 function showRevealFX(){
@@ -89,14 +89,14 @@ if(resultAnimalAudio){resultAnimalAudio.pause();resultAnimalAudio.currentTime=0;
 const url=animalSounds[key];if(!url)return;
 // Reproducir llamadas más contundentes y graves sin convertirlas en sonido ambiental.
 const soundSettings={
-leader:{rate:.78,volume:1},       // aullido de lobo, más profundo
-strategist:{rate:.72,volume:1},   // llamada grave de búho
-guardian:{rate:.72,volume:1},    // gruñido de oso
-creator:{rate:.82,volume:1},      // vocalización de zorro
-visionary:{rate:.82,volume:1},    // chillido de águila, algo más robusto
-protector:{rate:.74,volume:1},    // rugido de león
-inventor:{rate:.78,volume:1},     // graznido de cuervo
-freeSpirit:{rate:.92,volume:1}    // silbidos y chasquidos de delfín
+leader:{rate:.82,volume:1},       // aullido contundente de lobo
+strategist:{rate:.78,volume:1},   // ululato de búho
+guardian:{rate:.76,volume:1},    // gruñido profundo de oso
+creator:{rate:.9,volume:1},       // llamada breve de zorro
+visionary:{rate:1,volume:1},      // llamada real de águila; conservar tono natural
+protector:{rate:.78,volume:1},    // rugido profundo de león
+inventor:{rate:.88,volume:1},     // graznido de cuervo
+freeSpirit:{rate:1,volume:1}      // llamada corta estilo delfín
 };
 const settings=soundSettings[key]||{rate:.8,volume:1};
 const audio=new Audio();resultAnimalAudio=audio;audio.src=url;audio.preload="auto";audio.volume=settings.volume;audio.playbackRate=settings.rate;audio.defaultPlaybackRate=settings.rate;
