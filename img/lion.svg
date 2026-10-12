@@ -1,1 +1,19 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="EL LEÓN"><defs><radialGradient id="bg" cx="35%" cy="25%" r="80%"><stop offset="0" stop-color="#59451e"/><stop offset=".62" stop-color="#211b10"/><stop offset="1" stop-color="#101012"/></radialGradient><linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ffdf8a"/><stop offset=".5" stop-color="#e7bd57"/><stop offset="1" stop-color="#9f7629"/></linearGradient><filter id="shadow" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="8" stdDeviation="9" flood-color="#000" flood-opacity=".65"/></filter></defs><circle cx="256" cy="256" r="247" fill="#0c0c0d" stroke="url(#gold)" stroke-width="7"/><circle cx="256" cy="256" r="226" fill="url(#bg)" stroke="#e7bd5755" stroke-width="2"/><circle cx="256" cy="256" r="193" fill="none" stroke="#e7bd5733" stroke-width="2"/><path d="M105 365 Q256 420 407 365" fill="none" stroke="url(#gold)" stroke-width="3" opacity=".8"/><text x="256" y="105" text-anchor="middle" font-family="Georgia,serif" font-size="23" font-weight="bold" letter-spacing="5" fill="#ffdf8a">EL LEÓN</text><text x="256" y="310" text-anchor="middle" dominant-baseline="middle" font-family="sans-serif" font-size="214" filter="url(#shadow)">🦁</text><path d="M175 403 L337 403" stroke="url(#gold)" stroke-width="3" stroke-linecap="round"/><circle cx="154" cy="403" r="4" fill="#ffdf8a"/><circle cx="358" cy="403" r="4" fill="#ffdf8a"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" role="img" aria-label="LEÓN LQDD">
+<defs>
+ <radialGradient id="bg" cx="50%" cy="35%" r="75%"><stop offset="0" stop-color="#493719"/><stop offset=".52" stop-color="#1c1913"/><stop offset="1" stop-color="#08090b"/></radialGradient>
+ <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff0b4"/><stop offset=".28" stop-color="#ffdf8a"/><stop offset=".58" stop-color="#b78124"/><stop offset=".82" stop-color="#ffe6a0"/><stop offset="1" stop-color="#9a6818"/></linearGradient>
+ <radialGradient id="halo"><stop stop-color="#f9d56f" stop-opacity=".34"/><stop offset="1" stop-color="#f9d56f" stop-opacity="0"/></radialGradient>
+ <filter id="glow"><feGaussianBlur stdDeviation="8"/></filter>
+ <filter id="shadow"><feDropShadow dx="0" dy="12" stdDeviation="12" flood-color="#000" flood-opacity=".8"/></filter>
+ <pattern id="stars" width="52" height="52" patternUnits="userSpaceOnUse"><circle cx="7" cy="9" r="1.5" fill="#ffdf8a" opacity=".45"/><circle cx="36" cy="32" r="1" fill="#fff0b4" opacity=".35"/></pattern>
+</defs>
+<rect width="600" height="600" rx="300" fill="url(#bg)"/><circle cx="300" cy="270" r="235" fill="url(#halo)"/>
+<circle cx="300" cy="300" r="270" fill="none" stroke="url(#gold)" stroke-width="5"/>
+<circle cx="300" cy="300" r="253" fill="none" stroke="#ffdf8a" stroke-opacity=".4" stroke-width="1.5"/>
+<circle cx="300" cy="300" r="238" fill="url(#stars)"/>
+<g fill="url(#gold)"><path d="M300 30l8 17-8 17-8-17z"/><path d="M300 536l8 17-8 17-8-17z"/><path d="M30 300l17-8 17 8-17 8z"/><path d="M536 300l17-8 17 8-17 8z"/></g>
+<circle cx="300" cy="275" r="155" fill="#08090b" fill-opacity=".52" stroke="url(#gold)" stroke-width="2" filter="url(#shadow)"/>
+<text x="300" y="335" text-anchor="middle" font-size="190" font-family="Apple Color Emoji,Segoe UI Emoji,Noto Color Emoji,sans-serif" filter="url(#shadow)">🦁</text>
+<path d="M190 445 Q300 480 410 445" fill="none" stroke="url(#gold)" stroke-width="2" opacity=".8"/>
+<text x="300" y="485" text-anchor="middle" fill="#ffdf8a" font-family="Georgia,serif" font-size="24" letter-spacing="7">LEÓN</text>
+</svg>
