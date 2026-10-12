@@ -68,12 +68,12 @@ function render(){$("counter").textContent="Pregunta "+(i+1)+" de "+qs.length;$(
 const animalSounds={
 leader:"https://sfxmint.com/dl/wolf-howl-02.mp3",
 strategist:"https://sfxmint.com/dl/animal-owl-01.mp3",
-guardian:"https://sfxmint.com/dl/bear-growl-01.mp3",
-creator:"https://sfxmint.com/dl/growth-e821d044b2ea1967205ba97b-part-1-v2.mp3",
+guardian:"https://commons.wikimedia.org/wiki/Special:Redirect/file/Bear_growl.ogg",
+creator:"https://commons.wikimedia.org/wiki/Special:Redirect/file/Red_Fox_(Vulpes_vulpes)_(W1CDR0001529_BD12).ogg",
 visionary:"https://commons.wikimedia.org/wiki/Special:Redirect/file/Bald_Eagle_Yellowstone_National_Park.ogg",
 protector:"https://sfxmint.com/dl/lion-roar-02.mp3",
-inventor:"https://sfxmint.com/dl/crow-call-sequence-01.mp3",
-freeSpirit:"https://sfxmint.com/dl/short-dolphin-style-call-01.mp3"
+inventor:"https://commons.wikimedia.org/wiki/Special:Redirect/file/Common_Raven.ogg",
+freeSpirit:"https://commons.wikimedia.org/wiki/Special:Redirect/file/Whales_and_Dolphins_whale_nature_sounds_songs_nueva_esparta.ogg"
 };
 let resultAnimalAudio=null;
 function showRevealFX(){
@@ -89,14 +89,14 @@ if(resultAnimalAudio){resultAnimalAudio.pause();resultAnimalAudio.currentTime=0;
 const url=animalSounds[key];if(!url)return;
 // Reproducir llamadas más contundentes y graves sin convertirlas en sonido ambiental.
 const soundSettings={
-leader:{rate:.82,volume:1},       // aullido contundente de lobo
-strategist:{rate:.78,volume:1},   // ululato de búho
-guardian:{rate:.76,volume:1},    // gruñido profundo de oso
-creator:{rate:.9,volume:1},       // llamada breve de zorro
-visionary:{rate:1,volume:1},      // llamada real de águila; conservar tono natural
-protector:{rate:.78,volume:1},    // rugido profundo de león
-inventor:{rate:.88,volume:1},     // graznido de cuervo
-freeSpirit:{rate:1,volume:1}      // llamada corta estilo delfín
+leader:{rate:1,volume:1},
+strategist:{rate:1,volume:1},
+guardian:{rate:.9,volume:1},
+creator:{rate:1,volume:1},
+visionary:{rate:1,volume:1},
+protector:{rate:1,volume:1},
+inventor:{rate:1,volume:1},
+freeSpirit:{rate:1,volume:1}
 };
 const settings=soundSettings[key]||{rate:.8,volume:1};
 const audio=new Audio();resultAnimalAudio=audio;audio.src=url;audio.preload="auto";audio.volume=settings.volume;audio.playbackRate=settings.rate;audio.defaultPlaybackRate=settings.rate;
