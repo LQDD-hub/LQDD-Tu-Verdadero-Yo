@@ -104,6 +104,11 @@
 .result-video.hidden,.meaning-video.hidden{display:none!important}
 .meaning-video{display:block;width:min(100%,560px);height:auto;aspect-ratio:9/16;max-height:58dvh;object-fit:contain;margin:6px auto 14px;border:1px solid #8c6a2b;border-radius:10px}
 
+/* Vídeos más grandes en las tarjetas, con brillo dorado animado */
+.meaning-card .meaning-video{width:190px!important;height:190px!important;min-width:190px!important;min-height:190px!important;max-width:190px!important;max-height:190px!important;aspect-ratio:1/1!important;object-fit:cover!important;border-radius:20px!important;border:2px solid var(--gold)!important;box-shadow:0 0 0 4px #e7bd5712,0 8px 24px #e7bd5730!important;margin:8px auto 14px!important;animation:goldVideoGlow 2.8s ease-in-out infinite!important}
+#result .result-video{width:190px!important;height:190px!important;min-width:190px!important;min-height:190px!important;max-width:190px!important;max-height:190px!important;aspect-ratio:1/1!important;object-fit:cover!important;border-radius:20px!important;border:2px solid var(--gold)!important;box-shadow:0 0 0 4px #e7bd5712,0 8px 24px #e7bd5730!important;margin:8px auto 14px!important;animation:goldVideoGlow 2.8s ease-in-out infinite!important}
+@keyframes goldVideoGlow{0%,100%{box-shadow:0 0 0 3px #e7bd5710,0 7px 20px #e7bd5720;transform:scale(1)}50%{box-shadow:0 0 0 6px #e7bd5720,0 8px 30px #e7bd5750;transform:scale(1.025)}}
+@media(prefers-reduced-motion:reduce){.meaning-card .meaning-video,#result .result-video{animation:none!important}}
 /* Vídeo protagonista, cuadrado y elegante */
 .meaning-card .meaning-video{width:148px!important;height:148px!important;min-width:148px!important;min-height:148px!important;max-width:148px!important;max-height:148px!important;aspect-ratio:1/1!important;object-fit:cover!important;border-radius:18px!important;border:2px solid var(--gold)!important;box-shadow:0 0 0 4px #e7bd5712,0 8px 24px #e7bd5730!important;margin:8px auto 14px!important}
 #result .result-video{width:148px!important;height:148px!important;min-width:148px!important;min-height:148px!important;max-width:148px!important;max-height:148px!important;aspect-ratio:1/1!important;object-fit:cover!important;border-radius:18px!important;border:2px solid var(--gold)!important;box-shadow:0 0 0 4px #e7bd5712,0 8px 24px #e7bd5730!important;margin:8px auto 14px!important}
