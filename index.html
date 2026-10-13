@@ -594,18 +594,12 @@ function paint(){let d=getData();const level=Math.min(8,d.unlocked.length),pct=l
 let currentMeaningId=null;
 function openMeaning(id){
  const p=profiles[id];if(!p)return;currentMeaningId=id;
- const mv=$("meaningVideo");
- const image=$("meaningImage");
+ const mv=$("meaningVideo"),image=$("meaningImage");
+ if(image){image.classList.add("hidden");image.src=p.img;image.alt=p.title;}
  if(mv){
-  mv.pause();mv.removeAttribute("src");mv.load();mv.classList.add("hidden");
-  const videoPath=animalVideos[id];
-  if(videoPath){
-   mv.src=videoPath;mv.loop=true;mv.muted=true;mv.playsInline=true;mv.classList.remove("hidden");
-   mv.onerror=()=>{mv.pause();mv.classList.add("hidden");if(image){image.classList.remove("hidden");image.src=p.img;image.alt=p.title;}};
-   mv.onloadeddata=()=>{if(image)image.classList.add("hidden");};
-   mv.load();const playPromise=mv.play();if(playPromise&&playPromise.catch)playPromise.catch(()=>{});
-  }else if(image){image.classList.remove("hidden");image.src=p.img;image.alt=p.title;}
- }else if(image){image.classList.remove("hidden");image.src=p.img;image.alt=p.title;}
+  mv.pause();mv.onerror=null;mv.onloadeddata=null;mv.oncanplay=null;
+  mv.removeAttribute("src");mv.load();mv.classList.add("hidden");
+ }
  $("meaningTitle").replaceChildren();
  const titleIcon=document.createElement("img");titleIcon.className="meaning-title-animal";titleIcon.src=p.img;titleIcon.alt="";titleIcon.onerror=()=>titleIcon.remove();
  $("meaningTitle").append(titleIcon,document.createTextNode(" "+p.title));
@@ -618,6 +612,17 @@ function openMeaning(id){
  rarity.textContent=tier==="supreme"?"✦ SECRETO SUPREMO":tier==="secret"?"◆ PERFIL SECRETO":"● ANIMAL NORMAL";
  void card.offsetWidth;card.classList.add("meaning-reveal");
  $("meaningOverlay").classList.remove("hidden");document.body.style.overflow="hidden";
+ if(mv&&animalVideos[id]){
+  mv.src=new URL(animalVideos[id],document.baseURI).href;
+  mv.loop=true;mv.autoplay=true;mv.muted=true;mv.defaultMuted=true;mv.playsInline=true;mv.preload="auto";
+  mv.classList.remove("hidden");
+  mv.style.setProperty("display","block","important");
+  mv.style.setProperty("visibility","visible","important");
+  mv.onerror=()=>{mv.pause();mv.classList.add("hidden");};
+  mv.onloadeddata=()=>{mv.classList.remove("hidden");mv.style.setProperty("display","block","important");};
+  mv.oncanplay=()=>{mv.classList.remove("hidden");mv.style.setProperty("display","block","important");};
+  mv.load();const pp=mv.play();if(pp&&pp.catch)pp.catch(()=>{});
+ }
 }
 function closeMeaning(){
  $("meaningOverlay").classList.add("hidden");
