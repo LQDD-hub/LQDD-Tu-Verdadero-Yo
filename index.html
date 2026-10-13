@@ -614,14 +614,14 @@ function openMeaning(id){
  $("meaningOverlay").classList.remove("hidden");document.body.style.overflow="hidden";
  if(mv&&animalVideos[id]){
   mv.src=new URL(animalVideos[id],document.baseURI).href;
-  mv.loop=true;mv.autoplay=true;mv.muted=true;mv.defaultMuted=true;mv.playsInline=true;mv.preload="auto";
+  mv.loop=true;mv.autoplay=true;mv.muted=false;mv.defaultMuted=false;mv.volume=1;mv.playsInline=true;mv.preload="auto";
   mv.classList.remove("hidden");
   mv.style.setProperty("display","block","important");
   mv.style.setProperty("visibility","visible","important");
   mv.onerror=()=>{mv.pause();mv.classList.add("hidden");};
   mv.onloadeddata=()=>{mv.classList.remove("hidden");mv.style.setProperty("display","block","important");};
   mv.oncanplay=()=>{mv.classList.remove("hidden");mv.style.setProperty("display","block","important");};
-  mv.load();const pp=mv.play();if(pp&&pp.catch)pp.catch(()=>{});
+  mv.load();const pp=mv.play();if(pp&&pp.catch)pp.catch(()=>{ /* En móviles el sonido puede requerir una interacción directa. */ });
  }
 }
 function closeMeaning(){
