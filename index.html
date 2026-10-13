@@ -822,13 +822,14 @@ function openAnimalDuel(mineId,friendId,minePct,friendPct){
  else{$("duelTitle").textContent="¡Tenemos ganador!";verdict.textContent="🏆 ¡GANA "+friend.title.toLocaleUpperCase("es-ES")+"!";}
  $("duelSubtitle").textContent=mine.title+" vs. "+friend.title;
  const mineBase=duelSkillBases[mineId]||[70,70,70,70,70],friendBase=duelSkillBases[friendId]||[70,70,70,70,70];
- const skillRoot=$("duelSkills");skillRoot.replaceChildren();
+ const skillRoot=$("duelSkills");skillRoot.replaceChildren();const winnerReasons=[];
  duelSkillNames.forEach((skill,i)=>{
   let a=mineBase[i],b=friendBase[i];
   if(mineWins&&a<=b)a=Math.min(100,b+5);
   else if(friendWins&&b<=a)b=Math.min(100,a+5);
   if(mineWins&&a===b)b=Math.max(1,a-5);
   if(friendWins&&a===b)a=Math.max(1,b-5);
+  if(mineWins&&a>b)winnerReasons.push({name:skill,diff:a-b});else if(friendWins&&b>a)winnerReasons.push({name:skill,diff:b-a});
   const row=document.createElement("div");row.className="duel-skill";
   row.innerHTML="<div class='duel-skill-title'></div><div class='duel-skill-row'><span></span><div class='duel-skill-track'><i></i></div><b></b></div><div class='duel-skill-row'><span></span><div class='duel-skill-track'><i></i></div><b></b></div>";
   row.querySelector(".duel-skill-title").textContent=skill;
@@ -836,6 +837,7 @@ function openAnimalDuel(mineId,friendId,minePct,friendPct){
   [[mine.title,a,mineWins],[friend.title,b,friendWins]].forEach((item,j)=>{rows[j].children[0].textContent=item[0].replace(/^El /,"");rows[j].children[1].firstElementChild.style.width=item[1]+"%";rows[j].children[2].textContent=item[1]+"%";if(item[2])rows[j].classList.add("wins")});
   skillRoot.appendChild(row);
  });
+ if(mineWins||friendWins){winnerReasons.sort((a,b)=>b.diff-a.diff);const top=winnerReasons.slice(0,2).map(x=>x.name.toLowerCase()).join(" y ");verdict.textContent+=" Destaca especialmente en "+top+", según las puntuaciones de este duelo."}
  $("duelOverlay").classList.remove("hidden");
 }
 function closeAnimalDuel(){$("duelOverlay").classList.add("hidden")}
