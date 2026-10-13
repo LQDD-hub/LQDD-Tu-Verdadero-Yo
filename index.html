@@ -956,11 +956,16 @@ const duelSkillBases={
 function openAnimalDuel(mineId,friendId,minePct,friendPct){
  const mine=profiles[mineId],friend=profiles[friendId];if(!mine||!friend)return;
  const mineRank=animalPercent(mineId),friendRank=animalPercent(friendId);const mineWins=mineRank>friendRank,friendWins=friendRank>mineRank;
- const setCard=(side,pct,p,isWinner)=>{
+ const challengerId=duelCode&&activeDuelRoom?activeDuelRoom.creator_animal:mineId;
+ const challengedId=duelCode&&activeDuelRoom?activeDuelRoom.guest_animal:friendId;
+ const mineLabel=challengerId===mineId?"RETADOR · QUIEN RETA":"RETADO · QUIEN ACEPTA";
+ const friendLabel=challengedId===friendId?"RETADO · QUIEN ACEPTA":"RETADOR · QUIEN RETA";
+ const setCard=(side,pct,p,isWinner,role)=>{
   const card=$("duel"+side),img=$( "duel"+side+"Img"),name=$("duel"+side+"Name"),percent=$("duel"+side+"Percent"),bar=$("duel"+side+"Bar");
   img.src=p.img;img.alt=p.title;name.textContent=p.title;percent.textContent=pct+"%";bar.style.width=pct+"%";card.classList.toggle("is-winner",isWinner);card.querySelector(".duel-winner").classList.toggle("hidden",!isWinner);
+  const owner=card.querySelector(".duel-owner");if(owner)owner.textContent=role;
  };
- setCard("Mine",minePct,mine,mineWins);setCard("Friend",friendPct,friend,friendWins);
+ setCard("Mine",minePct,mine,mineWins,mineLabel);setCard("Friend",friendPct,friend,friendWins,friendLabel);
  const verdict=$("duelVerdict");
  if(mineRank===friendRank){$("duelTitle").textContent="¡Duelo igualado!";verdict.textContent="🤝 ¡EMPATE! "+mine.title+" y "+friend.title+" tienen la misma afinidad."}
  else if(mineWins){$("duelTitle").textContent="¡Tenemos ganador!";verdict.textContent="🏆 ¡GANA "+mine.title.toLocaleUpperCase("es-ES")+"!"; }
