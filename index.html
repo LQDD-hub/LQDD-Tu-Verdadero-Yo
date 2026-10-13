@@ -423,6 +423,9 @@ html{scroll-behavior:smooth;scroll-padding-top:12px}
  .collect-card .collection-animal{height:clamp(88px,26vw,120px)}
 }
 @media(prefers-reduced-motion:reduce){#result.rarity-normal,#result.rarity-secret,#result.rarity-supreme{animation:none!important}}
+
+/* Evita mostrar dos veces la misma categoría de rareza en el resultado */
+#result #secretTag{display:none!important}
 </style></head><body><main><header><img class="brand-logo" src="logo-lqdd.png" alt="Logotipo oficial LQDD con lobo, corona, laureles y cruz"><div class="kicker">Autoconocimiento · LQDD</div><h1>Tu Verdadero Yo Animal</h1><p class="subtitle">¿Eres un Lobo que lidera, un Búho que calcula o un Zorro que encuentra caminos? Responde y descubre el animal que representa tu forma de ser.</p></header>
 <div class="stats"><div class="pill">🔥 Racha: <strong id="streak">0 días</strong></div><div class="pill">🏆 Colección: <strong id="collectionCount">0 de 8</strong></div></div>
 <section class="panel level-panel" aria-label="Progreso de nivel">
