@@ -1,8 +1,8 @@
 {
   "id": "./",
-  "name": "LQDD · Tu Verdadero Yo",
+  "name": "LQDD · Tu Verdadero Yo Animal",
   "short_name": "LQDD",
-  "description": "Descubre tu animal y tu verdadero yo con el reto diario LQDD.",
+  "description": "Descubre tu animal interior y tu verdadero yo con LQDD.",
   "lang": "es-ES",
   "start_url": "./?source=pwa",
   "scope": "./",
