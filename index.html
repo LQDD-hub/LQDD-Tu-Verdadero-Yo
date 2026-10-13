@@ -859,6 +859,17 @@ function updateMusicButton(){
  musicToggle.textContent = musicEnabled ? "Desactivar música" : "Activar música";
  musicToggle.setAttribute("aria-pressed",String(musicEnabled));
 }
+function stopResultMusic(){
+ Object.values(lqddTracks).forEach(track=>{track.pause();try{track.currentTime=0}catch(e){}});
+ musicEnabled=false;
+ musicWasPlayingBeforeMeaning=false;
+ updateMusicButton();
+}
+const resultCard=document.getElementById("result");
+if(resultCard)resultCard.addEventListener("click",event=>{
+ const control=event.target.closest("button,a");
+ if(control && control.id!=="musicToggle")stopResultMusic();
+},true);
 function chooseNormalMusic(){
  const options=normalMusicKeys.filter(key=>key!==lastNormalMusicKey);
  const chosen=options[Math.floor(Math.random()*options.length)]||normalMusicKeys[0];
