@@ -524,6 +524,14 @@ html{scroll-behavior:smooth;scroll-padding-top:12px}
 
 /* Eliminar por completo los controles visibles de sonido/vídeo en la tarjeta ampliada */
 #meaningSound,[id="meaningSoundStatus"]{display:none!important}
+
+/* Igualar el filo exterior de la tarjeta ampliada al color de su rareza */
+#meaningOverlay .meaning-card.rarity-normal{border-color:#4eaa7b!important;box-shadow:0 0 0 1px #4eaa7b33,0 0 28px #4eaa7b22,0 25px 90px #000c!important}
+#meaningOverlay .meaning-card.rarity-normal:before{border-color:#4eaa7b88!important}
+#meaningOverlay .meaning-card.rarity-secret{border-color:#a77bd7!important;box-shadow:0 0 0 1px #a77bd744,0 0 34px #a77bd733,0 25px 90px #000c!important}
+#meaningOverlay .meaning-card.rarity-secret:before{border-color:#c5a0ffcc!important}
+#meaningOverlay .meaning-card.rarity-supreme{border-color:#ffdf8a!important;box-shadow:0 0 0 2px #ffdf8a55,0 0 35px #ffdf8a66,0 0 70px #b8792266,0 25px 90px #000c!important}
+#meaningOverlay .meaning-card.rarity-supreme:before{border-color:#ffdf8a!important}
 </style></head><body><main><header><img class="brand-logo" src="logo-lqdd.png" alt="Logotipo oficial LQDD con lobo, corona, laureles y cruz"><div class="kicker">Autoconocimiento · LQDD</div><h1>Tu Verdadero Yo Animal</h1><p class="subtitle">¿Eres un Lobo que lidera, un Búho que calcula o un Zorro que encuentra caminos? Responde y descubre el animal que representa tu forma de ser.</p></header>
 <div class="stats"><div class="pill">🔥 Racha: <strong id="streak">0 días</strong></div><div class="pill">🏆 Colección: <strong id="collectionCount">0 de 8</strong></div></div>
 <section class="panel level-panel" aria-label="Progreso de nivel">
