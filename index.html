@@ -284,6 +284,46 @@
 @media(max-width:360px){.collection{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:6px!important}.collect-card{padding:4px!important}}
 /* El resultado final conserva la animación de revelación y el vídeo se reproduce una sola vez */
 #result video#resultVideo{loop:false}
+
+/* Ajustes de juego móvil: más compacto, legible y dinámico */
+@media(max-width:600px){
+ main{width:100%!important;padding:8px 10px 26px!important}
+ header{padding:8px 6px 12px!important}
+ .brand-logo{width:clamp(76px,21vw,112px)!important;max-height:112px!important;margin:0 auto 8px!important}
+ header h1{font-size:clamp(1.75rem,7vw,2.35rem)!important;line-height:1.06!important;margin:5px 0 8px!important}
+ header .subtitle{font-size:.94rem!important;line-height:1.45!important;margin:0 auto 10px!important;max-width:38ch}
+ .stats{gap:7px!important;margin:8px 0 12px!important}
+ .stats .pill{padding:9px 11px!important;font-size:.78rem!important;min-width:0!important}
+ .panel{padding:17px 15px!important;border-radius:19px!important;margin-bottom:12px!important}
+ #quiz .topline{font-size:.86rem!important;margin-bottom:9px!important}
+ #quiz .track{height:8px!important;margin-bottom:17px!important}
+ #quiz .kicker{font-size:.68rem!important;letter-spacing:.15em!important;margin-bottom:7px!important}
+ #question{font-size:clamp(1.25rem,5.1vw,1.7rem)!important;line-height:1.22!important;margin:0 0 15px!important;text-wrap:balance}
+ .answers{gap:9px!important}
+ .answer{padding:13px 13px!important;border-radius:14px!important;font-size:1rem!important;line-height:1.32!important;min-height:54px!important;overflow-wrap:anywhere}
+ .note{font-size:.76rem!important;line-height:1.4!important;margin:12px 0 0!important}
+ #result .result-video{width:100%!important;max-height:43vh!important;object-fit:contain!important;border-radius:14px!important}
+ #result h2{font-size:clamp(1.45rem,6vw,2rem)!important;line-height:1.15!important}
+ .actions{gap:9px!important}
+ .actions button{width:100%!important;min-height:48px!important}
+}
+@media(max-height:760px) and (max-width:600px){
+ header{padding-top:4px!important;padding-bottom:7px!important}
+ .brand-logo{width:68px!important;max-height:68px!important;margin-bottom:5px!important}
+ header .subtitle{display:none!important}
+ #quiz .track{margin-bottom:12px!important}
+ #question{margin-bottom:11px!important}
+ .answer{min-height:48px!important;padding:11px 12px!important}
+}
+@media(prefers-reduced-motion:no-preference){
+ #question{animation:questionEnter .28s ease-out both}
+ .answer{animation:answerEnter .28s ease-out both}
+ .answer:nth-child(2){animation-delay:35ms}
+ .answer:nth-child(3){animation-delay:70ms}
+ .answer:nth-child(4){animation-delay:105ms}
+}
+@keyframes questionEnter{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+@keyframes answerEnter{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 </style></head><body><main><header><img class="brand-logo" src="logo-lqdd.png" alt="Logotipo oficial de LQDD"><div class="kicker">Autoconocimiento · LQDD</div><h1>Tu verdadero yo</h1><p class="subtitle">¿Eres un Lobo que lidera, un Búho que calcula o un Zorro que encuentra caminos? Responde y descubre el animal que representa tu forma de ser.</p></header>
 <div class="stats"><div class="pill">🔥 Racha: <strong id="streak">0 días</strong></div><div class="pill">🏆 Colección: <strong id="collectionCount">0 de 8</strong></div></div>
 <section class="panel" id="quiz" aria-live="polite"><div class="topline"><span id="counter"></span><span id="percent"></span></div><div class="track"><div class="fill" id="fill" style="width:10%"></div></div><div class="kicker" style="margin-bottom:10px">¿Qué animal eres?</div><h2 id="question">Preparando el test…</h2><div class="answers" id="answers"></div><p class="note">Las preguntas y respuestas cambian de orden entre partidas. Test orientativo de reflexión personal.</p></section>
