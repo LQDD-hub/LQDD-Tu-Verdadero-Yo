@@ -419,24 +419,38 @@ async function makeShareCard(profileId){
  const p=profiles[profileId];if(!p)throw new Error("Perfil no encontrado");
  const canvas=document.createElement("canvas");canvas.width=1080;canvas.height=1350;
  const ctx=canvas.getContext("2d");
- const bg=ctx.createLinearGradient(0,0,1080,1350);bg.addColorStop(0,"#09090b");bg.addColorStop(.52,"#211a0e");bg.addColorStop(1,"#09090b");ctx.fillStyle=bg;ctx.fillRect(0,0,1080,1350);
- ctx.strokeStyle="#e7bd57";ctx.lineWidth=3;ctx.strokeRect(30,30,1020,1290);ctx.strokeStyle="#e7bd574d";ctx.lineWidth=1;ctx.strokeRect(48,48,984,1284);
+ const bg=ctx.createLinearGradient(0,0,1080,1350);bg.addColorStop(0,"#09090b");bg.addColorStop(.5,"#211a0e");bg.addColorStop(1,"#09090b");ctx.fillStyle=bg;ctx.fillRect(0,0,1080,1350);
+ ctx.strokeStyle="#e7bd57";ctx.lineWidth=3;ctx.strokeRect(30,30,1020,1290);ctx.strokeStyle="#e7bd574d";ctx.lineWidth=1;ctx.strokeRect(48,48,984,1254);
  const gold=ctx.createLinearGradient(0,70,0,180);gold.addColorStop(0,"#fff2c4");gold.addColorStop(.55,"#ffdf8a");gold.addColorStop(1,"#bd8c32");
- ctx.textAlign="center";ctx.fillStyle=gold;ctx.font="bold 36px Georgia,serif";ctx.fillText("LQDD",540,105);
- ctx.fillStyle="#d7bd78";ctx.font="bold 24px Arial,sans-serif";ctx.letterSpacing="5px";ctx.fillText("TU VERDADERO YO",540,150);
- ctx.fillStyle="#f5e7bd";ctx.font="bold 48px Georgia,serif";ctx.fillText("MI ANIMAL INTERIOR",540,218);
+ // Emblema propio LQDD: lobo dorado, corona, laureles y cruz.
+ const logo=new Image();logo.src=new URL("img/lobo-realista.jpg.png",location.href).href;logo.crossOrigin="anonymous";
+ await new Promise((resolve,reject)=>{logo.onload=resolve;logo.onerror=reject});
+ const cx=175,cy=170,r=112;
+ ctx.save();ctx.shadowColor="#e7bd57";ctx.shadowBlur=24;ctx.fillStyle="#09090b";ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.fill();ctx.restore();
+ ctx.strokeStyle="#e7bd57";ctx.lineWidth=5;ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.stroke();
+ ctx.strokeStyle="#bd8c32";ctx.lineWidth=2;ctx.beginPath();ctx.arc(cx,cy,r-11,0,Math.PI*2);ctx.stroke();
+ ctx.save();ctx.beginPath();ctx.arc(cx,cy, r-18,0,Math.PI*2);ctx.clip();const sc=Math.max((r-18)*2/logo.width,(r-18)*2/logo.height);const iw=logo.width*sc,ih=logo.height*sc;ctx.drawImage(logo,cx-iw/2,cy-ih/2,iw,ih);ctx.restore();
+ // Corona estilizada
+ ctx.fillStyle=gold;ctx.beginPath();ctx.moveTo(cx-39,cy-r+12);ctx.lineTo(cx-31,cy-r-10);ctx.lineTo(cx-12,cy-r+3);ctx.lineTo(cx,cy-r-19);ctx.lineTo(cx+13,cy-r+3);ctx.lineTo(cx+31,cy-r-10);ctx.lineTo(cx+40,cy-r+12);ctx.closePath();ctx.fill();
+ ctx.fillStyle="#09090b";ctx.font="bold 26px Georgia,serif";ctx.textAlign="center";ctx.fillText("LQDD",cx,cy+r+27);
+ // Cruz dorada bajo el emblema
+ ctx.strokeStyle="#ffdf8a";ctx.lineWidth=6;ctx.beginPath();ctx.moveTo(cx,cy+r+35);ctx.lineTo(cx,cy+r+68);ctx.moveTo(cx-12,cy+r+46);ctx.lineTo(cx+12,cy+r+46);ctx.stroke();
+ ctx.textAlign="left";ctx.fillStyle=gold;ctx.font="bold 40px Georgia,serif";ctx.fillText("MI ANIMAL",330,105);ctx.fillText("INTERIOR",330,151);
+ ctx.fillStyle="#d7bd78";ctx.font="bold 23px Arial,sans-serif";ctx.fillText("LQDD · TU VERDADERO YO",333,193);
+ ctx.strokeStyle="#e7bd57";ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(330,215);ctx.lineTo(1000,215);ctx.stroke();
+ const x=205,y=255,w=670,h=455;
  const img=new Image();img.src=new URL(p.img,location.href).href;img.crossOrigin="anonymous";
  await new Promise((resolve,reject)=>{img.onload=resolve;img.onerror=reject});
- const x=210,y=260,w=660,h=470;ctx.save();ctx.beginPath();ctx.roundRect(x,y,w,h,28);ctx.clip();
- const scale=Math.max(w/img.width,h/img.height),iw=img.width*scale,ih=img.height*scale;ctx.drawImage(img,x+(w-iw)/2,y+(h-ih)/2,iw,ih);ctx.restore();
+ ctx.save();ctx.beginPath();ctx.roundRect(x,y,w,h,28);ctx.clip();const scale=Math.max(w/img.width,h/img.height),iw=img.width*scale,ih=img.height*scale;ctx.drawImage(img,x+(w-iw)/2,y+(h-ih)/2,iw,ih);ctx.restore();
  ctx.strokeStyle="#e7bd57";ctx.lineWidth=5;ctx.beginPath();ctx.roundRect(x,y,w,h,28);ctx.stroke();
- ctx.fillStyle=gold;ctx.font="bold 57px Georgia,serif";ctx.fillText(p.title,540,800);
- ctx.fillStyle="#ffdf8a";ctx.font="italic 31px Georgia,serif";wrapCardText(ctx,p.line||"Descubre tu lado más auténtico.",540,860,850,45);
- ctx.fillStyle="#e5ddcb";ctx.font="28px Arial,sans-serif";wrapCardText(ctx,p.text||"",540,990,820,43,3);
- ctx.strokeStyle="#80652e";ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(190,1150);ctx.lineTo(890,1150);ctx.stroke();
- ctx.fillStyle="#ffdf8a";ctx.font="bold 30px Arial,sans-serif";ctx.fillText("¿QUÉ ANIMAL ERES TÚ?",540,1205);
- ctx.fillStyle="#c8bda5";ctx.font="24px Arial,sans-serif";ctx.fillText("Haz el test y reta a tus amigos",540,1250);
- ctx.fillStyle="#9d8a5e";ctx.font="19px Arial,sans-serif";ctx.fillText(location.origin+location.pathname,540,1290);
+ ctx.textAlign="center";ctx.fillStyle=gold;ctx.font="bold 53px Georgia,serif";ctx.fillText(p.title,540,775);
+ ctx.fillStyle="#ffdf8a";ctx.font="italic 29px Georgia,serif";wrapCardText(ctx,p.line||"Descubre tu lado más auténtico.",540,824,850,40);
+ ctx.fillStyle="#e5ddcb";ctx.font="25px Arial,sans-serif";wrapCardText(ctx,p.text||"",540,930,820,38,3);
+ ctx.strokeStyle="#80652e";ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(190,1080);ctx.lineTo(890,1080);ctx.stroke();
+ ctx.fillStyle="#ffdf8a";ctx.font="bold 29px Arial,sans-serif";ctx.fillText("¿QUÉ ANIMAL ERES TÚ?",540,1130);
+ ctx.fillStyle="#e5ddcb";ctx.font="24px Arial,sans-serif";ctx.fillText("Comparte tu resultado y reta a tus amigos",540,1172);
+ ctx.fillStyle="#9d8a5e";ctx.font="20px Arial,sans-serif";ctx.fillText("Haz el test en LQDD · Tu Verdadero Yo",540,1220);
+ ctx.fillStyle="#ffdf8a";ctx.font="bold 23px Georgia,serif";ctx.fillText("PORQUE JUNTOS HACEMOS HISTORIA",540,1270);
  return await new Promise((resolve,reject)=>canvas.toBlob(b=>b?resolve(b):reject(new Error("No se pudo crear la tarjeta")),"image/png"));
 }
 function wrapCardText(ctx,text,x,y,maxWidth,lineHeight,maxLines=2){
