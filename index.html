@@ -536,6 +536,27 @@ html{scroll-behavior:smooth;scroll-padding-top:12px}
 /* Eliminación definitiva del botón y texto de escucha de sonido */
 #meaningOverlay #meaningSound,
 #meaningOverlay #meaningSoundStatus{display:none!important;visibility:hidden!important;width:0!important;height:0!important;min-width:0!important;padding:0!important;margin:0!important;border:0!important}
+
+/* LQDD: recuperar los halos de color animados propios de cada vídeo animal */
+.meaning-card video#meaningVideo:not(.hidden){transition:filter .45s ease,box-shadow .45s ease,border-color .45s ease;animation-duration:3.2s;animation-timing-function:ease-in-out;animation-iteration-count:infinite;animation-direction:alternate}
+.meaning-card.animal-leader video#meaningVideo:not(.hidden){border-color:#ffdf8a!important;box-shadow:0 0 0 4px #ffdf8a20,0 0 26px #ffdf8a88,0 0 48px #ffb52e55!important;animation-name:videoGlowGold}
+.meaning-card.animal-strategist video#meaningVideo:not(.hidden){border-color:#c5a0ff!important;box-shadow:0 0 0 4px #c5a0ff20,0 0 26px #c5a0ff88,0 0 48px #8064ff55!important;animation-name:videoGlowViolet}
+.meaning-card.animal-guardian video#meaningVideo:not(.hidden){border-color:#ffad5c!important;box-shadow:0 0 0 4px #ffad5c20,0 0 26px #ffad5c88,0 0 48px #d65b2655!important;animation-name:videoGlowAmber}
+.meaning-card.animal-creator video#meaningVideo:not(.hidden){border-color:#ff8c45!important;box-shadow:0 0 0 4px #ff8c4520,0 0 26px #ff8c4588,0 0 48px #ffcf4d55!important;animation-name:videoGlowOrange}
+.meaning-card.animal-visionary video#meaningVideo:not(.hidden){border-color:#8fe6ff!important;box-shadow:0 0 0 4px #8fe6ff20,0 0 26px #8fe6ff88,0 0 48px #458bff55!important;animation-name:videoGlowSky}
+.meaning-card.animal-protector video#meaningVideo:not(.hidden){border-color:#fff0a5!important;box-shadow:0 0 0 4px #fff0a520,0 0 28px #fff0a5aa,0 0 52px #ffb52e77!important;animation-name:videoGlowSupreme}
+.meaning-card.animal-inventor video#meaningVideo:not(.hidden){border-color:#d8bdff!important;box-shadow:0 0 0 4px #d8bdff20,0 0 26px #d8bdff88,0 0 48px #875dff66!important;animation-name:videoGlowRaven}
+.meaning-card.animal-freeSpirit video#meaningVideo:not(.hidden){border-color:#8cf4ed!important;box-shadow:0 0 0 4px #8cf4ed20,0 0 26px #8cf4ed88,0 0 48px #3aacee66!important;animation-name:videoGlowAqua}
+@keyframes videoGlowGold{from{filter:brightness(1) saturate(1.05);box-shadow:0 0 15px #ffdf8a55}to{filter:brightness(1.14) saturate(1.2);box-shadow:0 0 34px #ffdf8aaa,0 0 56px #ffb52e66}}
+@keyframes videoGlowViolet{from{filter:brightness(1) saturate(1.05);box-shadow:0 0 15px #c5a0ff55}to{filter:brightness(1.13) saturate(1.25);box-shadow:0 0 34px #c5a0ffaa,0 0 56px #8064ff77}}
+@keyframes videoGlowAmber{from{filter:brightness(1) saturate(1.05)}to{filter:brightness(1.13) saturate(1.25)}}
+@keyframes videoGlowOrange{from{filter:brightness(1) saturate(1.05)}to{filter:brightness(1.15) saturate(1.3)}}
+@keyframes videoGlowSky{from{filter:brightness(1) saturate(1.05)}to{filter:brightness(1.15) saturate(1.25)}}
+@keyframes videoGlowSupreme{from{filter:brightness(1.02) saturate(1.08)}to{filter:brightness(1.22) saturate(1.28)}}
+@keyframes videoGlowRaven{from{filter:brightness(1) saturate(1.05)}to{filter:brightness(1.15) saturate(1.3)}}
+@keyframes videoGlowAqua{from{filter:brightness(1) saturate(1.05)}to{filter:brightness(1.14) saturate(1.25)}}
+@media(prefers-reduced-motion:reduce){.meaning-card video#meaningVideo:not(.hidden){animation:none!important}}
+
 </style></head><body><main><header><img class="brand-logo" src="logo-lqdd.png" alt="Logotipo oficial LQDD con lobo, corona, laureles y cruz"><div class="kicker">Autoconocimiento · LQDD</div><h1>Tu Verdadero Yo Animal</h1><p class="subtitle">¿Eres un Lobo que lidera, un Búho que calcula o un Zorro que encuentra caminos? Responde y descubre el animal que representa tu forma de ser.</p></header>
 <div class="stats"><div class="pill">🔥 Racha: <strong id="streak">0 días</strong></div><div class="pill">🏆 Colección: <strong id="collectionCount">0 de 8</strong></div></div>
 <section class="panel level-panel" aria-label="Progreso de nivel">
