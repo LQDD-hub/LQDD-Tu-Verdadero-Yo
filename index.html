@@ -651,7 +651,9 @@ const secretPairs={"leader|strategist":"visionary","guardian|leader":"protector"
 const ids=Object.keys(profiles),$=id=>document.getElementById(id),key="lqdd_tvy_v2";
 const challengeAnimal=(()=>{try{const id=new URLSearchParams(location.search).get("compat");return profiles[id]?id:null}catch(e){return null}})();
 const challengePercent=(()=>{try{const raw=new URLSearchParams(location.search).get("pct");if(raw===null)return 50;const n=Number(raw);return Number.isFinite(n)&&n>=0&&n<=100?Math.round(n):50}catch(e){return 0}})();
-function duelPercent(id,rawScore,total){return Math.max(0,Math.min(100,Math.round(100*(Number(rawScore)||0)/(Number(total)||1))))}
+const animalPercentages={strategist:66,creator:68,inventor:70,freeSpirit:72,leader:82,guardian:86,visionary:90,protector:99};
+function animalPercent(id){return animalPercentages[id]??50}
+function duelPercent(id,rawScore,total){return animalPercent(id)}
 
 function setupDuelInvite(){
  const invite=$("duelInvite");if(!challengeAnimal||!invite)return;
@@ -811,14 +813,14 @@ const duelSkillBases={
 };
 function openAnimalDuel(mineId,friendId,minePct,friendPct){
  const mine=profiles[mineId],friend=profiles[friendId];if(!mine||!friend)return;
- const mineWins=minePct>friendPct,friendWins=friendPct>minePct;
+ const tierRank=id=>id==="protector"?3:profiles[id]&&profiles[id].secret?2:1;const mineRank=tierRank(mineId),friendRank=tierRank(friendId);const mineWins=mineRank!==friendRank?mineRank>friendRank:minePct>friendPct,friendWins=mineRank!==friendRank?friendRank>mineRank:friendPct>minePct;
  const setCard=(side,pct,p,isWinner)=>{
   const card=$("duel"+side),img=$( "duel"+side+"Img"),name=$("duel"+side+"Name"),percent=$("duel"+side+"Percent"),bar=$("duel"+side+"Bar");
   img.src=p.img;img.alt=p.title;name.textContent=p.title;percent.textContent=pct+"%";bar.style.width=pct+"%";card.classList.toggle("is-winner",isWinner);card.querySelector(".duel-winner").classList.toggle("hidden",!isWinner);
  };
  setCard("Mine",minePct,mine,mineWins);setCard("Friend",friendPct,friend,friendWins);
  const verdict=$("duelVerdict");
- if(minePct===friendPct){$("duelTitle").textContent="¡Duelo igualado!";verdict.textContent="🤝 ¡EMPATE! "+mine.title+" y "+friend.title+" quedan igualados."}
+ if(mineRank===friendRank&&minePct===friendPct){$("duelTitle").textContent="¡Duelo igualado!";verdict.textContent="🤝 ¡EMPATE! "+mine.title+" y "+friend.title+" quedan igualados."}
  else if(mineWins){$("duelTitle").textContent="¡Tenemos ganador!";verdict.textContent="🏆 ¡GANA "+mine.title.toLocaleUpperCase("es-ES")+"!"; }
  else{$("duelTitle").textContent="¡Tenemos ganador!";verdict.textContent="🏆 ¡GANA "+friend.title.toLocaleUpperCase("es-ES")+"!";}
  $("duelSubtitle").textContent=mine.title+" vs. "+friend.title;
@@ -843,8 +845,8 @@ $("duelClose").addEventListener("click",closeAnimalDuel);$("duelOk").addEventLis
 $("duelOverlay").addEventListener("click",e=>{if(e.target===$("duelOverlay"))closeAnimalDuel()});
 function finish(){let ranked=Object.keys(score).sort((a,b)=>score[b]-score[a]),a=ranked[0],b=ranked[1],winner=a;let pair=[a,b].sort().join("|");if(pair==="guardian|leader"&&score[a]===score[b])winner="protector";else if(score[a]-score[b]<=1&&secretPairs[pair])winner=secretPairs[pair];else{const balance=getAnimalStats();let close=ranked.filter(id=>score[a]-score[id]<=2);if(close.length>1){const recent=(()=>{try{const h=JSON.parse(localStorage.getItem(dailyHistoryKey)||"[]");return h.length?h[h.length-1].winner:null}catch(e){return null}})();if(recent&&close.includes(recent)&&close.some(id=>id!==recent))close=close.filter(id=>id!==recent);close.sort((x,y)=>(Number(balance.wins[x])||0)-(Number(balance.wins[y])||0));const least=Number(balance.wins[close[0]])||0;const options=close.filter(id=>(Number(balance.wins[id])||0)===least);winner=options[Math.floor(Math.random()*options.length)]}}last=winner;applyResultRarity(winner);let cumulativeStats=getAnimalStats();cumulativeStats.games=(Number(cumulativeStats.games)||0)+1;cumulativeStats.points[winner]=(Number(cumulativeStats.points[winner])||0)+pointsForAnimal(winner);cumulativeStats.wins[winner]=(Number(cumulativeStats.wins[winner])||0)+1;saveAnimalStats(cumulativeStats);try{const day=todayKey(),count=Math.min(dailyLimit,playsToday()+1),game={date:day,number:count,winner:winner,pointsAwarded:pointsForAnimal(winner),answers:chosen.slice(),time:new Date().toLocaleTimeString("es-ES",{hour:"2-digit",minute:"2-digit"})};let history=JSON.parse(localStorage.getItem(dailyHistoryKey)||"[]");if(!Array.isArray(history))history=[];history=history.filter(g=>g&&g.date===day);history.push(game);localStorage.setItem(dailyHistoryKey,JSON.stringify(history.slice(-dailyLimit)));localStorage.setItem(dailyPlayKey,day);localStorage.setItem(dailyCountKey,JSON.stringify({date:day,count:count}));localStorage.setItem(dailyResultKey,JSON.stringify({date:day,winner:winner,plays:count,limit:dailyLimit,pointsAwarded:game.pointsAwarded,answers:game.answers,number:count}))}catch(e){}let p=profiles[winner],d=getData(),fresh=!d.unlocked.includes(winner);if(fresh)d.unlocked.push(winner);streak();putData(d);paint();$("quiz").classList.add("hidden");$("result").classList.remove("hidden");currentMusicPhase=winner==="protector"?"supreme":chooseNormalMusic();musicEnabled=true;updateMusicButton();setMusicPhase(currentMusicPhase);$("result").classList.remove("reveal-active");void $("result").offsetWidth;$("result").classList.add("reveal-active");setTimeout(()=>$("result").classList.remove("reveal-active"),3200);$("symbol").classList.add("hidden");const rv=$("resultVideo");rv.pause();rv.removeAttribute("src");rv.classList.remove("hidden");rv.onerror=()=>{rv.classList.add("hidden")};rv.loop=false;rv.muted=false;rv.defaultMuted=false;rv.currentTime=0;rv.src=animalVideos[winner];rv.load();rv.play().catch(()=>{});setRarityBadge(winner,fresh);$("resultTitle").textContent=p.title;const resultPoints=$("resultPoints");if(resultPoints)resultPoints.remove();$("shareLine").textContent=p.line||"Descubre tu lado más auténtico.";$("resultText").textContent=p.text;$("strengths").replaceChildren(...(p.strengths||[]).map(s=>{let li=document.createElement("li");li.textContent=s;return li}));$("second").textContent="";$("bars").replaceChildren();const ownRow=document.createElement("div");ownRow.className="row discovered-result-row";ownRow.innerHTML="<span></span><div class='bar'><i></i></div><b></b>";const affinity=affinityPercent(winner,score[winner]??score[a]??0,qs.length);ownRow.children[0].textContent="Afinidad";ownRow.children[1].firstChild.style.width=affinity+"%";ownRow.children[2].textContent=affinity+" %";$("bars").append(ownRow);$("collectionMessage").textContent=fresh?"¡Nuevo perfil añadido a tu colección!":"Ya lo habías descubierto. Prueba otra combinación.";if(challengeAnimal&&profiles[challengeAnimal]){
  const mine=profiles[winner],theirs=profiles[challengeAnimal];
- const minePct=duelPercent(winner,score[winner]??0,qs.length);
- const friendPct=challengePercent;
+ const minePct=animalPercent(winner);
+ const friendPct=animalPercent(challengeAnimal);
  const same=challengeAnimal===winner;
  const verdict=minePct===friendPct?"¡EMPATE! Los dos habéis quedado igualados.":minePct>friendPct?"¡GANAS TÚ!":"¡GANA TU AMIGO!";
  $("compatibility").textContent=(same?"¡Mismo animal! ":"Duelo de animales: ")+verdict+" "+mine.title+" ("+minePct+"%) frente a "+theirs.title+" ("+friendPct+"%).";
@@ -902,7 +904,7 @@ function wrapCardText(ctx,text,x,y,maxWidth,lineHeight,maxLines=2){
 $("share").onclick=async()=>{
  stopResultMusic();
  if(!last)return;
- const p=profiles[last],u=new URL(location.href);u.search="";u.searchParams.set("compat",last);u.searchParams.set("pct",String(duelPercent(last,score[last]??0,qs.length)));
+ const p=profiles[last],u=new URL(location.href);u.search="";u.searchParams.set("compat",last);u.searchParams.set("pct",String(animalPercent(last)));
  const msg="⚔️ ¡TE RETO A UN DUELO LQDD! Mi animal es "+p.title+" "+p.symbol+". Abre el enlace, completa tu test y pulsa «Ver resultado del duelo» para comparar las dos cartas, cinco habilidades y descubrir quién gana. ";
  const btn=$("share"),old=btn.textContent;btn.disabled=true;btn.textContent="Preparando tarjeta…";
  try{
