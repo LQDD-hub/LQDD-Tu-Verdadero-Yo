@@ -499,6 +499,23 @@ html{scroll-behavior:smooth;scroll-padding-top:12px}
 @keyframes supremeBurst{0%{opacity:0;transform:scale(.3) rotate(-35deg)}18%{opacity:1}100%{opacity:0;transform:scale(1.3) rotate(25deg)}}
 @keyframes shareCardTap{0%{transform:scale(1)}45%{transform:scale(.96);filter:brightness(1.4)}100%{transform:scale(1);filter:brightness(1)}}
 @media(prefers-reduced-motion:reduce){#result.rarity-normal.reveal-active,#result.rarity-secret.reveal-active,#result.rarity-supreme.reveal-active,.meaning-card.rarity-normal,.meaning-card.rarity-secret,.meaning-card.rarity-supreme,#meaningOverlay .meaning-card.rarity-secret:after,#meaningOverlay .meaning-card.rarity-supreme:after,#share:active{animation:none!important}}
+
+/* Colores de rareza también en la tarjeta ampliada: cada perfil conserva su identidad */
+.meaning-card.rarity-normal{border-color:#78d9a4;background:radial-gradient(ellipse at 50% 0,#163b2b,#171719 58%,#101012);box-shadow:0 0 0 1px #78d9a433,0 0 28px #78d9a422,0 25px 90px #000c}
+.meaning-card.rarity-normal:before{border-color:#78d9a455}
+.meaning-card.rarity-normal img{border-color:#78d9a4;box-shadow:0 0 24px #78d9a433}
+.meaning-card.rarity-normal.meaning-reveal:before{border-color:#a5f3ca;box-shadow:inset 0 0 32px #78d9a422,0 0 28px #78d9a455}
+.meaning-card.rarity-secret{border-color:#c5a0ff;background:radial-gradient(ellipse at 50% 0,#302047,#171719 58%,#101012);box-shadow:0 0 0 1px #c5a0ff44,0 0 34px #c5a0ff33,0 25px 90px #000c}
+.meaning-card.rarity-secret:before{border-color:#c5a0ff66}
+.meaning-card.rarity-secret img{border-color:#c5a0ff;box-shadow:0 0 28px #c5a0ff55}
+.meaning-card.rarity-secret.meaning-reveal:before{border-color:#e2caff;box-shadow:inset 0 0 35px #c5a0ff33,0 0 30px #c5a0ff88}
+.meaning-card.rarity-supreme{border-color:#fff0a5;background:radial-gradient(ellipse at 50% 0,#604315,#211a12 58%,#101012);box-shadow:0 0 0 2px #ffdf8a55,0 0 35px #ffdf8a66,0 0 70px #b8792266,0 25px 90px #000c}
+.meaning-card.rarity-supreme:before{border:2px solid #fff0a5;box-shadow:inset 0 0 35px #ffdf8a33,0 0 24px #ffdf8a66}
+.meaning-card.rarity-supreme img{border-color:#fff0a5;box-shadow:0 0 32px #ffdf8a66}
+.meaning-card.rarity-supreme.meaning-reveal:before{border-color:#fff8d2;box-shadow:inset 0 0 40px #ffdf8a44,0 0 38px #ffdf8aaa}
+.meaning-card.rarity-normal .meaning-quote{color:#a5f3ca}
+.meaning-card.rarity-secret .meaning-quote{color:#d8bdff}
+.meaning-card.rarity-supreme .meaning-quote{color:#ffdf8a}
 </style></head><body><main><header><img class="brand-logo" src="logo-lqdd.png" alt="Logotipo oficial LQDD con lobo, corona, laureles y cruz"><div class="kicker">Autoconocimiento · LQDD</div><h1>Tu Verdadero Yo Animal</h1><p class="subtitle">¿Eres un Lobo que lidera, un Búho que calcula o un Zorro que encuentra caminos? Responde y descubre el animal que representa tu forma de ser.</p></header>
 <div class="stats"><div class="pill">🔥 Racha: <strong id="streak">0 días</strong></div><div class="pill">🏆 Colección: <strong id="collectionCount">0 de 8</strong></div></div>
 <section class="panel level-panel" aria-label="Progreso de nivel">
