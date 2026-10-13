@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#09090b">
+<title>LQDD · Test jugable</title>
+<style>
+:root{color-scheme:dark;--gold:#ffdf8a;--line:#5b4925}*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(ellipse at top,#403018,#09090b 58%);color:#f7f3e9;font-family:system-ui,sans-serif}
+main{max-width:720px;margin:auto;padding:22px 16px 48px}
+header{text-align:center;padding:16px 8px 24px}.kicker{letter-spacing:.16em;color:var(--gold);font-size:.8rem;font-weight:800}
+h1{font: bold clamp(2rem,8vw,3.4rem) Georgia,serif;color:var(--gold);margin:12px 0}
+.panel{border:1px solid var(--line);border-radius:24px;background:linear-gradient(145deg,#1b1b1d,#101012);padding:clamp(20px,5vw,32px);box-shadow:0 20px 60px #0008}
+.top{display:flex;justify-content:space-between;gap:10px;color:#c9c2b3;font-size:.9rem}.track{height:8px;border-radius:9px;background:#302a1d;overflow:hidden;margin:14px 0 26px}.fill{height:100%;width:0;background:linear-gradient(90deg,#bd8c32,var(--gold))}
+h2{font: bold clamp(1.4rem,5vw,2rem) Georgia,serif;line-height:1.25;margin:0 0 22px}
+.answers{display:grid;gap:12px}.answer,.action{font:inherit;cursor:pointer;border-radius:15px;padding:16px;text-align:left;color:#f7f3e9;background:#222224;border:1px solid #514321;width:100%;line-height:1.45}
+.answer:focus,.answer:hover{border-color:var(--gold);background:#302716}.action{margin-top:18px;text-align:center;background:linear-gradient(135deg,#ffdf8a,#d8a83d);color:#18140a;font-weight:800;border:0}
+.note{color:#b9b6ad;font-size:.9rem;line-height:1.6;margin-top:22px}.result{text-align:center}.result h2{color:var(--gold);margin-top:18px}
+.hidden{display:none}
+</style>
+</head>
+<body><main>
+<header><div class="kicker">✦ LQDD · TU VERDADERO YO ANIMAL ✦</div><h1>¿Qué animal eres?</h1><p>Responde con sinceridad. No hay respuestas correctas o incorrectas.</p></header>
+<section class="panel" id="quiz">
+<div class="top"><span id="counter">Preparando test…</span><span id="percent">0 %</span></div><div class="track"><div class="fill" id="fill"></div></div>
+<h2 id="question">Cargando la primera pregunta…</h2><div class="answers" id="answers"></div>
+<p class="note">Test orientativo de reflexión personal. Las preguntas y las opciones cambian de orden.</p>
+</section>
+<section class="panel result hidden" id="result" aria-live="polite"><div class="kicker">✦ TU RESULTADO LQDD ✦</div><h2 id="resultTitle"></h2><p id="resultText"></p><button class="action" id="again">Volver a jugar</button></section>
+</main>
+<script>
+(function(){
+const questions=[
+["El encargado se guarda comida y nadie se atreve a denunciarlo.",[["Reúno pruebas antes de actuar.","strategist"],["Lo denuncio aunque me perjudique.","leader"],["Me callo por si necesito un favor.","guardian"],["Me uno a otros afectados para reclamar.","creator"]]],
+["Reparten los mejores refugios entre quienes tienen contactos.",[["Busco una solución para los míos.","strategist"],["Reclamo un reparto justo aunque me cueste.","leader"],["Acepto si mi familia sale beneficiada.","guardian"],["Organizo una reclamación colectiva.","creator"]]],
+["Quieren hacer una excepción a la norma solo para sus amigos.",[["Compruebo los requisitos y aplico el mismo criterio.","strategist"],["Exijo reglas justas para todos.","leader"],["Hago la excepción por los míos.","guardian"],["Propongo revisar la norma de forma transparente.","creator"]]],
+["Hay pruebas de que un animal ha robado y quieren culpar a toda su especie.",[["Distingo las pruebas de los rumores.","strategist"],["Exijo que responda solo el responsable.","leader"],["Lo defiendo porque es de los míos.","guardian"],["Pido una investigación justa y reparación del daño.","creator"]]],
+["Una familia vuelve a su madriguera y encuentra dentro a otros que se niegan a salir.",[["Documento lo ocurrido y busco la vía legal.","strategist"],["Exijo una solución rápida y justa.","leader"],["No intervengo si no es mi casa.","guardian"],["Busco apoyo y asesoramiento para evitar una pelea.","creator"]]],
+["Un animal te amenaza y avanza hacia ti. ¿Qué haces?",[["Busco distancia y una salida segura.","strategist"],["Me protejo y uso solo la fuerza necesaria para frenar la amenaza.","leader"],["Ataco primero para darle una lección.","guardian"],["Me pongo a salvo y pido ayuda.","creator"]]],
+["Un refugio rechaza a un animal solo por su especie, aunque cumple las reglas.",[["Compruebo si existe un motivo objetivo.","strategist"],["Reclamo el mismo trato para todos.","leader"],["Apoyo el rechazo si favorece a mi grupo.","guardian"],["Reúno pruebas y presento una reclamación.","creator"]]],
+["La comida escasea y no alcanza para todos.",[["Calculo las reservas y las necesidades.","strategist"],["Defiendo un reparto claro y justo.","leader"],["Guardo primero para mi familia.","guardian"],["Busco recursos y organizo turnos.","creator"]]],
+["Los poderosos incumplen las normas y castigan a los débiles por lo mismo.",[["Reúno pruebas del trato desigual.","strategist"],["Lo denuncio aunque me señalen.","leader"],["Miro hacia otro lado para evitar problemas.","guardian"],["Busco apoyos para una revisión independiente.","creator"]]],
+["Una mayoría toma una decisión que perjudica a una minoría.",[["Busco una alternativa viable y calculo los daños.","strategist"],["Me opongo si vulnera derechos básicos.","leader"],["Acepto para no quedarme solo.","guardian"],["Reúno apoyos para cambiar la decisión.","creator"]]],
+["Una manada rival sufre una inundación, pero ayudar consume tus reservas.",[["Ofrezco ayuda limitada tras calcular el riesgo.","strategist"],["Ayudo si la necesidad es urgente.","leader"],["No ayudo porque antes ellos no ayudaron.","guardian"],["Coordino una ayuda compartida.","creator"]]],
+["Circula una imagen alarmante sobre otra manada y no sabes si es real.",[["Busco el origen antes de usarla.","strategist"],["No la difundo sin pruebas.","leader"],["La comparto si perjudica a mis rivales.","guardian"],["Investigo y explico solo lo verificable.","creator"]]]
+];
+const profiles={
+strategist:["El Búho Estratega","Observas, analizas y reúnes información antes de actuar."],
+leader:["El Lobo Líder","Tomas la iniciativa y defiendes tus principios incluso bajo presión."],
+guardian:["El Oso Guardián","Priorizas la seguridad de los tuyos y evitas riesgos innecesarios."],
+creator:["El Zorro Explorador","Buscas alternativas y soluciones prácticas cuando otros ven un callejón sin salida."]
+};
+const $=id=>document.getElementById(id);let order=[],index=0,score;
+function shuffle(arr){const a=arr.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function start(){index=0;score={strategist:0,leader:0,guardian:0,creator:0};order=shuffle(questions).slice(0,10).map(q=>[q[0],shuffle(q[1])]);$("result").classList.add("hidden");$("quiz").classList.remove("hidden");render()}
+function render(){if(index>=order.length){finish();return}const q=order[index];$("counter").textContent="Pregunta "+(index+1)+" de "+order.length;$("percent").textContent=Math.round(index/order.length*100)+" %";$("fill").style.width=(index/order.length*100)+"%";$("question").textContent=q[0];const list=$("answers");list.replaceChildren();q[1].forEach(([label,type])=>{const b=document.createElement("button");b.type="button";b.className="answer";b.textContent=label;b.addEventListener("click",()=>{score[type]++;index++;render()});list.appendChild(b)})}
+function finish(){const winner=Object.keys(score).sort((a,b)=>score[b]-score[a])[0];$("quiz").classList.add("hidden");$("result").classList.remove("hidden");$("resultTitle").textContent=profiles[winner][0];$("resultText").textContent=profiles[winner][1]+" Tus respuestas: "+Object.entries(score).map(([k,v])=>profiles[k][0]+": "+v).join(" · ");$("counter")&&($("counter").textContent="Test completado");}
+$("again").addEventListener("click",start);
+try{start()}catch(e){$("question").textContent="Pulsa para comenzar";$("answers").replaceChildren();const b=document.createElement("button");b.className="answer";b.textContent="Iniciar test";b.onclick=start;$("answers").appendChild(b)}
+})();
+</script></body></html>
