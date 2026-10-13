@@ -571,7 +571,7 @@ html{scroll-behavior:smooth;scroll-padding-top:12px}
  <div class="level-foot"><span id="levelProgressText">0 de 8 animales descubiertos</span><span id="nextLevel">Siguiente: nivel 1</span></div>
  <p class="level-message" id="levelMessage">Descubre animales para subir de nivel. Cada nuevo perfil te acerca al nivel 8.</p>
 </section>
-<section class="music-panel" aria-label="Música ambiental"><button type="button" class="music-toggle" id="musicToggle" aria-pressed="false">Activar música</button></section>
+
 <section class="panel" id="quiz" aria-live="polite"><div class="topline"><span id="counter"></span><span id="percent"></span></div><div class="track"><div class="fill" id="fill" style="width:10%"></div></div><div class="kicker" style="margin-bottom:10px">¿Qué animal eres?</div><h2 id="question">Preparando el test…</h2><div class="answers" id="answers"></div><p class="note">Las preguntas y respuestas cambian de orden entre partidas. Test orientativo de reflexión personal.</p></section>
 <section class="panel result hidden" id="result" aria-live="polite"><div class="kicker">TU RESULTADO LQDD</div><img class="result-symbol" id="symbol" src="oso.png" alt="Animal de tu resultado" width="220" height="220"><div class="gold-animal" id="goldAnimal" aria-label="Símbolo dorado del animal">🐾</div><video class="result-video hidden" id="resultVideo" playsinline autoplay loop preload="metadata" controlslist="nodownload nofullscreen noremoteplayback" disablepictureinpicture disableremoteplayback tabindex="-1" aria-label="Vídeo animado del animal"></video><div id="badge"></div><div id="secretTag" class="kicker hidden">✦ PERFIL SECRETO DESBLOQUEADO ✦</div><h2 id="resultTitle"></h2><div class="result-points" id="resultPoints">0 puntos acumulados</div><p class="tag" id="shareLine"></p><p id="resultText"></p><ul class="strengths" id="strengths"></ul><p class="second" id="second"></p><div class="bars" id="bars"></div><p id="compatibility"></p><p class="muted" id="collectionMessage"></p><div class="actions"><button class="action" id="share">Compartir y retar a un amigo</button><button class="action secondary" id="restart">Otra partida</button></div></section>
 <section class="panel"><div class="topline"><span>🏆 Tu colección</span><span id="collectionSub">Perfiles descubiertos</span></div><div class="collection" id="collection"></div><p class="note">Toca cualquier animal descubierto para abrir su tarjeta y compartirla. Puedes compartir todas las tarjetas que hayas desbloqueado; los perfiles bloqueados se desbloquean al completar tests.</p></section><div class="meaning-overlay hidden" id="meaningOverlay" role="dialog" aria-modal="true" aria-labelledby="meaningTitle"><article class="meaning-card"><button class="meaning-close" id="meaningClose" aria-label="Cerrar tarjeta">×</button><div class="kicker">✦ SIGNIFICADO DE TU ANIMAL ✦</div><div id="meaningRarity" class="rarity-chip tier-normal">● ANIMAL NORMAL</div><img id="meaningImage" src="" alt=""><div class="gold-animal" id="meaningGoldAnimal" aria-label="Símbolo dorado del animal">🐾</div><video class="meaning-video hidden" id="meaningVideo" playsinline autoplay loop preload="auto" controls controlslist="nodownload nofullscreen noremoteplayback" aria-label="Vídeo del animal; usa el control de volumen para escuchar el sonido"></video><h2 id="meaningTitle"></h2><div class="profile-points" id="meaningPoints">0 puntos acumulados</div><p class="meaning-quote" id="meaningQuote"></p><p id="meaningText"></p><div class="actions"><button class="action" id="meaningShare">Compartir esta tarjeta</button><button class="action secondary" id="meaningDone">Cerrar tarjeta</button></div></article></div><footer>© LQDD · Tu Verdadero Yo Animal</footer></main>
@@ -712,10 +712,13 @@ async function shareAnimalProfile(profileId,button){
 }
 $("meaningShare").onclick=()=>{if(currentMeaningId)shareAnimalProfile(currentMeaningId,$("meaningShare"))};
 function closeMeaning(){
+ const mv=$("meaningVideo");
+ if(mv){mv.pause();mv.muted=true;mv.currentTime=0;mv.removeAttribute("src");mv.load();mv.classList.add("hidden");}
+ const rv=$("resultVideo");
+ if(rv){rv.pause();rv.muted=true;rv.currentTime=0;}
  $("meaningOverlay").classList.add("hidden");
- const mv=$("meaningVideo");if(mv){mv.pause();mv.removeAttribute("src");mv.load();}
  document.body.style.overflow="";
- resumeMusicAfterMeaning();
+ musicWasPlayingBeforeMeaning=false;
 }
 $("meaningClose").addEventListener("click",closeMeaning);
 $("meaningDone").addEventListener("click",closeMeaning);
@@ -854,12 +857,7 @@ function resumeMusicAfterMeaning(){
  track.play().catch(()=>{});
  musicWasPlayingBeforeMeaning = false;
 }
-const musicToggle = document.getElementById("musicToggle");
-function updateMusicButton(){
- if(!musicToggle)return;
- musicToggle.textContent = musicEnabled ? "Desactivar música" : "Activar música";
- musicToggle.setAttribute("aria-pressed",String(musicEnabled));
-}
+function updateMusicButton(){}
 function stopResultMusic(){
  Object.values(lqddTracks).forEach(track=>{track.pause();try{track.currentTime=0}catch(e){}});
  musicEnabled=false;
@@ -884,25 +882,7 @@ function setMusicPhase(phase){
  Object.values(lqddTracks).forEach(track => { if(track !== chosenTrack){ track.pause(); track.currentTime = 0; } });
  if(chosenTrack && chosenTrack.paused) chosenTrack.play().catch(()=>{});
 }
-if(musicToggle)musicToggle.addEventListener("click",async()=>{
- if($("result").classList.contains("hidden"))return;
- if(musicEnabled){
-  Object.values(lqddTracks).forEach(track => track.pause());
-  musicEnabled=false;
-  updateMusicButton();
- }else{
-  try{
-   const track = lqddTracks[currentMusicPhase] || lqddTracks.mystery;
-   await track.play();
-   Object.values(lqddTracks).forEach(other => { if(other !== track){other.pause();other.currentTime=0;} });
-   musicEnabled=true;
-   updateMusicButton();
-  }catch(e){
-   musicEnabled=false;
-   updateMusicButton();
-  }
- }
-});
+
 
 try{paint()}catch(initError){console.error("LQDD paint error",initError)}try{start()}catch(initError){console.error("LQDD start error",initError);$("quiz").classList.remove("hidden");$("question").textContent="Error al iniciar el test. Pulsa «Reintentar test»."; $("answers").replaceChildren();$("restart").textContent="Reintentar test";}
 if("serviceWorker" in navigator){window.addEventListener("load",()=>{navigator.serviceWorker.register("./sw.js").catch(()=>{});});}
