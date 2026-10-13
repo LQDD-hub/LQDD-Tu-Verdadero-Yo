@@ -1,4 +1,4 @@
-const CACHE_NAME = "lqdd-tvy-shell-v84";
+const CACHE_NAME = "lqdd-tvy-shell-v85";
 const BASE = "/LQDD-Tu-Verdadero-Yo/";
 const CORE = [BASE, BASE + "index.html", BASE + "manifest.webmanifest", BASE + "logo-lqdd.png", BASE + "audio/misterio/%E7%AD%89%E5%BE%85%E9%BB%8E%E6%98%8E.mp3", BASE + "audio/revelacion/Triumph%20des%20%C3%89toiles.mp3", BASE + "audio/legendaria/L%27Appel%20du%20Roi.mp3", BASE + "audio/Soft%20Piano%20Bloom.mp3"];
 self.addEventListener("install", event => {
