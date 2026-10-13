@@ -903,7 +903,7 @@ function finish(){const winner=correctAnswers<=3?"inventor":correctAnswers<=5?"c
  $("viewDuel").classList.remove("hidden");
  $("viewDuel").onclick=()=>openAnimalDuel(winner,challengeAnimal,minePct,friendPct);
 }else{
- $("compatibility").textContent="Comparte tu resultado para que tus amigos descubran qué animal son.";
+ $("compatibility").textContent="";$("compatibility").style.display="none";
 }
 const resultPanel=$("result");resultPanel.classList.remove("gold-reveal");void resultPanel.offsetWidth;resultPanel.classList.add("gold-reveal");setTimeout(()=>resultPanel.classList.remove("gold-reveal"),2400);setTimeout(()=>resultPanel.scrollIntoView({behavior:"smooth",block:"start"}),80);}
 async function makeShareCard(profileId){
