@@ -429,7 +429,7 @@ async function makeShareCard(profileId){
  ctx.save();ctx.shadowColor="#e7bd57";ctx.shadowBlur=24;ctx.fillStyle="#09090b";ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.fill();ctx.restore();
  ctx.strokeStyle="#e7bd57";ctx.lineWidth=5;ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.stroke();
  ctx.strokeStyle="#bd8c32";ctx.lineWidth=2;ctx.beginPath();ctx.arc(cx,cy,r-11,0,Math.PI*2);ctx.stroke();
- ctx.save();ctx.beginPath();ctx.arc(cx,cy, r-18,0,Math.PI*2);ctx.clip();const sc=Math.max((r-18)*2/logo.width,(r-18)*2/logo.height);const iw=logo.width*sc,ih=logo.height*sc;ctx.drawImage(logo,cx-iw/2,cy-ih/2,iw,ih);ctx.restore();
+ ctx.save();ctx.beginPath();ctx.arc(cx,cy, r-18,0,Math.PI*2);ctx.clip();const sc=Math.max((r-18)*2/logo.width,(r-18)*2/logo.height);const logoW=logo.width*sc,logoH=logo.height*sc;ctx.drawImage(logo,cx-logoW/2,cy-logoH/2,logoW,logoH);ctx.restore();
  // Corona estilizada
  ctx.fillStyle=gold;ctx.beginPath();ctx.moveTo(cx-39,cy-r+12);ctx.lineTo(cx-31,cy-r-10);ctx.lineTo(cx-12,cy-r+3);ctx.lineTo(cx,cy-r-19);ctx.lineTo(cx+13,cy-r+3);ctx.lineTo(cx+31,cy-r-10);ctx.lineTo(cx+40,cy-r+12);ctx.closePath();ctx.fill();
  ctx.fillStyle="#09090b";ctx.font="bold 26px Georgia,serif";ctx.textAlign="center";ctx.fillText("LQDD",cx,cy+r+27);
