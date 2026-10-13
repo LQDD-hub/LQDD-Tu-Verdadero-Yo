@@ -1,6 +1,6 @@
-const CACHE_NAME = "lqdd-tvy-shell-v54";
+const CACHE_NAME = "lqdd-tvy-shell-v56";
 const BASE = "/LQDD-Tu-Verdadero-Yo/";
-const CORE = [BASE, BASE + "index.html", BASE + "manifest.webmanifest", BASE + "logo-lqdd.png"];
+const CORE = [BASE, BASE + "index.html", BASE + "manifest.webmanifest", BASE + "logo-lqdd.png", BASE + "audio/musica-lqdd.mp3"];
 self.addEventListener("install", event => {
   event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(CORE)).then(() => self.skipWaiting()));
 });
