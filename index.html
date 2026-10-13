@@ -649,7 +649,7 @@ const animalVideos={leader:"videos/lobo-aullando.mp4",strategist:"videos/buho-au
 const secretPairs={"leader|strategist":"visionary","guardian|leader":"protector"};
 const ids=Object.keys(profiles),$=id=>document.getElementById(id),key="lqdd_tvy_v2";
 const challengeAnimal=(()=>{try{const id=new URLSearchParams(location.search).get("compat");return profiles[id]?id:null}catch(e){return null}})();
-const challengePercent=(()=>{try{const raw=new URLSearchParams(location.search).get("pct");if(raw===null)return 0;const n=Number(raw);return Number.isFinite(n)&&n>=0&&n<=100?Math.round(n):0}catch(e){return 0}})();
+const challengePercent=(()=>{try{const raw=new URLSearchParams(location.search).get("pct");if(raw===null)return 50;const n=Number(raw);return Number.isFinite(n)&&n>=0&&n<=100?Math.round(n):50}catch(e){return 0}})();
 function duelPercent(id,rawScore,total){return Math.max(0,Math.min(100,Math.round(100*(Number(rawScore)||0)/(Number(total)||1))))}
 
 function getData(){const fallback={unlocked:[],streak:0,lastDay:null};try{const raw=JSON.parse(localStorage.getItem(key)||"null");if(!raw||typeof raw!=="object")return fallback;return{unlocked:Array.isArray(raw.unlocked)?raw.unlocked.filter(id=>Object.prototype.hasOwnProperty.call(profiles,id)):[],streak:Number.isFinite(raw.streak)?raw.streak:0,lastDay:typeof raw.lastDay==="string"?raw.lastDay:null}}catch(e){return fallback}}
