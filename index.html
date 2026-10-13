@@ -847,9 +847,7 @@ function finish(){let ranked=Object.keys(score).sort((a,b)=>score[b]-score[a]),a
  const mine=profiles[winner],theirs=profiles[challengeAnimal];
  const minePct=animalPercent(winner);
  const friendPct=animalPercent(challengeAnimal);
- const same=challengeAnimal===winner;
- const verdict=minePct===friendPct?"¡EMPATE! Los dos habéis quedado igualados.":minePct>friendPct?"¡GANAS TÚ!":"¡GANA TU AMIGO!";
- $("compatibility").textContent=(same?"¡Mismo animal! ":"Duelo de animales: ")+verdict+" "+mine.title+" ("+minePct+"%) frente a "+theirs.title+" ("+friendPct+"%).";
+ $("compatibility").textContent="";
  $("shareLine").textContent="Duelo LQDD: "+mine.title+" contra "+theirs.title;
  $("viewDuel").classList.remove("hidden");
  $("viewDuel").onclick=()=>openAnimalDuel(winner,challengeAnimal,minePct,friendPct);
