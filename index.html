@@ -897,12 +897,12 @@ function showSavedResult(){let saved=null;try{saved=JSON.parse(localStorage.getI
  const pts=document.createElement("strong");pts.style.cssText="color:#ffdf8a;font-size:.78rem";
  const img=document.createElement("img");img.loading="lazy";img.style.cssText="width:38px;height:44px;object-fit:cover;border-radius:6px;border:1px solid #705724;flex-shrink:0";
  if(g.type==="duel"){
-  const a=profiles[g.creator_animal],b=profiles[g.guest_animal];row.setAttribute("aria-label","Ver duelo: retador "+a.title+" contra retado "+b.title);
+  const a=profiles[g.creator_animal],b=profiles[g.guest_animal];row.setAttribute("aria-label","Ver duelo: atacante "+a.title+" contra defensor "+b.title);
   row.style.cssText+=";flex-wrap:wrap";
   row.onclick=()=>openAnimalDuel(g.creator_animal,g.guest_animal,animalPercent(g.creator_animal),animalPercent(g.guest_animal));
   img.remove();
   const duelCards=document.createElement("div");duelCards.style.cssText="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px;width:100%;";
-  [[a,"RETADOR · QUIEN RETA"],[b,"RETADO · QUIEN ACEPTA"]].forEach(([p,role])=>{
+  [[a,"ATACANTE"],[b,"DEFENSOR"]].forEach(([p,role])=>{
    const card=document.createElement("div");card.style.cssText="display:flex;align-items:center;gap:7px;min-width:0;padding:6px;border:1px solid #705724;border-radius:9px;background:linear-gradient(135deg,#211c12,#141416)";
    const animalImg=document.createElement("img");animalImg.src=p.img;animalImg.alt=p.title;animalImg.loading="lazy";animalImg.style.cssText="width:48px;height:56px;object-fit:cover;border-radius:6px;border:1px solid #b28b3b;flex-shrink:0";
    const labels=document.createElement("div");labels.style.cssText="min-width:0;display:flex;flex-direction:column;gap:4px";
@@ -958,8 +958,8 @@ function openAnimalDuel(mineId,friendId,minePct,friendPct){
  const mineRank=animalPercent(mineId),friendRank=animalPercent(friendId);const mineWins=mineRank>friendRank,friendWins=friendRank>mineRank;
  const challengerId=duelCode&&activeDuelRoom?activeDuelRoom.creator_animal:mineId;
  const challengedId=duelCode&&activeDuelRoom?activeDuelRoom.guest_animal:friendId;
- const mineLabel=challengerId===mineId?"RETADOR · QUIEN RETA":"RETADO · QUIEN ACEPTA";
- const friendLabel=challengedId===friendId?"RETADO · QUIEN ACEPTA":"RETADOR · QUIEN RETA";
+ const mineLabel=challengerId===mineId?"ATACANTE":"DEFENSOR";
+ const friendLabel=challengedId===friendId?"DEFENSOR":"ATACANTE";
  const setCard=(side,pct,p,isWinner,role)=>{
   const card=$("duel"+side),img=$( "duel"+side+"Img"),name=$("duel"+side+"Name"),percent=$("duel"+side+"Percent"),bar=$("duel"+side+"Bar");
   img.src=p.img;img.alt=p.title;name.textContent=p.title;percent.textContent=pct+"%";bar.style.width=pct+"%";card.classList.toggle("is-winner",isWinner);card.querySelector(".duel-winner").classList.toggle("hidden",!isWinner);
