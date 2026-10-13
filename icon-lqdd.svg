@@ -1,1 +1,21 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff0ae"/><stop offset=".5" stop-color="#e7bd57"/><stop offset="1" stop-color="#8b5d16"/></linearGradient><radialGradient id="b"><stop stop-color="#302516"/><stop offset="1" stop-color="#09090b"/></radialGradient></defs><rect width="512" height="512" rx="112" fill="url(#b)"/><circle cx="256" cy="256" r="211" fill="none" stroke="url(#g)" stroke-width="12"/><circle cx="256" cy="256" r="190" fill="none" stroke="#e7bd57" stroke-opacity=".4" stroke-width="3"/><path d="M139 154 204 189 256 174 308 189 373 154 356 270 327 328 256 373 185 328 156 270Z" fill="url(#g)" stroke="#fff0ae" stroke-width="5" stroke-linejoin="round"/><path d="M167 218 214 230 201 251 171 247ZM345 218 298 230 311 251 341 247Z" fill="#09090b"/><path d="M230 267 256 252 282 267 256 291Z" fill="#09090b"/><path d="M226 312 256 327 286 312" fill="none" stroke="#09090b" stroke-width="9" stroke-linecap="round"/><path d="M235 120 256 83 277 120 315 125 287 151 294 184 256 166 218 184 225 151 197 125Z" fill="url(#g)" stroke="#fff0ae" stroke-width="4" stroke-linejoin="round"/><text x="256" y="432" font-family="Georgia,serif" font-size="56" font-weight="bold" text-anchor="middle" fill="url(#g)">LQDD</text></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+<defs><linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff4c8"/><stop offset=".45" stop-color="#f1c65d"/><stop offset="1" stop-color="#9a6517"/></linearGradient><radialGradient id="bg"><stop stop-color="#302516"/><stop offset="1" stop-color="#070708"/></radialGradient></defs>
+<rect width="512" height="512" rx="100" fill="url(#bg)"/>
+<circle cx="256" cy="250" r="218" fill="none" stroke="url(#gold)" stroke-width="9"/><circle cx="256" cy="250" r="202" fill="none" stroke="#e7bd57" stroke-opacity=".35" stroke-width="2"/>
+<!-- Laurel branches -->
+<g fill="url(#gold)" stroke="#9a6517" stroke-width="1.5">
+<path d="M100 360 Q55 270 104 170 Q78 267 121 338Z"/><path d="M104 316 Q63 306 63 278 Q94 284 104 316Z"/><path d="M91 278 Q51 263 57 236 Q85 248 91 278Z"/><path d="M89 239 Q59 213 72 190 Q96 211 89 239Z"/><path d="M101 205 Q82 173 103 154 Q119 180 101 205Z"/>
+<path d="M412 360 Q457 270 408 170 Q434 267 391 338Z"/><path d="M408 316 Q449 306 449 278 Q418 284 408 316Z"/><path d="M421 278 Q461 263 455 236 Q427 248 421 278Z"/><path d="M423 239 Q453 213 440 190 Q416 211 423 239Z"/><path d="M411 205 Q430 173 409 154 Q393 180 411 205Z"/>
+</g>
+<!-- Crown -->
+<path d="M193 104 L178 65 L215 85 L256 42 L297 85 L334 65 L319 104Z" fill="url(#gold)" stroke="#fff0ae" stroke-width="4" stroke-linejoin="round"/><path d="M193 104 H319 L309 125 H203Z" fill="url(#gold)" stroke="#9a6517" stroke-width="3"/><circle cx="178" cy="65" r="6" fill="#fff2bd"/><circle cx="256" cy="42" r="7" fill="#fff2bd"/><circle cx="334" cy="65" r="6" fill="#fff2bd"/>
+<!-- Wolf head -->
+<path d="M155 144 L205 168 L256 151 L307 168 L357 144 L346 245 L322 307 L256 354 L190 307 L166 245Z" fill="url(#gold)" stroke="#fff0ae" stroke-width="5" stroke-linejoin="round"/>
+<path d="M177 178 L211 197 L204 225 L178 219Z M335 178 L301 197 L308 225 L334 219Z" fill="#09090b"/>
+<path d="M209 224 L239 214 L229 243 L207 247Z M303 224 L273 214 L283 243 L305 247Z" fill="#fff0ae" opacity=".8"/>
+<path d="M213 264 L246 248 L256 260 L266 248 L299 264 L284 292 L256 307 L228 292Z" fill="#09090b"/><path d="M241 283 L256 290 L271 283" fill="none" stroke="#e7bd57" stroke-width="4" stroke-linecap="round"/>
+<path d="M221 315 L256 329 L291 315" fill="none" stroke="#09090b" stroke-width="7" stroke-linecap="round"/>
+<!-- Cross and wordmark -->
+<path d="M256 356 V405 M237 374 H275" stroke="url(#gold)" stroke-width="9" stroke-linecap="round"/>
+<text x="256" y="458" font-family="Georgia,serif" font-size="48" font-weight="bold" letter-spacing="3" text-anchor="middle" fill="url(#gold)">LQDD</text>
+</svg>
