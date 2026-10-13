@@ -741,8 +741,15 @@ function setupDuelInvite(){
  const inviteId=challengeAnimal||(activeDuelRoom&&activeDuelRoom.creator_animal);
  const p=profiles[inviteId];if(p){$("inviteAnimalImg").src=p.img;$("inviteAnimalImg").alt=p.title;$("inviteAnimalName").textContent=p.title;}
  $("inviteText").textContent=p?"Tu amigo te reta con "+p.title+". Completa el test y el resultado se guardará para que ambos podáis consultar el duelo desde este enlace.":"Tu duelo LQDD está listo. Comparte el enlace con tu amigo.";
- invite.classList.remove("hidden");
- if(duelCode){refreshDuelRoom();if(!roomPollHandle)roomPollHandle=setInterval(()=>{if(document.visibilityState!=="hidden")refreshDuelRoom()},8000);}
+ if(duelCode){
+  invite.classList.add("hidden");
+  $("quiz").classList.remove("hidden");
+  setTimeout(()=> $("quiz").scrollIntoView({behavior:"smooth",block:"start"}),180);
+  refreshDuelRoom();
+  if(!roomPollHandle)roomPollHandle=setInterval(()=>{if(document.visibilityState!=="hidden")refreshDuelRoom()},8000);
+ }else{
+  invite.classList.remove("hidden");
+ }
 }
 function getData(){const fallback={unlocked:[],streak:0,lastDay:null};try{const raw=JSON.parse(localStorage.getItem(key)||"null");if(!raw||typeof raw!=="object")return fallback;return{unlocked:Array.isArray(raw.unlocked)?raw.unlocked.filter(id=>Object.prototype.hasOwnProperty.call(profiles,id)):[],streak:Number.isFinite(raw.streak)?raw.streak:0,lastDay:typeof raw.lastDay==="string"?raw.lastDay:null}}catch(e){return fallback}}
 const animalStatsKey="lqdd_tvy_animal_stats_v1";
