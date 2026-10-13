@@ -701,15 +701,47 @@ const secretPairs={"leader|strategist":"visionary","guardian|leader":"protector"
 const ids=Object.keys(profiles),$=id=>document.getElementById(id),key="lqdd_tvy_v2";
 const challengeAnimal=(()=>{try{const id=new URLSearchParams(location.search).get("compat");return profiles[id]?id:null}catch(e){return null}})();
 const challengePercent=(()=>{try{const raw=new URLSearchParams(location.search).get("pct");if(raw===null)return 50;const n=Number(raw);return Number.isFinite(n)&&n>=0&&n<=100?Math.round(n):50}catch(e){return 0}})();
+let duelCode=(()=>{try{return new URLSearchParams(location.search).get("duel")||null}catch(e){return null}})();
+const DUEL_API_URL="https://ghsbkpetgsfixpjeuroa.supabase.co/functions/v1/duel-room";
+const DUEL_API_KEY="sb_publishable_e7CAiA9eSMcxyh9wDOb78g_SqXQQsqh";
+let activeDuelRoom=null,roomResultShown=false,roomPollHandle=null;
+async function duelRequest(payload){
+ const response=await fetch(DUEL_API_URL,{method:"POST",headers:{"Content-Type":"application/json","apikey":DUEL_API_KEY,"Authorization":"Bearer "+DUEL_API_KEY},body:JSON.stringify(payload),cache:"no-store"});
+ let data={};try{data=await response.json()}catch(e){}
+ if(!response.ok)throw new Error(data.error||"No se pudo conectar con el duelo.");
+ return data.room;
+}
+function showRoomResult(room){
+ if(!room||!room.guest_animal||roomResultShown)return;
+ roomResultShown=true;
+ $("duelInvite").classList.remove("hidden");
+ $("inviteText").textContent="¡Duelo completado! Los dos resultados están guardados. Puedes volver a este enlace para consultar la comparación.";
+ $("quiz").classList.add("hidden");
+ if($("result").classList.contains("hidden"))$("result").classList.add("hidden");
+ openAnimalDuel(room.creator_animal,room.guest_animal,animalPercent(room.creator_animal),animalPercent(room.guest_animal));
+}
+async function refreshDuelRoom(){
+ if(!duelCode)return;
+ try{
+  const room=await duelRequest({action:"get",code:duelCode});
+  activeDuelRoom=room;
+  if(room.guest_animal)showRoomResult(room);
+  else if($("inviteText"))$("inviteText").textContent="Tu amigo te reta con "+(profiles[room.creator_animal]?.title||"su animal")+". Completa el test; al terminar, el resultado se guardará para que ambos podáis consultar el duelo desde este enlace.";
+ }catch(error){
+  if($("inviteText"))$("inviteText").textContent=error.message||"No se ha podido cargar este duelo.";
+ }
+}
 const animalPercentages={inventor:65,creator:68,freeSpirit:70,strategist:72,visionary:82,leader:85,guardian:88,protector:91};
 function animalPercent(id){return animalPercentages[id]??50}
 function duelPercent(id,rawScore,total){return animalPercent(id)}
 
 function setupDuelInvite(){
- const invite=$("duelInvite");if(!challengeAnimal||!invite)return;
- const p=profiles[challengeAnimal];$("inviteAnimalImg").src=p.img;$("inviteAnimalImg").alt=p.title;$("inviteAnimalName").textContent=p.title;
- $("inviteText").textContent="Tu amigo te reta con "+p.title+". Completa el test y pulsa «Ver resultado del duelo» para descubrir quién gana.";
+ const invite=$("duelInvite");if(!invite||(!challengeAnimal&&!duelCode))return;
+ const inviteId=challengeAnimal||(activeDuelRoom&&activeDuelRoom.creator_animal);
+ const p=profiles[inviteId];if(p){$("inviteAnimalImg").src=p.img;$("inviteAnimalImg").alt=p.title;$("inviteAnimalName").textContent=p.title;}
+ $("inviteText").textContent=p?"Tu amigo te reta con "+p.title+". Completa el test y el resultado se guardará para que ambos podáis consultar el duelo desde este enlace.":"Tu duelo LQDD está listo. Comparte el enlace con tu amigo.";
  invite.classList.remove("hidden");
+ if(duelCode){refreshDuelRoom();if(!roomPollHandle)roomPollHandle=setInterval(()=>{if(document.visibilityState!=="hidden")refreshDuelRoom()},8000);}
 }
 function getData(){const fallback={unlocked:[],streak:0,lastDay:null};try{const raw=JSON.parse(localStorage.getItem(key)||"null");if(!raw||typeof raw!=="object")return fallback;return{unlocked:Array.isArray(raw.unlocked)?raw.unlocked.filter(id=>Object.prototype.hasOwnProperty.call(profiles,id)):[],streak:Number.isFinite(raw.streak)?raw.streak:0,lastDay:typeof raw.lastDay==="string"?raw.lastDay:null}}catch(e){return fallback}}
 const animalStatsKey="lqdd_tvy_animal_stats_v1";
@@ -894,7 +926,26 @@ function openAnimalDuel(mineId,friendId,minePct,friendPct){
 function closeAnimalDuel(){$("duelOverlay").classList.add("hidden")}
 $("duelClose").addEventListener("click",closeAnimalDuel);$("duelOk").addEventListener("click",closeAnimalDuel);
 $("duelOverlay").addEventListener("click",e=>{if(e.target===$("duelOverlay"))closeAnimalDuel()});
-function finish(){const winner=correctAnswers<=3?"inventor":correctAnswers<=5?"creator":correctAnswers<=7?"freeSpirit":correctAnswers<=9?"strategist":correctAnswers<=11?"visionary":correctAnswers<=13?"leader":correctAnswers===14?"guardian":"protector";last=winner;applyResultRarity(winner);try{const day=todayKey(),count=Math.min(dailyLimit,playsToday()+1),game={date:day,number:count,winner:winner,correctAnswers:correctAnswers,totalQuestions:qs.length,answers:chosen.slice(),time:new Date().toLocaleTimeString("es-ES",{hour:"2-digit",minute:"2-digit"})};let history=JSON.parse(localStorage.getItem(dailyHistoryKey)||"[]");if(!Array.isArray(history))history=[];history=history.filter(g=>g&&g.date===day);history.push(game);localStorage.setItem(dailyHistoryKey,JSON.stringify(history.slice(-dailyLimit)));localStorage.setItem(dailyPlayKey,day);localStorage.setItem(dailyCountKey,JSON.stringify({date:day,count:count}));localStorage.setItem(dailyResultKey,JSON.stringify({date:day,winner:winner,plays:count,limit:dailyLimit,pointsAwarded:game.pointsAwarded,answers:game.answers,number:count}))}catch(e){}let p=profiles[winner],d=getData(),fresh=!d.unlocked.includes(winner);if(fresh)d.unlocked.push(winner);streak();putData(d);paint();$("quiz").classList.add("hidden");$("result").classList.remove("hidden");currentMusicPhase=winner==="protector"?"supreme":chooseNormalMusic();musicEnabled=true;updateMusicButton();setMusicPhase(currentMusicPhase);$("result").classList.remove("reveal-active");void $("result").offsetWidth;$("result").classList.add("reveal-active");setTimeout(()=>$("result").classList.remove("reveal-active"),3200);$("symbol").classList.add("hidden");const rv=$("resultVideo");rv.pause();rv.removeAttribute("src");rv.classList.remove("hidden");rv.onerror=()=>{rv.classList.add("hidden")};rv.loop=false;rv.muted=false;rv.defaultMuted=false;rv.currentTime=0;rv.src=animalVideos[winner];rv.load();rv.play().catch(()=>{});setRarityBadge(winner,fresh);$("resultTitle").textContent=p.title;const resultPoints=$("resultPoints");if(resultPoints){resultPoints.textContent=correctAnswers+"/"+qs.length;resultPoints.style.display="block";}const correctList=$("correctQuestions");if(correctList)correctList.remove();$("shareLine").textContent="";$("shareLine").classList.add("hidden");$("resultText").textContent=p.text;$("strengths").replaceChildren(...(p.strengths||[]).map(s=>{let li=document.createElement("li");li.textContent=s;return li}));$("second").textContent="";$("bars").replaceChildren();const ownRow=document.createElement("div");ownRow.className="row discovered-result-row";ownRow.innerHTML="<span></span><div class='bar'><i></i></div><b></b>";const affinity=affinityPercent(winner,score[winner]??score[a]??0,qs.length);ownRow.children[0].textContent="Afinidad";ownRow.children[1].firstChild.style.width=affinity+"%";ownRow.children[2].textContent=affinity+" %";$("bars").append(ownRow);$("collectionMessage").textContent=fresh?"¡Nuevo perfil añadido a tu colección!":"Ya lo habías descubierto. Prueba otra combinación.";if(challengeAnimal&&profiles[challengeAnimal]){
+async function finish(){const winner=correctAnswers<=3?"inventor":correctAnswers<=5?"creator":correctAnswers<=7?"freeSpirit":correctAnswers<=9?"strategist":correctAnswers<=11?"visionary":correctAnswers<=13?"leader":correctAnswers===14?"guardian":"protector";last=winner;applyResultRarity(winner);try{const day=todayKey(),count=Math.min(dailyLimit,playsToday()+1),game={date:day,number:count,winner:winner,correctAnswers:correctAnswers,totalQuestions:qs.length,answers:chosen.slice(),time:new Date().toLocaleTimeString("es-ES",{hour:"2-digit",minute:"2-digit"})};let history=JSON.parse(localStorage.getItem(dailyHistoryKey)||"[]");if(!Array.isArray(history))history=[];history=history.filter(g=>g&&g.date===day);history.push(game);localStorage.setItem(dailyHistoryKey,JSON.stringify(history.slice(-dailyLimit)));localStorage.setItem(dailyPlayKey,day);localStorage.setItem(dailyCountKey,JSON.stringify({date:day,count:count}));localStorage.setItem(dailyResultKey,JSON.stringify({date:day,winner:winner,plays:count,limit:dailyLimit,pointsAwarded:game.pointsAwarded,answers:game.answers,number:count}))}catch(e){}let p=profiles[winner],d=getData(),fresh=!d.unlocked.includes(winner);if(fresh)d.unlocked.push(winner);streak();putData(d);paint();$("quiz").classList.add("hidden");$("result").classList.remove("hidden");currentMusicPhase=winner==="protector"?"supreme":chooseNormalMusic();musicEnabled=true;updateMusicButton();setMusicPhase(currentMusicPhase);$("result").classList.remove("reveal-active");void $("result").offsetWidth;$("result").classList.add("reveal-active");setTimeout(()=>$("result").classList.remove("reveal-active"),3200);$("symbol").classList.add("hidden");const rv=$("resultVideo");rv.pause();rv.removeAttribute("src");rv.classList.remove("hidden");rv.onerror=()=>{rv.classList.add("hidden")};rv.loop=false;rv.muted=false;rv.defaultMuted=false;rv.currentTime=0;rv.src=animalVideos[winner];rv.load();rv.play().catch(()=>{});setRarityBadge(winner,fresh);$("resultTitle").textContent=p.title;const resultPoints=$("resultPoints");if(resultPoints){resultPoints.textContent=correctAnswers+"/"+qs.length;resultPoints.style.display="block";}const correctList=$("correctQuestions");if(correctList)correctList.remove();$("shareLine").textContent="";$("shareLine").classList.add("hidden");$("resultText").textContent=p.text;$("strengths").replaceChildren(...(p.strengths||[]).map(s=>{let li=document.createElement("li");li.textContent=s;return li}));$("second").textContent="";$("bars").replaceChildren();const ownRow=document.createElement("div");ownRow.className="row discovered-result-row";ownRow.innerHTML="<span></span><div class='bar'><i></i></div><b></b>";const affinity=affinityPercent(winner,score[winner]??score[a]??0,qs.length);ownRow.children[0].textContent="Afinidad";ownRow.children[1].firstChild.style.width=affinity+"%";ownRow.children[2].textContent=affinity+" %";$("bars").append(ownRow);$("collectionMessage").textContent=fresh?"¡Nuevo perfil añadido a tu colección!":"Ya lo habías descubierto. Prueba otra combinación.";if(duelCode){
+ try{
+  const room=await duelRequest({action:"complete",code:duelCode,guestAnimal:winner});
+  activeDuelRoom=room;
+  $("compatibility").textContent="";
+  $("shareLine").textContent="Duelo LQDD: "+profiles[room.creator_animal].title+" contra "+profiles[room.guest_animal].title;
+  $("shareLine").classList.remove("hidden");
+  $("viewDuel").classList.remove("hidden");
+  $("viewDuel").onclick=()=>openAnimalDuel(room.creator_animal,room.guest_animal,animalPercent(room.creator_animal),animalPercent(room.guest_animal));
+  roomResultShown=true;
+  $("inviteText").textContent="¡Duelo completado! Los dos resultados están guardados. Puedes volver a este enlace para consultar la comparación.";
+  openAnimalDuel(room.creator_animal,room.guest_animal,animalPercent(room.creator_animal),animalPercent(room.guest_animal));
+ }catch(error){
+  $("compatibility").textContent="No se pudo guardar el resultado compartido: "+(error.message||"error de conexión")+". Comprueba tu conexión y vuelve a intentarlo.";
+  if(challengeAnimal&&profiles[challengeAnimal]){
+   $("viewDuel").classList.remove("hidden");
+   $("viewDuel").onclick=()=>openAnimalDuel(winner,challengeAnimal,animalPercent(winner),animalPercent(challengeAnimal));
+  }
+ }
+}else if(challengeAnimal&&profiles[challengeAnimal]){
  const mine=profiles[winner],theirs=profiles[challengeAnimal];
  const minePct=animalPercent(winner);
  const friendPct=animalPercent(challengeAnimal);
@@ -954,9 +1005,16 @@ $("share").onclick=async()=>{
  stopResultMusic();
  if(!last)return;
  const p=profiles[last],u=new URL(location.href);u.search="";u.searchParams.set("compat",last);u.searchParams.set("pct",String(animalPercent(last)));
- const msg="⚔️ ¡TE RETO A UN DUELO LQDD! Mi animal es "+p.title+" "+p.symbol+". Abre el enlace, completa tu test y pulsa «Ver resultado del duelo» para comparar las dos cartas, cinco habilidades y descubrir quién gana. ";
+ const msg="⚔️ ¡TE RETO A UN DUELO LQDD! Mi animal es "+p.title+" "+p.symbol+". Abre el enlace y completa tu test. Cuando termines, los dos podremos volver al mismo enlace para ver las cartas, las cinco habilidades y quién gana. ";
  const btn=$("share"),old=btn.textContent;btn.disabled=true;btn.textContent="Preparando tarjeta…";
+ let roomCreated=false;
  try{
+  const created=await duelRequest({action:"create",creatorAnimal:last});
+  duelCode=created.code;activeDuelRoom=created;
+  u.searchParams.set("duel",created.code);
+  history.replaceState(null,"",u.href);
+  setupDuelInvite();
+  roomCreated=true;
   // Los PNG nuevos ya son tarjetas completas: se comparten tal cual, sin incrustarlas en otra tarjeta.
   const cardUrl=new URL(p.shareImg||p.img,location.href).href;
   const response=await fetch(cardUrl,{cache:"no-store"});
@@ -972,7 +1030,9 @@ $("share").onclick=async()=>{
    btn.textContent="¡Tarjeta completa guardada!";setTimeout(()=>btn.textContent=old,2500);
   }
  }catch(e){
-  if(e&&e.name!=="AbortError"){
+  if(!roomCreated){
+   alert("No se pudo crear la sala de duelo. No se ha compartido un enlace sin sala. Inténtalo de nuevo en unos segundos.");
+  }else if(e&&e.name!=="AbortError"){
    try{await navigator.clipboard.writeText(msg+" "+u.href);btn.textContent="Enlace copiado"}catch(err){prompt("Copia el enlace para retar a un amigo:",u.href)}
    setTimeout(()=>btn.textContent=old,2500);
   }
