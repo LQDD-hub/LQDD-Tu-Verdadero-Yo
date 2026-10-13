@@ -594,8 +594,18 @@ function paint(){let d=getData();const level=Math.min(8,d.unlocked.length),pct=l
 let currentMeaningId=null;
 function openMeaning(id){
  const p=profiles[id];if(!p)return;currentMeaningId=id;
- const mv=$("meaningVideo");if(mv){mv.pause();mv.removeAttribute("src");mv.classList.add("hidden");}
- const image=$("meaningImage");if(image){image.classList.remove("hidden");image.src=p.img;image.alt=p.title;}
+ const mv=$("meaningVideo");
+ const image=$("meaningImage");
+ if(mv){
+  mv.pause();mv.removeAttribute("src");mv.load();mv.classList.add("hidden");
+  const videoPath=animalVideos[id];
+  if(videoPath){
+   mv.src=videoPath;mv.loop=true;mv.muted=true;mv.playsInline=true;mv.classList.remove("hidden");
+   mv.onerror=()=>{mv.pause();mv.classList.add("hidden");if(image){image.classList.remove("hidden");image.src=p.img;image.alt=p.title;}};
+   mv.onloadeddata=()=>{if(image)image.classList.add("hidden");};
+   mv.load();const playPromise=mv.play();if(playPromise&&playPromise.catch)playPromise.catch(()=>{});
+  }else if(image){image.classList.remove("hidden");image.src=p.img;image.alt=p.title;}
+ }else if(image){image.classList.remove("hidden");image.src=p.img;image.alt=p.title;}
  $("meaningTitle").replaceChildren();
  const titleIcon=document.createElement("img");titleIcon.className="meaning-title-animal";titleIcon.src=p.img;titleIcon.alt="";titleIcon.onerror=()=>titleIcon.remove();
  $("meaningTitle").append(titleIcon,document.createTextNode(" "+p.title));
