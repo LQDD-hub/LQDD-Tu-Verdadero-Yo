@@ -897,9 +897,22 @@ function showSavedResult(){let saved=null;try{saved=JSON.parse(localStorage.getI
  const pts=document.createElement("strong");pts.style.cssText="color:#ffdf8a;font-size:.78rem";
  const img=document.createElement("img");img.loading="lazy";img.style.cssText="width:38px;height:44px;object-fit:cover;border-radius:6px;border:1px solid #705724;flex-shrink:0";
  if(g.type==="duel"){
-  const a=profiles[g.creator_animal],b=profiles[g.guest_animal];row.setAttribute("aria-label","Ver duelo entre "+a.title+" y "+b.title);
+  const a=profiles[g.creator_animal],b=profiles[g.guest_animal];row.setAttribute("aria-label","Ver duelo: retador "+a.title+" contra retado "+b.title);
+  row.style.cssText+=";flex-wrap:wrap";
   row.onclick=()=>openAnimalDuel(g.creator_animal,g.guest_animal,animalPercent(g.creator_animal),animalPercent(g.guest_animal));
-  img.src=a.img;img.alt=a.title;title.textContent="⚔️ Duelo · "+a.title+" vs. "+b.title;pts.textContent=(g.date===todayKey()?"Hoy":g.date||"Otro día")+" · Completado · "+(g.time||"");
+  img.remove();
+  const duelCards=document.createElement("div");duelCards.style.cssText="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px;width:100%;";
+  [[a,"RETADOR · QUIEN RETA"],[b,"RETADO · QUIEN ACEPTA"]].forEach(([p,role])=>{
+   const card=document.createElement("div");card.style.cssText="display:flex;align-items:center;gap:7px;min-width:0;padding:6px;border:1px solid #705724;border-radius:9px;background:linear-gradient(135deg,#211c12,#141416)";
+   const animalImg=document.createElement("img");animalImg.src=p.img;animalImg.alt=p.title;animalImg.loading="lazy";animalImg.style.cssText="width:48px;height:56px;object-fit:cover;border-radius:6px;border:1px solid #b28b3b;flex-shrink:0";
+   const labels=document.createElement("div");labels.style.cssText="min-width:0;display:flex;flex-direction:column;gap:4px";
+   const roleText=document.createElement("span");roleText.style.cssText="font-size:.58rem;font-weight:800;letter-spacing:.04em;color:#ffdf8a;line-height:1.2";roleText.textContent=role;
+   const animalName=document.createElement("strong");animalName.style.cssText="font-size:.72rem;line-height:1.2;color:#f5d98d;overflow-wrap:anywhere";animalName.textContent=p.title;
+   labels.append(roleText,animalName);card.append(animalImg,labels);duelCards.append(card);
+  });
+  title.textContent="⚔️ Duelo · "+(g.date===todayKey()?"Hoy":g.date||"Otro día")+" · "+(g.time||"");
+  pts.textContent="Toca para ver la comparación";
+  info.append(title,pts);row.append(duelCards,info);host.append(row);return;
  }else{
   const p=profiles[g.winner];row.setAttribute("aria-label","Abrir tarjeta de "+p.title+" de la partida "+g.number);row.onclick=()=>openShareCard(g.winner);
   img.src=p.img;img.alt=p.title;title.textContent="Partida "+g.number+" · "+p.title+" · "+(Number.isFinite(Number(g.correctAnswers))?g.correctAnswers:"—")+"/"+(Number(g.totalQuestions)||15)+" aciertos";pts.textContent="Resultado: "+p.title;
