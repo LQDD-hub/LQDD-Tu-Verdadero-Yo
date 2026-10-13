@@ -850,6 +850,22 @@ function setMusicPhase(phase){
  Object.values(lqddTracks).forEach(track => { if(track !== chosenTrack){ track.pause(); track.currentTime = 0; } });
  if(chosenTrack && chosenTrack.paused) chosenTrack.play().catch(()=>{});
 }
+/* Arranca automáticamente con la primera interacción del usuario, sin exigir pulsar «Activar música». */
+document.addEventListener("click", async function startMusicOnFirstTap(event){
+ if(event.target && event.target.closest && event.target.closest("#musicToggle")) return;
+ document.removeEventListener("click", startMusicOnFirstTap, true);
+ if(musicEnabled)return;
+ const track = lqddTracks[currentMusicPhase] || lqddTracks.mystery;
+ try{
+  await track.play();
+  Object.values(lqddTracks).forEach(other => { if(other !== track){other.pause();other.currentTime=0;} });
+  musicEnabled=true;
+  updateMusicButton();
+ }catch(e){
+  /* Si el navegador bloquea el audio, el siguiente toque podrá iniciarlo. */
+  document.addEventListener("click", startMusicOnFirstTap, true);
+ }
+}, true);
 if(musicToggle)musicToggle.addEventListener("click",async()=>{
  if(musicEnabled){
   Object.values(lqddTracks).forEach(track => track.pause());
