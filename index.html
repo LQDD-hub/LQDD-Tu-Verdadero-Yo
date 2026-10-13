@@ -567,7 +567,7 @@ html{scroll-behavior:smooth;scroll-padding-top:12px}
 </section>
 <section class="panel" id="quiz" aria-live="polite"><div class="topline"><span id="counter"></span><span id="percent"></span></div><div class="track"><div class="fill" id="fill" style="width:10%"></div></div><div class="kicker" style="margin-bottom:10px">¿Qué animal eres?</div><h2 id="question">Preparando el test…</h2><div class="answers" id="answers"></div><p class="note">Las preguntas y respuestas cambian de orden entre partidas. Test orientativo de reflexión personal.</p></section>
 <section class="panel result hidden" id="result" aria-live="polite"><div class="kicker">TU RESULTADO LQDD</div><img class="result-symbol" id="symbol" src="oso.png" alt="Animal de tu resultado" width="220" height="220"><div class="gold-animal" id="goldAnimal" aria-label="Símbolo dorado del animal">🐾</div><video class="result-video hidden" id="resultVideo" playsinline autoplay loop preload="metadata" controlslist="nodownload nofullscreen noremoteplayback" disablepictureinpicture disableremoteplayback tabindex="-1" aria-label="Vídeo animado del animal"></video><div id="badge"></div><div id="secretTag" class="kicker hidden">✦ PERFIL SECRETO DESBLOQUEADO ✦</div><h2 id="resultTitle"></h2><p class="tag" id="shareLine"></p><p id="resultText"></p><ul class="strengths" id="strengths"></ul><p class="second" id="second"></p><div class="bars" id="bars"></div><p id="compatibility"></p><p class="muted" id="collectionMessage"></p><div class="actions"><button class="action" id="share">Compartir y retar a un amigo</button><button class="action secondary" id="restart">Otra partida</button></div></section>
-<section class="panel"><div class="topline"><span>🏆 Tu colección</span><span id="collectionSub">Perfiles descubiertos</span></div><div class="collection" id="collection"></div><p class="note">Toca cualquiera de los animales descubiertos para abrir una tarjeta con su imagen, frase y significado. Los perfiles bloqueados se desbloquean al completar tests.</p></section><div class="meaning-overlay hidden" id="meaningOverlay" role="dialog" aria-modal="true" aria-labelledby="meaningTitle"><article class="meaning-card"><button class="meaning-close" id="meaningClose" aria-label="Cerrar tarjeta">×</button><div class="kicker">✦ SIGNIFICADO DE TU ANIMAL ✦</div><div id="meaningRarity" class="rarity-chip tier-normal">● ANIMAL NORMAL</div><img id="meaningImage" src="" alt=""><div class="gold-animal" id="meaningGoldAnimal" aria-label="Símbolo dorado del animal">🐾</div><video class="meaning-video hidden" id="meaningVideo" playsinline autoplay loop preload="auto" controls controlslist="nodownload nofullscreen noremoteplayback" aria-label="Vídeo del animal; usa el control de volumen para escuchar el sonido"></video><h2 id="meaningTitle"></h2><p class="meaning-quote" id="meaningQuote"></p><p id="meaningText"></p><div class="actions"><button class="action secondary" id="meaningDone">Cerrar tarjeta</button></div></article></div><footer>© LQDD · Tu Verdadero Yo Animal</footer></main>
+<section class="panel"><div class="topline"><span>🏆 Tu colección</span><span id="collectionSub">Perfiles descubiertos</span></div><div class="collection" id="collection"></div><p class="note">Toca cualquier animal descubierto para abrir su tarjeta y compartirla. Puedes compartir todas las tarjetas que hayas desbloqueado; los perfiles bloqueados se desbloquean al completar tests.</p></section><div class="meaning-overlay hidden" id="meaningOverlay" role="dialog" aria-modal="true" aria-labelledby="meaningTitle"><article class="meaning-card"><button class="meaning-close" id="meaningClose" aria-label="Cerrar tarjeta">×</button><div class="kicker">✦ SIGNIFICADO DE TU ANIMAL ✦</div><div id="meaningRarity" class="rarity-chip tier-normal">● ANIMAL NORMAL</div><img id="meaningImage" src="" alt=""><div class="gold-animal" id="meaningGoldAnimal" aria-label="Símbolo dorado del animal">🐾</div><video class="meaning-video hidden" id="meaningVideo" playsinline autoplay loop preload="auto" controls controlslist="nodownload nofullscreen noremoteplayback" aria-label="Vídeo del animal; usa el control de volumen para escuchar el sonido"></video><h2 id="meaningTitle"></h2><p class="meaning-quote" id="meaningQuote"></p><p id="meaningText"></p><div class="actions"><button class="action" id="meaningShare">Compartir esta tarjeta</button><button class="action secondary" id="meaningDone">Cerrar tarjeta</button></div></article></div><footer>© LQDD · Tu Verdadero Yo Animal</footer></main>
 <script>
 const questions=[
 {q:"En el grupo nadie se decide y se acerca la hora.",a:[["Propongo dos opciones y cerramos el tema.","leader"],["Miro qué encaja mejor para todos.","strategist"],["Reservo sitio para el año que viene, a este paso.","creator"]]},
@@ -671,6 +671,34 @@ function openMeaning(id){
   mv.load();const pp=mv.play();if(pp&&pp.catch)pp.catch(()=>{ /* En móviles el sonido puede requerir una interacción directa. */ });
  }
 }
+async function shareAnimalProfile(profileId,button){
+ const p=profiles[profileId];if(!p)return;
+ const old=button.textContent;button.disabled=true;button.textContent="Preparando tarjeta…";
+ const u=new URL(location.href);u.search="";u.searchParams.set("compat",profileId);
+ const msg="Mi animal en LQDD · Tu Verdadero Yo Animal es "+p.title+" "+p.symbol+". "+(p.line||"¿Qué animal eres tú?")+" Descubre el tuyo.";
+ try{
+  const cardUrl=new URL(p.shareImg||p.img,location.href).href;
+  const response=await fetch(cardUrl,{cache:"no-store"});
+  if(!response.ok)throw new Error("No se pudo cargar la tarjeta");
+  const blob=await response.blob();
+  const file=new File([blob],"LQDD-"+profileId+"-tarjeta.png",{type:blob.type||"image/png"});
+  if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){
+   await navigator.share({title:"LQDD · Tu Verdadero Yo Animal",text:msg+" "+u.href,files:[file]});
+  }else{
+   const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="LQDD-"+profileId+"-tarjeta.png";document.body.appendChild(a);a.click();a.remove();
+   setTimeout(()=>URL.revokeObjectURL(a.href),1500);
+   try{await navigator.clipboard.writeText(msg+" "+u.href)}catch(e){}
+   button.textContent="¡Tarjeta guardada para compartir!";
+   setTimeout(()=>{button.textContent=old},2500);
+  }
+ }catch(e){
+  if(e&&e.name!=="AbortError"){
+   try{await navigator.clipboard.writeText(msg+" "+u.href);button.textContent="Enlace copiado";setTimeout(()=>{button.textContent=old},2500)}
+   catch(err){prompt("Copia el enlace para compartir esta tarjeta:",u.href)}
+  }
+ }finally{button.disabled=false;if(button.textContent==="Preparando tarjeta…")button.textContent=old}
+}
+$("meaningShare").onclick=()=>{if(currentMeaningId)shareAnimalProfile(currentMeaningId,$("meaningShare"))};
 function closeMeaning(){
  $("meaningOverlay").classList.add("hidden");
  const mv=$("meaningVideo");if(mv){mv.pause();mv.removeAttribute("src");mv.load();}
