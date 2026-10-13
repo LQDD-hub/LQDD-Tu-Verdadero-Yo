@@ -653,6 +653,8 @@ function paint(){let d=getData();paintAnimalStats();const level=Math.min(8,d.unl
 let currentMeaningId=null;
 function openMeaning(id){
  const p=profiles[id];if(!p)return;pauseMusicForMeaning();currentMeaningId=id;
+ $("meaningQuote").classList.remove("hidden");$("meaningText").classList.remove("hidden");$("meaningGoldAnimal").classList.remove("hidden");
+ $("meaningImage").style.cssText="";
  const mv=$("meaningVideo"),image=$("meaningImage");
  if(image){image.classList.add("hidden");image.src=p.img;image.alt=p.title;}
  if(mv){
