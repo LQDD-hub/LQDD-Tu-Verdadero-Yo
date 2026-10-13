@@ -415,7 +415,59 @@ audio.addEventListener("playing",()=>{const status=$("meaningSoundStatus");if(st
 audio.load();audio.play().then(()=>{setTimeout(()=>{if(resultAnimalAudio===audio){audio.pause();audio.currentTime=0}},6500)}).catch(()=>{const status=$("meaningSoundStatus");if(status)status.textContent="Toca «Escuchar sonido» para iniciar el audio."});
 }
 function finish(){let ranked=Object.keys(score).sort((a,b)=>score[b]-score[a]),a=ranked[0],b=ranked[1],winner=a;if(score[a]-score[b]<=1){let pair=[a,b].sort().join("|");if(secretPairs[pair])winner=secretPairs[pair]}last=winner;try{localStorage.setItem(dailyPlayKey,todayKey());localStorage.setItem(dailyResultKey,JSON.stringify({date:todayKey(),winner:winner}))}catch(e){}let p=profiles[winner],d=getData(),fresh=!d.unlocked.includes(winner);if(fresh)d.unlocked.push(winner);streak();putData(d);paint();$("quiz").classList.add("hidden");$("result").classList.remove("hidden");$("result").classList.remove("reveal-active");void $("result").offsetWidth;$("result").classList.add("reveal-active");setTimeout(()=>$("result").classList.remove("reveal-active"),3200);$("symbol").classList.add("hidden");const rv=$("resultVideo");rv.pause();rv.removeAttribute("src");rv.classList.remove("hidden");rv.onerror=()=>{rv.classList.add("hidden")};rv.loop=false;rv.currentTime=0;rv.src=animalVideos[winner];rv.load();rv.play().catch(()=>{});$("badge").innerHTML=fresh?'<span class="kicker">★ NUEVO ANIMAL EN TU COLECCIÓN</span>':"";$("resultTitle").textContent=p.title;$("shareLine").textContent=p.line||"Descubre tu lado más auténtico.";$("resultText").textContent=p.text;$("strengths").replaceChildren(...(p.strengths||[]).map(s=>{let li=document.createElement("li");li.textContent=s;return li}));$("second").textContent="";$("bars").replaceChildren();const ownRow=document.createElement("div");ownRow.className="row discovered-result-row";ownRow.innerHTML="<span></span><div class='bar'><i></i></div><b></b>";ownRow.children[0].textContent="Tu animal de hoy";ownRow.children[1].firstChild.style.width=Math.round(score[winner]/qs.length*100)+"%";ownRow.children[2].textContent=Math.round(score[winner]/qs.length*100)+" %";$("bars").append(ownRow);$("secretTag").classList.toggle("hidden",!p.secret);$("collectionMessage").textContent=fresh?"¡Nuevo perfil añadido a tu colección!":"Ya lo habías descubierto. Prueba otra combinación.";$("compatibility").textContent="Comparte tu resultado para que tus amigos descubran qué animal son.";const resultPanel=$("result");resultPanel.classList.remove("gold-reveal");void resultPanel.offsetWidth;resultPanel.classList.add("gold-reveal");setTimeout(()=>resultPanel.classList.remove("gold-reveal"),2400);setTimeout(()=>resultPanel.scrollIntoView({behavior:"smooth",block:"start"}),80);}
-$("share").onclick=async()=>{if(!last)return;let p=profiles[last],u=new URL(location.href);u.search="";u.searchParams.set("compat",last);let msg="Mi animal en LQDD · Tu Verdadero Yo es "+p.title+" "+p.symbol+". "+(p.line||"¿Qué animal eres tú?")+" Haz el test y reta a tus amigos.";if(navigator.share){try{await navigator.share({title:"LQDD · Tu Verdadero Yo",text:msg,url:u.href})}catch(e){}}else{try{await navigator.clipboard.writeText(msg+" "+u.href);$("share").textContent="¡Enlace copiado!";setTimeout(()=>$("share").textContent="Compartir y retar a un amigo",2200)}catch(e){prompt("Copia este enlace para retar a un amigo:",u.href)}}};
+async function makeShareCard(profileId){
+ const p=profiles[profileId];if(!p)throw new Error("Perfil no encontrado");
+ const canvas=document.createElement("canvas");canvas.width=1080;canvas.height=1350;
+ const ctx=canvas.getContext("2d");
+ const bg=ctx.createLinearGradient(0,0,1080,1350);bg.addColorStop(0,"#09090b");bg.addColorStop(.52,"#211a0e");bg.addColorStop(1,"#09090b");ctx.fillStyle=bg;ctx.fillRect(0,0,1080,1350);
+ ctx.strokeStyle="#e7bd57";ctx.lineWidth=3;ctx.strokeRect(30,30,1020,1290);ctx.strokeStyle="#e7bd574d";ctx.lineWidth=1;ctx.strokeRect(48,48,984,1284);
+ const gold=ctx.createLinearGradient(0,70,0,180);gold.addColorStop(0,"#fff2c4");gold.addColorStop(.55,"#ffdf8a");gold.addColorStop(1,"#bd8c32");
+ ctx.textAlign="center";ctx.fillStyle=gold;ctx.font="bold 36px Georgia,serif";ctx.fillText("LQDD",540,105);
+ ctx.fillStyle="#d7bd78";ctx.font="bold 24px Arial,sans-serif";ctx.letterSpacing="5px";ctx.fillText("TU VERDADERO YO",540,150);
+ ctx.fillStyle="#f5e7bd";ctx.font="bold 48px Georgia,serif";ctx.fillText("MI ANIMAL INTERIOR",540,218);
+ const img=new Image();img.src=new URL(p.img,location.href).href;img.crossOrigin="anonymous";
+ await new Promise((resolve,reject)=>{img.onload=resolve;img.onerror=reject});
+ const x=210,y=260,w=660,h=470;ctx.save();ctx.beginPath();ctx.roundRect(x,y,w,h,28);ctx.clip();
+ const scale=Math.max(w/img.width,h/img.height),iw=img.width*scale,ih=img.height*scale;ctx.drawImage(img,x+(w-iw)/2,y+(h-ih)/2,iw,ih);ctx.restore();
+ ctx.strokeStyle="#e7bd57";ctx.lineWidth=5;ctx.beginPath();ctx.roundRect(x,y,w,h,28);ctx.stroke();
+ ctx.fillStyle=gold;ctx.font="bold 57px Georgia,serif";ctx.fillText(p.title,540,800);
+ ctx.fillStyle="#ffdf8a";ctx.font="italic 31px Georgia,serif";wrapCardText(ctx,p.line||"Descubre tu lado más auténtico.",540,860,850,45);
+ ctx.fillStyle="#e5ddcb";ctx.font="28px Arial,sans-serif";wrapCardText(ctx,p.text||"",540,990,820,43,3);
+ ctx.strokeStyle="#80652e";ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(190,1150);ctx.lineTo(890,1150);ctx.stroke();
+ ctx.fillStyle="#ffdf8a";ctx.font="bold 30px Arial,sans-serif";ctx.fillText("¿QUÉ ANIMAL ERES TÚ?",540,1205);
+ ctx.fillStyle="#c8bda5";ctx.font="24px Arial,sans-serif";ctx.fillText("Haz el test y reta a tus amigos",540,1250);
+ ctx.fillStyle="#9d8a5e";ctx.font="19px Arial,sans-serif";ctx.fillText(location.origin+location.pathname,540,1290);
+ return await new Promise((resolve,reject)=>canvas.toBlob(b=>b?resolve(b):reject(new Error("No se pudo crear la tarjeta")),"image/png"));
+}
+function wrapCardText(ctx,text,x,y,maxWidth,lineHeight,maxLines=2){
+ const words=String(text).split(/\s+/);let line="",lines=[];
+ for(const word of words){const test=line?line+" "+word:word;if(ctx.measureText(test).width>maxWidth&&line){lines.push(line);line=word}else line=test}
+ if(line)lines.push(line);if(lines.length>maxLines){lines=lines.slice(0,maxLines);let last=lines[maxLines-1];while(ctx.measureText(last+"…").width>maxWidth&&last.length)last=last.slice(0,-1);lines[maxLines-1]=last+"…"}
+ lines.forEach((l,i)=>ctx.fillText(l,x,y+i*lineHeight));
+}
+$("share").onclick=async()=>{
+ if(!last)return;
+ const p=profiles[last],u=new URL(location.href);u.search="";u.searchParams.set("compat",last);
+ const msg="Mi animal en LQDD · Tu Verdadero Yo es "+p.title+" "+p.symbol+". "+(p.line||"¿Qué animal eres tú?")+" Haz el test y reta a tus amigos.";
+ const btn=$("share"),old=btn.textContent;btn.disabled=true;btn.textContent="Preparando tarjeta…";
+ try{
+  const blob=await makeShareCard(last),file=new File([blob],"LQDD-mi-animal.png",{type:"image/png"});
+  if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){
+   await navigator.share({title:"LQDD · Tu Verdadero Yo",text:msg+" "+u.href,files:[file]});
+  }else if(navigator.share){
+   await navigator.share({title:"LQDD · Tu Verdadero Yo",text:msg+" "+u.href});
+  }else{
+   const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="LQDD-mi-animal.png";a.click();URL.revokeObjectURL(a.href);
+   try{await navigator.clipboard.writeText(msg+" "+u.href)}catch(e){}
+   btn.textContent="¡Tarjeta guardada!";setTimeout(()=>btn.textContent=old,2500);
+  }
+ }catch(e){
+  if(e&&e.name!=="AbortError"){
+   try{await navigator.clipboard.writeText(msg+" "+u.href);btn.textContent="Enlace copiado"}catch(err){prompt("Copia el enlace para retar a un amigo:",u.href)}
+   setTimeout(()=>btn.textContent=old,2500);
+  }
+ }finally{btn.disabled=false;if(btn.textContent==="Preparando tarjeta…")btn.textContent=old}
+};
 $("restart").onclick=start;paint();start();
 if("serviceWorker" in navigator){window.addEventListener("load",()=>{navigator.serviceWorker.register("./sw.js").catch(()=>{});});}
 
