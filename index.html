@@ -652,7 +652,7 @@ function streak(){let d=getData(),t=dateKey();if(d.lastDay!==t){let y=new Date()
 function paint(){let d=getData();paintAnimalStats();const level=Math.min(8,d.unlocked.length),pct=level/8*100;$("streak").textContent=(d.streak||0)+" "+(d.streak===1?"día":"días");$("collectionCount").textContent=d.unlocked.length+" de 8";$("levelNumber").textContent="NIVEL "+level;$("levelFill").style.width=pct+"%";$("levelProgress").setAttribute("aria-valuenow",String(level));$("levelProgressText").textContent=d.unlocked.length+" de 8 animales descubiertos";$("nextLevel").textContent=level===8?"Nivel máximo alcanzado":"Siguiente: nivel "+(level+1);$("levelMessage").textContent=level===8?"¡Has alcanzado el nivel 8! Pronto podrás descubrir nuevos animales y seguir avanzando.":level===0?"Empiezas en el nivel 0. Descubre tu primer animal para empezar a subir.":"¡Vas avanzando! Descubre "+(8-level)+" "+((8-level)===1?"animal más":"animales más")+" para alcanzar el nivel 8.";$("collection").replaceChildren();ids.forEach(id=>{let p=profiles[id],ok=d.unlocked.includes(id),c=document.createElement("button");c.type="button";c.className="collect-card"+(ok?"":" locked");c.disabled=!ok;c.setAttribute("aria-label",ok?"Ver significado de "+p.title:"Perfil bloqueado; completa tests para descubrirlo");let b=document.createElement("strong"),s=document.createElement("span");if(ok){let im=document.createElement("img");im.src=p.img;im.alt="";im.loading="lazy";im.className="collection-animal animal-"+id;c.append(im)}const tier=document.createElement("span");tier.className="rarity-chip "+(id==="protector"?"tier-supreme":p.secret?"tier-secret":"tier-normal");tier.textContent=id==="protector"?"✦ SECRETO SUPREMO":p.secret?"◆ SECRETO":"● NORMAL";b.textContent=ok?p.symbol+" "+p.title:"🔒 Perfil oculto";s.textContent=ok?"Pulsa para ver su significado":"Completa tests para descubrirlo";c.append(tier,b,s);if(ok)c.addEventListener("click",()=>openMeaning(id));$("collection").append(c)});$("collectionSub").textContent=d.unlocked.length===8?"¡Colección completa!":"Perfiles descubiertos"}
 let currentMeaningId=null;
 function openMeaning(id){
- const p=profiles[id];if(!p)return;currentMeaningId=id;
+ const p=profiles[id];if(!p)return;pauseMusicForMeaning();currentMeaningId=id;
  const mv=$("meaningVideo"),image=$("meaningImage");
  if(image){image.classList.add("hidden");image.src=p.img;image.alt=p.title;}
  if(mv){
@@ -715,6 +715,7 @@ function closeMeaning(){
  $("meaningOverlay").classList.add("hidden");
  const mv=$("meaningVideo");if(mv){mv.pause();mv.removeAttribute("src");mv.load();}
  document.body.style.overflow="";
+ resumeMusicAfterMeaning();
 }
 $("meaningClose").addEventListener("click",closeMeaning);
 $("meaningDone").addEventListener("click",closeMeaning);
@@ -834,6 +835,21 @@ const lqddTracks = {
 Object.values(lqddTracks).forEach(track => { track.loop = true; track.preload = "auto"; track.volume = 0.35; });
 let musicEnabled = false;
 let currentMusicPhase = "mystery";
+let musicPositionBeforeMeaning = 0;
+let musicWasPlayingBeforeMeaning = false;
+function pauseMusicForMeaning(){
+ const track = lqddTracks[currentMusicPhase];
+ musicWasPlayingBeforeMeaning = !!(musicEnabled && track && !track.paused);
+ musicPositionBeforeMeaning = track ? track.currentTime : 0;
+ if(track) track.pause();
+}
+function resumeMusicAfterMeaning(){
+ const track = lqddTracks[currentMusicPhase];
+ if(!musicWasPlayingBeforeMeaning || !musicEnabled || !track)return;
+ try{ track.currentTime = musicPositionBeforeMeaning; }catch(e){}
+ track.play().catch(()=>{});
+ musicWasPlayingBeforeMeaning = false;
+}
 const musicToggle = document.getElementById("musicToggle");
 function updateMusicButton(){
  if(!musicToggle)return;
