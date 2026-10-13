@@ -800,6 +800,7 @@ function wrapCardText(ctx,text,x,y,maxWidth,lineHeight,maxLines=2){
  lines.forEach((l,i)=>ctx.fillText(l,x,y+i*lineHeight));
 }
 $("share").onclick=async()=>{
+ stopResultMusic();
  if(!last)return;
  const p=profiles[last],u=new URL(location.href);u.search="";u.searchParams.set("compat",last);
  const msg="Mi animal en LQDD · Tu Verdadero Yo Animal es "+p.title+" "+p.symbol+". "+(p.line||"¿Qué animal eres tú?")+" Haz el test y reta a tus amigos.";
