@@ -377,7 +377,7 @@ freeSpirit:{title:"El Delfín Libre",symbol:"🐬",img:"img/delfin-realista.jpg.
 const animalVideos={leader:"videos/lobo-aullando.mp4",strategist:"videos/buho-aullando.mp4",guardian:"videos/oso-rugiendo.mp4",creator:"videos/zorro-moviendose.mp4",visionary:"videos/aguila-aleteando.mp4",protector:"videos/leon-rugiendo.mp4",inventor:"videos/cuervo-graznando.mp4",freeSpirit:"videos/delfin-nadando.mp4"};
 const secretPairs={"leader|strategist":"visionary","guardian|leader":"protector","creator|strategist":"inventor","creator|guardian":"freeSpirit"};
 const ids=Object.keys(profiles),$=id=>document.getElementById(id),key="lqdd_tvy_v2";
-function getData(){try{return JSON.parse(localStorage.getItem(key))||{unlocked:[],streak:0,lastDay:null}}catch(e){return{unlocked:[],streak:0,lastDay:null}}}
+function getData(){const fallback={unlocked:[],streak:0,lastDay:null};try{const raw=JSON.parse(localStorage.getItem(key)||"null");if(!raw||typeof raw!=="object")return fallback;return{unlocked:Array.isArray(raw.unlocked)?raw.unlocked.filter(id=>Object.prototype.hasOwnProperty.call(profiles,id)):[],streak:Number.isFinite(raw.streak)?raw.streak:0,lastDay:typeof raw.lastDay==="string"?raw.lastDay:null}}catch(e){return fallback}}
 function putData(d){try{localStorage.setItem(key,JSON.stringify(d))}catch(e){}}
 function dateKey(d=new Date()){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
 function streak(){let d=getData(),t=dateKey();if(d.lastDay!==t){let y=new Date();y.setDate(y.getDate()-1);d.streak=d.lastDay===dateKey(y)?(d.streak||0)+1:1;d.lastDay=t;putData(d)}return d}
@@ -482,7 +482,7 @@ $("share").onclick=async()=>{
   }
  }finally{btn.disabled=false;if(btn.textContent==="Preparando tarjeta…")btn.textContent=old}
 };
-$("restart").onclick=start;paint();start();
+$("restart").onclick=start;try{paint();start()}catch(initError){console.error("LQDD init error",initError);$("quiz").classList.remove("hidden");$("question").textContent="No se pudieron cargar los datos guardados. Pulsa «Otra partida» para volver a intentarlo."; $("answers").replaceChildren();$("restart").textContent="Reintentar test";}
 if("serviceWorker" in navigator){window.addEventListener("load",()=>{navigator.serviceWorker.register("./sw.js").catch(()=>{});});}
 
 /* Sonido breve al seleccionar una respuesta */
