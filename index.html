@@ -426,6 +426,32 @@ html{scroll-behavior:smooth;scroll-padding-top:12px}
 
 /* Evita mostrar dos veces la misma categoría de rareza en el resultado */
 #result #secretTag{display:none!important}
+
+/* Cuestionario móvil: alineación centrada y menos saltos entre preguntas */
+#quiz{overflow-anchor:none}
+#quiz #question{
+ text-align:center!important;
+ display:flex!important;
+ align-items:center;
+ justify-content:center;
+ min-height:6em;
+ margin-left:auto!important;
+ margin-right:auto!important;
+ text-wrap:balance;
+}
+#quiz .answers .answer{
+ text-align:center!important;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+}
+@media(max-width:600px){
+ main{padding-top:14px!important}
+ #quiz{scroll-margin-top:8px}
+ #quiz #question{min-height:6.2em;font-size:clamp(1.22rem,5vw,1.65rem)!important;line-height:1.2!important;margin-bottom:14px!important}
+ #quiz .answers{gap:9px!important}
+ #quiz .answers .answer{padding:13px 14px!important;min-height:58px}
+}
 </style></head><body><main><header><img class="brand-logo" src="logo-lqdd.png" alt="Logotipo oficial LQDD con lobo, corona, laureles y cruz"><div class="kicker">Autoconocimiento · LQDD</div><h1>Tu Verdadero Yo Animal</h1><p class="subtitle">¿Eres un Lobo que lidera, un Búho que calcula o un Zorro que encuentra caminos? Responde y descubre el animal que representa tu forma de ser.</p></header>
 <div class="stats"><div class="pill">🔥 Racha: <strong id="streak">0 días</strong></div><div class="pill">🏆 Colección: <strong id="collectionCount">0 de 8</strong></div></div>
 <section class="panel level-panel" aria-label="Progreso de nivel">
