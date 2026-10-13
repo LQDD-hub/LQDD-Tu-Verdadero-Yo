@@ -756,4 +756,43 @@ function playAnswerSound(){
   }else playTone();
  }catch(e){}
 }
+
+<script>
+/* Arranque de emergencia independiente para que el test siga siendo jugable. */
+(function(){
+ const qEl=document.getElementById("question"),aEl=document.getElementById("answers"),counter=document.getElementById("counter"),percent=document.getElementById("percent"),fill=document.getElementById("fill"),quiz=document.getElementById("quiz");
+ if(!qEl||!aEl||!quiz)return;
+ const fallbackQuestions=[
+ ["El encargado se guarda comida y nadie se atreve a denunciarlo. ¿Qué haces?",[["Reúno pruebas antes de actuar.","strategist"],["Lo denuncio aunque me perjudique.","leader"],["Me callo por si necesito un favor.","guardian"],["Me uno a otros afectados para reclamar.","creator"]]],
+ ["Reparten los mejores refugios entre quienes tienen contactos. ¿Qué haces?",[["Busco una solución para los míos.","strategist"],["Reclamo un reparto justo aunque me cueste.","leader"],["Acepto si mi familia sale beneficiada.","guardian"],["Organizo una reclamación colectiva.","creator"]]],
+ ["La ley permite rechazar una petición que no cumple los requisitos, pero quieren hacer una excepción para sus amigos. ¿Qué haces?",[["Compruebo los requisitos y aplico el mismo criterio.","strategist"],["Exijo reglas justas para todos.","leader"],["Hago la excepción por los míos.","guardian"],["Propongo revisar la norma de forma transparente.","creator"]]],
+ ["Hay pruebas de que un animal ha robado y quieren culpar a toda su especie. ¿Qué haces?",[["Distingo las pruebas de los rumores.","strategist"],["Exijo que responda solo el responsable.","leader"],["Lo defiendo porque es de los míos.","guardian"],["Pido una investigación justa y reparación del daño.","creator"]]],
+ ["Una familia vuelve a su madriguera y encuentra dentro a otros que se niegan a salir. ¿Qué haces?",[["Documento lo ocurrido y busco la vía legal.","strategist"],["Exijo una solución rápida y justa.","leader"],["No intervengo si no es mi casa.","guardian"],["Busco apoyo y asesoramiento para evitar una pelea.","creator"]]],
+ ["Un animal te amenaza y avanza hacia ti. ¿Qué haces?",[["Busco distancia y una salida segura.","strategist"],["Me protejo y uso solo la fuerza necesaria para frenar la amenaza.","leader"],["Ataco primero para darle una lección.","guardian"],["Me pongo a salvo y pido ayuda.","creator"]]],
+ ["Un refugio rechaza a un animal solo por su especie, aunque cumple las reglas. ¿Qué haces?",[["Compruebo si existe un motivo objetivo.","strategist"],["Reclamo el mismo trato para todos.","leader"],["Apoyo el rechazo si favorece a mi grupo.","guardian"],["Reúno pruebas y presento una reclamación.","creator"]]],
+ ["La comida escasea y no alcanza para todos. ¿Qué haces?",[["Calculo las reservas y las necesidades.","strategist"],["Defiendo un reparto claro y justo.","leader"],["Guardo primero para mi familia.","guardian"],["Busco recursos y organizo turnos.","creator"]]],
+ ["Los poderosos incumplen las normas y castigan a los débiles por lo mismo. ¿Qué haces?",[["Reúno pruebas del trato desigual.","strategist"],["Lo denuncio aunque me señalen.","leader"],["Miro hacia otro lado para evitar problemas.","guardian"],["Busco apoyos para una revisión independiente.","creator"]]],
+ ["Una mayoría toma una decisión que perjudica a una minoría. ¿Qué haces?",[["Busco una alternativa viable y calculo los daños.","strategist"],["Me opongo si vulnera derechos básicos.","leader"],["Acepto para no quedarme solo.","guardian"],["Reúno apoyos para cambiar la decisión.","creator"]]]
+ ];
+ const profiles={strategist:["El Búho Estratega","Observas, analizas y reúnes información antes de actuar."],leader:["El Lobo Líder","Tomas la iniciativa y defiendes tus principios incluso bajo presión."],guardian:["El Oso Guardián","Priorizas la seguridad de los tuyos y evitas riesgos innecesarios."],creator:["El Zorro Explorador","Buscas alternativas y soluciones prácticas cuando otros ven un callejón sin salida."]};
+ let order=[],idx=0,scores={strategist:0,leader:0,guardian:0,creator:0};
+ function shuffle(a){return a.slice().sort(()=>Math.random()-.5)}
+ function show(){
+  const item=order[idx];if(!item)return finish();
+  if(counter)counter.textContent="Pregunta "+(idx+1)+" de "+order.length;
+  if(percent)percent.textContent=Math.round((idx+1)/order.length*100)+" %";
+  if(fill)fill.style.width=((idx+1)/order.length*100)+"%";
+  qEl.textContent=item[0];aEl.replaceChildren();
+  shuffle(item[1]).forEach(([label,type])=>{const b=document.createElement("button");b.type="button";b.className="answer";b.textContent=label;b.addEventListener("click",()=>{scores[type]++;idx++;show()});aEl.appendChild(b)});
+ }
+ function finish(){
+  const winner=Object.keys(scores).sort((a,b)=>scores[b]-scores[a])[0],p=profiles[winner];
+  qEl.textContent="Tu resultado: "+p[0];aEl.replaceChildren();
+  const msg=document.createElement("p");msg.className="note";msg.textContent=p[1]+" Puntuación: "+Object.values(scores).join(" · ");aEl.appendChild(msg);
+  const again=document.createElement("button");again.type="button";again.className="action";again.textContent="Volver a jugar";again.onclick=boot;aEl.appendChild(again);
+  if(counter)counter.textContent="Test completado";if(percent)percent.textContent="100 %";if(fill)fill.style.width="100%";
+ }
+ function boot(){order=shuffle(fallbackQuestions).slice(0,10);idx=0;scores={strategist:0,leader:0,guardian:0,creator:0};quiz.classList.remove("hidden");const result=document.getElementById("result");if(result)result.classList.add("hidden");show()}
+ try{boot()}catch(e){qEl.textContent="Pulsa para iniciar el test";aEl.replaceChildren();const b=document.createElement("button");b.className="answer";b.textContent="Iniciar test";b.onclick=boot;aEl.appendChild(b)}
+})();
 </script></body></html>
