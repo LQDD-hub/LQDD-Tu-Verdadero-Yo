@@ -567,7 +567,7 @@ html{scroll-behavior:smooth;scroll-padding-top:12px}
  <div class="level-foot"><span id="levelProgressText">0 de 8 animales descubiertos</span><span id="nextLevel">Siguiente: nivel 1</span></div>
  <p class="level-message" id="levelMessage">Descubre animales para subir de nivel. Cada nuevo perfil te acerca al nivel 8.</p>
 </section>
-<section class="music-panel" aria-label="Música ambiental"><div class="music-copy"><strong>♫ Música ambiental LQDD</strong><span id="musicStatus">Preparada: empieza al tocar la pantalla</span></div><button type="button" class="music-toggle" id="musicToggle" aria-pressed="true">♫ Música activada</button><label class="music-volume" for="musicVolume">Volumen</label><input id="musicVolume" type="range" min="0" max="100" value="35" aria-label="Volumen de la música"></section>
+<section class="music-panel" aria-label="Música ambiental"><button type="button" class="music-toggle" id="musicToggle" aria-pressed="false">Activar música</button></section>
 <section class="panel" id="quiz" aria-live="polite"><div class="topline"><span id="counter"></span><span id="percent"></span></div><div class="track"><div class="fill" id="fill" style="width:10%"></div></div><div class="kicker" style="margin-bottom:10px">¿Qué animal eres?</div><h2 id="question">Preparando el test…</h2><div class="answers" id="answers"></div><p class="note">Las preguntas y respuestas cambian de orden entre partidas. Test orientativo de reflexión personal.</p></section>
 <section class="panel result hidden" id="result" aria-live="polite"><div class="kicker">TU RESULTADO LQDD</div><img class="result-symbol" id="symbol" src="oso.png" alt="Animal de tu resultado" width="220" height="220"><div class="gold-animal" id="goldAnimal" aria-label="Símbolo dorado del animal">🐾</div><video class="result-video hidden" id="resultVideo" playsinline autoplay loop preload="metadata" controlslist="nodownload nofullscreen noremoteplayback" disablepictureinpicture disableremoteplayback tabindex="-1" aria-label="Vídeo animado del animal"></video><div id="badge"></div><div id="secretTag" class="kicker hidden">✦ PERFIL SECRETO DESBLOQUEADO ✦</div><h2 id="resultTitle"></h2><div class="result-points" id="resultPoints">0 puntos acumulados</div><p class="tag" id="shareLine"></p><p id="resultText"></p><ul class="strengths" id="strengths"></ul><p class="second" id="second"></p><div class="bars" id="bars"></div><p id="compatibility"></p><p class="muted" id="collectionMessage"></p><div class="actions"><button class="action" id="share">Compartir y retar a un amigo</button><button class="action secondary" id="restart">Otra partida</button></div></section>
 <section class="panel"><div class="topline"><span>🏆 Tu colección</span><span id="collectionSub">Perfiles descubiertos</span></div><div class="collection" id="collection"></div><p class="note">Toca cualquier animal descubierto para abrir su tarjeta y compartirla. Puedes compartir todas las tarjetas que hayas desbloqueado; los perfiles bloqueados se desbloquean al completar tests.</p></section><div class="meaning-overlay hidden" id="meaningOverlay" role="dialog" aria-modal="true" aria-labelledby="meaningTitle"><article class="meaning-card"><button class="meaning-close" id="meaningClose" aria-label="Cerrar tarjeta">×</button><div class="kicker">✦ SIGNIFICADO DE TU ANIMAL ✦</div><div id="meaningRarity" class="rarity-chip tier-normal">● ANIMAL NORMAL</div><img id="meaningImage" src="" alt=""><div class="gold-animal" id="meaningGoldAnimal" aria-label="Símbolo dorado del animal">🐾</div><video class="meaning-video hidden" id="meaningVideo" playsinline autoplay loop preload="auto" controls controlslist="nodownload nofullscreen noremoteplayback" aria-label="Vídeo del animal; usa el control de volumen para escuchar el sonido"></video><h2 id="meaningTitle"></h2><div class="profile-points" id="meaningPoints">0 puntos acumulados</div><p class="meaning-quote" id="meaningQuote"></p><p id="meaningText"></p><div class="actions"><button class="action" id="meaningShare">Compartir esta tarjeta</button><button class="action secondary" id="meaningDone">Cerrar tarjeta</button></div></article></div><footer>© LQDD · Tu Verdadero Yo Animal</footer></main>
@@ -824,53 +824,34 @@ $("share").onclick=async()=>{
 $("restart").onclick=start;try{paint()}catch(initError){console.error("LQDD paint error",initError)}try{start()}catch(initError){console.error("LQDD start error",initError);$("quiz").classList.remove("hidden");$("question").textContent="Error al iniciar el test. Pulsa «Reintentar test»."; $("answers").replaceChildren();$("restart").textContent="Reintentar test";}
 if("serviceWorker" in navigator){window.addEventListener("load",()=>{navigator.serviceWorker.register("./sw.js").catch(()=>{});});}
 
-/* Música ambiental cinematográfica: los navegadores móviles exigen el primer toque del usuario. */
-let musicContext=null,musicNodes=[],musicGain=null,musicPlaying=false,musicEnabled=true,musicTimer=null,musicNoteIndex=0,musicPadNodes=[];
-function setMusicStatus(text){const el=document.getElementById("musicStatus");if(el)el.textContent=text}
-function updateMusicButton(){const btn=document.getElementById("musicToggle");if(btn){btn.textContent=musicEnabled?"♫ Música activada":"♪ Música desactivada";btn.setAttribute("aria-pressed",String(musicEnabled))}}
-function stopAmbientMusic(){if(musicTimer){clearInterval(musicTimer);musicTimer=null}if(musicGain&&musicContext){try{musicGain.gain.cancelScheduledValues(musicContext.currentTime);musicGain.gain.setTargetAtTime(0,musicContext.currentTime,.12)}catch(e){}}musicNodes.forEach(node=>{try{node.stop()}catch(e){}try{node.disconnect()}catch(e){}});musicNodes=[];musicPadNodes=[];if(musicGain){try{musicGain.disconnect()}catch(e){}musicGain=null}musicPlaying=false}
-function playAmbientNote(freq,delay=0,duration=4){if(!musicContext||!musicGain||!musicPlaying)return;const t=musicContext.currentTime+delay,osc=musicContext.createOscillator(),env=musicContext.createGain(),filter=musicContext.createBiquadFilter();osc.type="sine";osc.frequency.setValueAtTime(freq,t);filter.type="lowpass";filter.frequency.value=520;filter.Q.value=.35;env.gain.setValueAtTime(.0001,t);env.gain.exponentialRampToValueAtTime(.055,t+1.0);env.gain.setValueAtTime(.055,t+Math.max(1,duration-1));env.gain.exponentialRampToValueAtTime(.0001,t+duration);osc.connect(filter);filter.connect(env);env.connect(musicGain);osc.start(t);osc.stop(t+duration+.08);musicNodes.push(osc,env,filter);osc.onended=()=>{[osc,env,filter].forEach(n=>{try{n.disconnect()}catch(e){}});musicNodes=musicNodes.filter(n=>n!==osc&&n!==env&&n!==filter)}}
-async function startAmbientMusic(){try{const Ctx=window.AudioContext||window.webkitAudioContext;if(!Ctx){setMusicStatus("Este navegador no admite música");return}if(!musicContext)musicContext=new Ctx();if(musicContext.state==="suspended")await musicContext.resume();stopAmbientMusic();musicGain=musicContext.createGain();const volume=document.getElementById("musicVolume");musicGain.gain.setValueAtTime(.0001,musicContext.currentTime);musicGain.connect(musicContext.destination);musicGain.gain.setTargetAtTime(Math.max(.01,Number(volume?volume.value:55)/100*.9),musicContext.currentTime,.7);musicPlaying=true;musicEnabled=true;musicNoteIndex=0;
-/* Acordes cálidos y suaves, sin pitidos agudos ni melodía repetitiva. */
-const chordSets=[[130.81,196,261.63,329.63],[110,164.81,220,293.66],[146.83,220,293.66,369.99],[98,146.83,196,261.63]];
-function setWarmChord(index){if(!musicPlaying||!musicContext)return;const freqs=chordSets[index%chordSets.length];musicPadNodes.forEach((node,j)=>{try{node.frequency.setTargetAtTime(freqs[j],musicContext.currentTime,2.8)}catch(e){}})}
-chordSets[0].forEach((hz,index)=>{const osc=musicContext.createOscillator(),filter=musicContext.createBiquadFilter(),env=musicContext.createGain(),lfo=musicContext.createOscillator(),lfoGain=musicContext.createGain();osc.type="sine";osc.frequency.value=hz;filter.type="lowpass";filter.frequency.value=430;filter.Q.value=.25;env.gain.value=index===0?.20:.11;lfo.type="sine";lfo.frequency.value=.035+index*.009;lfoGain.gain.value=.8;lfo.connect(lfoGain);lfoGain.connect(osc.frequency);osc.connect(filter);filter.connect(env);env.connect(musicGain);osc.start();lfo.start();musicNodes.push(osc,lfo,env,lfoGain,filter);musicPadNodes.push(osc)});
-let chordIndex=0;musicTimer=setInterval(()=>{chordIndex=(chordIndex+1)%chordSets.length;setWarmChord(chordIndex)},8500);
-playAmbientNote(392,0,4.5);playAmbientNote(523.25,2.5,4.5);setMusicStatus("Música ambiental suave reproduciéndose");updateMusicButton()}catch(e){setMusicStatus("Toca de nuevo para iniciar la música")}}
-const musicToggle=document.getElementById("musicToggle");if(musicToggle)musicToggle.addEventListener("click",()=>{if(musicPlaying){musicEnabled=false;stopAmbientMusic();updateMusicButton();setMusicStatus("Música apagada")}else{musicEnabled=true;startAmbientMusic()}});
-const musicVolume=document.getElementById("musicVolume");if(musicVolume)musicVolume.addEventListener("input",()=>{if(musicGain&&musicContext)musicGain.gain.setTargetAtTime(Math.max(.01,(Number(musicVolume.value)||0)/100*.9),musicContext.currentTime,.12)});
-document.addEventListener("pointerdown",e=>{if(musicEnabled&&!musicPlaying&&e.target!==musicToggle&&!musicToggle.contains(e.target))startAmbientMusic()},{passive:true});
-document.addEventListener("keydown",e=>{if(musicEnabled&&!musicPlaying&&(e.key==="Enter"||e.key===" ")){startAmbientMusic()}});
-/* Sonido en todos los botones al pulsarlos */
-document.addEventListener("click",e=>{
- const button=e.target.closest("button");
- if(button&&!button.disabled)playAnswerSound();
-});
-/* Sonido breve al seleccionar una respuesta */
-let answerAudioContext=null;
-function playAnswerSound(){
- try{
-  const Ctx=window.AudioContext||window.webkitAudioContext;
-  if(!Ctx)return;
-  if(!answerAudioContext)answerAudioContext=new Ctx();
-  const ctx=answerAudioContext;
-  const playTone=()=>{
-   const now=ctx.currentTime;
-   const osc=ctx.createOscillator(),gain=ctx.createGain();
-   osc.type="sine";
-   osc.frequency.setValueAtTime(880,now);
-   osc.frequency.exponentialRampToValueAtTime(1320,now+.075);
-   gain.gain.setValueAtTime(.0001,now);
-   gain.gain.exponentialRampToValueAtTime(.11,now+.012);
-   gain.gain.exponentialRampToValueAtTime(.0001,now+.16);
-   osc.connect(gain);gain.connect(ctx.destination);
-   osc.start(now);osc.stop(now+.17);
-  };
-  if(ctx.state==="suspended"){
-   ctx.resume().then(()=>playTone()).catch(()=>{});
-  }else playTone();
- }catch(e){}
+/* Música real LQDD: pista MP3 de un minuto. */
+const lqddMusic = new Audio("musica-lqdd.mp3");
+lqddMusic.loop = true;
+lqddMusic.preload = "auto";
+lqddMusic.volume = 0.35;
+let musicEnabled = false;
+const musicToggle = document.getElementById("musicToggle");
+function updateMusicButton(){
+ if(!musicToggle)return;
+ musicToggle.textContent = musicEnabled ? "Desactivar música" : "Activar música";
+ musicToggle.setAttribute("aria-pressed",String(musicEnabled));
 }
-
+if(musicToggle)musicToggle.addEventListener("click",async()=>{
+ if(musicEnabled){
+  lqddMusic.pause();
+  musicEnabled=false;
+  updateMusicButton();
+ }else{
+  try{
+   await lqddMusic.play();
+   musicEnabled=true;
+   updateMusicButton();
+  }catch(e){
+   musicEnabled=false;
+   updateMusicButton();
+  }
+ }
+});
+/* Sin tonos artificiales al pulsar botones. */
 </script>
 </body></html>
