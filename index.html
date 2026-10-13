@@ -7,6 +7,7 @@
 .meaning-card.share-card-mode{height:auto;max-height:calc(100dvh - 36px);overflow-y:auto;padding:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px}
 .meaning-card.share-card-mode>*{display:none!important}
 .meaning-card.share-card-mode #meaningImage{display:block!important;width:100%!important;height:auto!important;max-height:calc(100dvh - 150px)!important;object-fit:contain!important;border:0!important;border-radius:8px!important;box-shadow:none!important;margin:0 auto!important}
+.meaning-card.share-card-mode #sharePosterImage{display:block!important;width:100%!important;height:auto!important;max-height:calc(100dvh - 170px)!important;object-fit:contain!important;border:0!important;border-radius:8px!important;box-shadow:none!important;margin:0 auto!important}
 .meaning-card.share-card-mode #meaningShare,.meaning-card.share-card-mode #meaningDone,.meaning-card.share-card-mode #meaningClose{display:block!important;position:relative;z-index:3}
 .meaning-card.share-card-mode .actions{display:flex!important;width:100%;gap:8px;margin-top:4px}
 .meaning-card.share-card-mode .actions button{font-size:.9rem;padding:12px 10px}
@@ -700,13 +701,16 @@ function openShareCard(id){
  card.classList.add("share-card-mode");
  card.classList.remove("meaning-reveal","rarity-normal","rarity-secret","rarity-supreme");
  card.classList.add("rarity-"+(id==="protector"?"supreme":p.secret?"secret":"normal"));
- const image=$("meaningImage"),video=$("meaningVideo"),gold=$("meaningGoldAnimal");
+ const video=$("meaningVideo"),gold=$("meaningGoldAnimal"),oldImage=$("meaningImage");
  if(video){video.pause();video.removeAttribute("src");video.load();video.classList.add("hidden");}
  if(gold)gold.classList.add("hidden");
- image.src=new URL(p.shareImg||p.img,document.baseURI).href;
- image.alt="Tarjeta de "+p.title+" para compartir";
- image.classList.remove("hidden");
- image.style.cssText="display:block;width:100%;height:auto;max-height:none;object-fit:contain;border-radius:14px;margin:14px auto";
+ oldImage.classList.add("hidden");
+ let poster=$("sharePosterImage");
+ if(!poster){poster=document.createElement("img");poster.id="sharePosterImage";poster.alt="";poster.style.cssText="display:block!important;width:100%!important;height:auto!important;max-height:calc(100dvh - 170px)!important;object-fit:contain!important;border:0!important;border-radius:8px!important;box-shadow:none!important;margin:0 auto!important";card.insertBefore(poster,$("meaningTitle"));}
+ poster.alt="Tarjeta completa de "+p.title;
+ poster.onload=()=>{poster.style.display="block";};
+ poster.onerror=()=>{poster.alt="No se ha podido cargar la tarjeta ilustrada";poster.style.display="none";};
+ poster.src=new URL(p.shareImg||p.img,location.href).href;
  $("meaningTitle").textContent="Tarjeta de "+p.title;
  $("meaningRarity").className="rarity-chip tier-"+(id==="protector"?"supreme":p.secret?"secret":"normal");
  $("meaningRarity").textContent="TARJETA LISTA PARA COMPARTIR";
