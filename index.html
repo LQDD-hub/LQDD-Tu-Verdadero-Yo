@@ -347,6 +347,7 @@ html{scroll-behavior:smooth;scroll-padding-top:12px}
 #result #bars .discovered-result-row>b{white-space:nowrap;color:#ffdf8a}
 #result #second:empty{display:none!important}
 @media(max-width:420px){#result #bars .discovered-result-row{grid-template-columns:minmax(84px,1fr) minmax(65px,1fr) auto;gap:8px;font-size:.88rem}}
+.answer.answer-selected{border-color:#ffe79a!important;background:linear-gradient(120deg,#4a3919,#242016)!important;box-shadow:0 0 0 1px #e7bd5777,0 0 22px #e7bd5744!important;transform:scale(.99)}
 </style></head><body><main><header><img class="brand-logo" src="logo-lqdd.png" alt="Logotipo oficial de LQDD"><div class="kicker">Autoconocimiento · LQDD</div><h1>Tu verdadero yo</h1><p class="subtitle">¿Eres un Lobo que lidera, un Búho que calcula o un Zorro que encuentra caminos? Responde y descubre el animal que representa tu forma de ser.</p></header>
 <div class="stats"><div class="pill">🔥 Racha: <strong id="streak">0 días</strong></div><div class="pill">🏆 Colección: <strong id="collectionCount">0 de 8</strong></div></div>
 <section class="panel" id="quiz" aria-live="polite"><div class="topline"><span id="counter"></span><span id="percent"></span></div><div class="track"><div class="fill" id="fill" style="width:10%"></div></div><div class="kicker" style="margin-bottom:10px">¿Qué animal eres?</div><h2 id="question">Preparando el test…</h2><div class="answers" id="answers"></div><p class="note">Las preguntas y respuestas cambian de orden entre partidas. Test orientativo de reflexión personal.</p></section>
@@ -385,7 +386,7 @@ let currentMeaningId=null;function openMeaning(id){const p=profiles[id];if(!p)re
 function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
 let qs=[],i=0,score={},chosen=[],last=null;
 const dailyPlayKey="lqdd_tvy_daily_play_v1",dailyResultKey="lqdd_tvy_daily_result_v1";function todayKey(){const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}function playedToday(){try{return localStorage.getItem(dailyPlayKey)===todayKey()}catch(e){return false}}function showSavedResult(){let saved=null;try{saved=JSON.parse(localStorage.getItem(dailyResultKey)||"null")}catch(e){}if(!saved||saved.date!==todayKey()||!profiles[saved.winner])return;const winner=saved.winner,p=profiles[winner];last=winner;$("quiz").classList.add("hidden");$("dailyLimit").classList.add("hidden");$("result").classList.remove("hidden");$("result").classList.remove("reveal-active");$("badge").innerHTML='<span class="kicker">✦ TU RESULTADO DE HOY ✦</span>';$("resultTitle").textContent=p.title;$("shareLine").textContent=p.line||"Descubre tu lado más auténtico.";$("resultText").textContent=p.text;$("strengths").replaceChildren(...(p.strengths||[]).map(s=>{let li=document.createElement("li");li.textContent=s;return li}));$("second").textContent="Este es el perfil que has obtenido en el reto de hoy.";$("bars").replaceChildren();$("secretTag").classList.toggle("hidden",!p.secret);$("collectionMessage").textContent="Tu resultado de hoy está guardado en este dispositivo.";$("compatibility").textContent="Comparte tu resultado para que tus amigos descubran qué animal son.";const rv=$("resultVideo");rv.pause();rv.removeAttribute("src");rv.classList.remove("hidden");rv.loop=false;rv.currentTime=0;rv.src=animalVideos[winner];rv.load();rv.play().catch(()=>{});const resultPanel=$("result");resultPanel.classList.remove("gold-reveal");void resultPanel.offsetWidth;resultPanel.classList.add("gold-reveal");setTimeout(()=>resultPanel.classList.remove("gold-reveal"),2400);resultPanel.scrollIntoView({behavior:"smooth",block:"start"})}function showDailyLimit(){let box=$("dailyLimit");if(!box){box=document.createElement("section");box.id="dailyLimit";box.className="panel";box.innerHTML="<div class='kicker'>✦ LQDD · RETO DIARIO ✦</div><h2>Ya has completado tu test de hoy</h2><p class='subtitle'>Tu resultado de hoy sigue guardado. Puedes volver a verlo cuando quieras o consultar tu colección.</p><div class='actions'><button class='action' id='viewTodayResult' type='button'>🏆 Ver mi resultado de hoy</button></div>";$("quiz").before(box)}box.classList.remove("hidden");const btn=$("viewTodayResult");if(btn)btn.onclick=showSavedResult}function start(){if(playedToday()){$("quiz").classList.add("hidden");$("result").classList.add("hidden");showDailyLimit();return}const box=$("dailyLimit");if(box)box.classList.add("hidden");i=0;score={leader:0,strategist:0,guardian:0,creator:0};chosen=[];qs=shuffle(questions).map(q=>({...q,a:shuffle(q.a)}));$("result").classList.add("hidden");$("quiz").classList.remove("hidden");render()}
-function render(){$("counter").textContent="Pregunta "+(i+1)+" de "+qs.length;$("percent").textContent=Math.round((i+1)/qs.length*100)+" %";$("fill").style.width=((i+1)/qs.length*100)+"%";$("question").textContent=qs[i].q;$("answers").replaceChildren();qs[i].a.forEach(([label,type])=>{let b=document.createElement("button");b.className="answer";b.textContent=label;b.type="button";b.onclick=()=>{score[type]++;chosen.push(type);i++;if(i<qs.length)render();else finish()};$("answers").append(b)})}
+function render(){$("counter").textContent="Pregunta "+(i+1)+" de "+qs.length;$("percent").textContent=Math.round((i+1)/qs.length*100)+" %";$("fill").style.width=((i+1)/qs.length*100)+"%";$("question").textContent=qs[i].q;$("answers").replaceChildren();qs[i].a.forEach(([label,type])=>{let b=document.createElement("button");b.className="answer";b.textContent=label;b.type="button";b.onclick=()=>{playAnswerSound();b.classList.add("answer-selected");setTimeout(()=>b.classList.remove("answer-selected"),220);score[type]++;chosen.push(type);i++;if(i<qs.length)render();else finish()};$("answers").append(b)})}
 const animalSounds={
 leader:"https://sfxmint.com/dl/wolf-howl-02.mp3",
 strategist:"https://sfxmint.com/dl/animal-owl-01.mp3",
@@ -417,4 +418,26 @@ function finish(){let ranked=Object.keys(score).sort((a,b)=>score[b]-score[a]),a
 $("share").onclick=async()=>{if(!last)return;let p=profiles[last],u=new URL(location.href);u.search="";u.searchParams.set("compat",last);let msg="Mi animal en LQDD · Tu Verdadero Yo es "+p.title+" "+p.symbol+". "+(p.line||"¿Qué animal eres tú?")+" Haz el test y reta a tus amigos.";if(navigator.share){try{await navigator.share({title:"LQDD · Tu Verdadero Yo",text:msg,url:u.href})}catch(e){}}else{try{await navigator.clipboard.writeText(msg+" "+u.href);$("share").textContent="¡Enlace copiado!";setTimeout(()=>$("share").textContent="Compartir y retar a un amigo",2200)}catch(e){prompt("Copia este enlace para retar a un amigo:",u.href)}}};
 $("restart").onclick=start;paint();start();
 if("serviceWorker" in navigator){window.addEventListener("load",()=>{navigator.serviceWorker.register("./sw.js").catch(()=>{});});}
+
+/* Sonido breve al seleccionar una respuesta */
+let answerAudioContext=null;
+function playAnswerSound(){
+ try{
+  const Ctx=window.AudioContext||window.webkitAudioContext;
+  if(!Ctx)return;
+  if(!answerAudioContext)answerAudioContext=new Ctx();
+  const ctx=answerAudioContext;
+  if(ctx.state==="suspended")ctx.resume();
+  const now=ctx.currentTime;
+  const osc=ctx.createOscillator(),gain=ctx.createGain();
+  osc.type="sine";
+  osc.frequency.setValueAtTime(880,now);
+  osc.frequency.exponentialRampToValueAtTime(1320,now+.075);
+  gain.gain.setValueAtTime(.0001,now);
+  gain.gain.exponentialRampToValueAtTime(.11,now+.012);
+  gain.gain.exponentialRampToValueAtTime(.0001,now+.16);
+  osc.connect(gain);gain.connect(ctx.destination);
+  osc.start(now);osc.stop(now+.17);
+ }catch(e){}
+}
 </script></body></html>
