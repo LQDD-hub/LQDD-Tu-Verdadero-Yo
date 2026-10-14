@@ -772,6 +772,8 @@ function showRoomResult(room){
  roomResultShown=true;
  activeDuelRoom=room;
  saveDuelToTodayHistory(room);
+ const creatorIsLoggedIn=playerSession?.access_token&&playerSession.user?.id===room.creator_user_id;
+ if(creatorIsLoggedIn){const winner=animalPercent(room.creator_animal)>animalPercent(room.guest_animal)?room.creator_animal:room.guest_animal;savePlayerHistory({mode:"duel",animal_id:room.creator_animal,opponent_name:room.guest_name||"Amigo",opponent_animal:room.guest_animal,winner_animal:winner,duel_code:room.code});}
  $("duelInvite").classList.add("hidden");
  const showResult=()=>openAnimalDuel(room.creator_animal,room.guest_animal,animalPercent(room.creator_animal),animalPercent(room.guest_animal));
  const sharedButton=$("viewSharedDuel");if(sharedButton){sharedButton.classList.remove("hidden");sharedButton.onclick=showResult;}
@@ -1072,6 +1074,8 @@ async function finish(){const winner=correctAnswers<=3?"inventor":correctAnswers
  try{
   const room=await duelRequest({action:"complete",code:duelCode,guestAnimal:winner});
   activeDuelRoom=room;
+  const guestIsLoggedIn=playerSession?.access_token&&playerSession.user?.id===room.guest_user_id;
+  if(guestIsLoggedIn){const winner=animalPercent(room.creator_animal)>animalPercent(room.guest_animal)?room.creator_animal:room.guest_animal;savePlayerHistory({mode:"duel",animal_id:room.guest_animal,opponent_name:room.creator_name||"Amigo",opponent_animal:room.creator_animal,winner_animal:winner,duel_code:room.code});}
   $("compatibility").textContent="";
   $("shareLine").textContent="Duelo LQDD: "+profiles[room.creator_animal].title+" contra "+profiles[room.guest_animal].title;
   $("shareLine").classList.remove("hidden");
@@ -1304,7 +1308,13 @@ async function doPlayerAuth(mode){
    playerSession=await playerAuth("/token?grant_type=password",{email,password});
   }
   localStorage.setItem(PLAYER_SESSION_KEY,JSON.stringify(playerSession));
-  await savePlayerProfile(name||playerSession.user?.user_metadata?.display_name||"Jugador LQDD");
+  if(mode==="signup"){
+   await savePlayerProfile(name||playerSession.user?.user_metadata?.display_name||"Jugador LQDD");
+  }else{
+   const existing=await playerFetch(PLAYER_REST_URL+"/player_profiles?select=user_id,display_name&limit=1");
+   playerProfile=existing?.[0]||null;
+   if(!playerProfile)await savePlayerProfile(playerSession.user?.user_metadata?.display_name||name||"Jugador LQDD");
+  }
   renderPlayerAuth();await loadPlayerHistory();
  }catch(e){setPlayerMessage(e.message||"No se pudo iniciar sesión.",true)}
 }
