@@ -964,7 +964,7 @@ function closeMeaning(){
  if(rv){rv.pause();rv.muted=true;rv.currentTime=0;}
  $("meaningOverlay").classList.add("hidden");
  document.body.style.overflow="";
- resumeMusicAfterMeaning();
+ stopResultMusic();
 }
 $("meaningClose").addEventListener("click",closeMeaning);
 $("meaningDone").addEventListener("click",closeMeaning);
