@@ -947,13 +947,17 @@ async function shareAnimalProfile(profileId,button){
  }finally{button.disabled=false;if(button.textContent==="Preparando tarjeta…")button.textContent=old}
 }
 
-$("meaningChallenge").onclick=async()=>{
- const id=currentMeaningId,p=profiles[id],button=$("meaningChallenge");if(!p)return;
+$("meaningChallenge").addEventListener("click",async(event)=>{
+ event.preventDefault();event.stopPropagation();
+ const id=currentMeaningId,p=profiles[id],button=$("meaningChallenge");
+ if(!p){alert("Abre primero la tarjeta de un animal desbloqueado y vuelve a pulsar «Retar a un amigo».");return;}
+ if(button.disabled)return;
  requestDuelNotificationPermission();
  const old=button.textContent;button.disabled=true;button.textContent="Creando duelo…";
  let roomCreated=false;
  try{
   const room=await duelRequest({action:"create",creatorAnimal:id,playerName:getDuelPlayerName()});
+  if(!room||!room.code)throw new Error("La sala no devolvió un enlace de duelo.");
   activeDuelRoom=room;roomResultShown=false;enableDuelPush(room.code);
   const u=new URL(location.href);u.search="";u.searchParams.set("compat",id);u.searchParams.set("pct",String(animalPercent(id)));u.searchParams.set("duel",room.code);
   history.replaceState(null,"",u.href);watchDuelRoom(room.code);roomCreated=true;
@@ -965,10 +969,13 @@ $("meaningChallenge").onclick=async()=>{
    try{await navigator.clipboard.writeText(msg);alert("El enlace del duelo está copiado. Envíalo a tu amigo para jugar.");closeMeaning();}
    catch(e){prompt("Copia este enlace para retar a un amigo:",u.href);}
   }
- }catch(e){if(!roomCreated)alert("No se pudo crear la sala de duelo. Inténtalo de nuevo en unos segundos.");else if(!e||e.name!=="AbortError")prompt("Copia este enlace para retar a un amigo:",location.href);}
- finally{button.disabled=false;if(button.textContent==="Creando duelo…")button.textContent=old;}
-};
-document.addEventListener("click",e=>{const b=e.target&&e.target.closest?e.target.closest("#meaningChallenge"):null;if(!b)return;e.preventDefault();e.stopImmediatePropagation();if(typeof b.onclick==="function")b.onclick.call(b,e);},true);
+ }catch(e){
+  console.error("LQDD duel challenge error",e);
+  if(!roomCreated)alert("No se pudo crear el duelo: "+(e&&e.message?e.message:"error de conexión")+". Comprueba la conexión e inténtalo otra vez.");
+  else if(!e||e.name!=="AbortError")prompt("Copia este enlace para retar a un amigo:",location.href);
+ }finally{button.disabled=false;if(button.textContent==="Creando duelo…")button.textContent=old;}
+});
+
 function closeMeaning(){
  const mv=$("meaningVideo");
  if(mv){mv.pause();mv.muted=true;mv.currentTime=0;mv.removeAttribute("src");mv.load();mv.classList.add("hidden");}
