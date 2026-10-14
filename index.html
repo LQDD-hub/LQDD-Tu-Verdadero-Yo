@@ -749,7 +749,10 @@ async function enableDuelPush(roomCode){
 
 let activeDuelRoom=null,roomResultShown=false,roomPollHandle=null;
 async function duelRequest(payload){
- const response=await fetch(DUEL_API_URL,{method:"POST",headers:{"Content-Type":"application/json","apikey":DUEL_API_KEY,"Authorization":"Bearer "+DUEL_API_KEY},body:JSON.stringify(payload),cache:"no-store"});
+ const sessionToken=typeof playerSession!=="undefined"&&playerSession?.access_token?playerSession.access_token:null;
+ const enriched={...payload};
+ if(sessionToken){enriched.playerName=playerName();enriched.playerUserId=playerSession.user?.id||null;}
+ const response=await fetch(DUEL_API_URL,{method:"POST",headers:{"Content-Type":"application/json","apikey":DUEL_API_KEY,"Authorization":"Bearer "+(sessionToken||DUEL_API_KEY)},body:JSON.stringify(enriched),cache:"no-store"});
  let data={};try{data=await response.json()}catch(e){}
  if(!response.ok)throw new Error(data.error||"No se pudo conectar con el duelo.");
  return data.room;
