@@ -584,32 +584,34 @@ input,textarea,[contenteditable="true"]{
 .player-panel input:focus{outline:2px solid var(--gold);outline-offset:1px}
 .player-history{display:grid;gap:10px}.history-entry{border:1px solid #34312a;border-radius:13px;padding:12px;background:#111}.history-entry strong{color:var(--gold2)}.history-meta{color:var(--muted);font-size:.82rem;margin-top:5px}.player-status-ok{color:#a8d6a0}
 
-/* Perfil compacto: el apodo queda en la cabecera y el historial se abre solo cuando se necesita. */
-#playerPanel{max-width:760px;margin:0 auto 12px;padding:10px 13px;border-radius:15px}
-#playerPanel .topline{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0;font-size:.9rem}
-#playerPanel .profile-main{display:flex;align-items:center;gap:8px;min-width:0}
-#playerPanel .profile-name{color:var(--gold2);font-weight:750;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:48vw}
-#playerPanel .profile-tools{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
-#playerPanel .profile-tool{border:1px solid #705724;border-radius:999px;background:#17140e;color:var(--gold2);padding:7px 10px;font:inherit;font-size:.78rem;cursor:pointer}
+/* Perfil en una barra discreta; los controles solo aparecen al abrirlo. */
+#playerPanel{max-width:760px;margin:0 auto 10px;padding:8px 11px;border-radius:13px;background:linear-gradient(120deg,#171719,#101012);box-shadow:none}
+#playerPanel .topline{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0;font-size:.88rem}
+#playerPanel .profile-main{display:flex;align-items:center;gap:7px;min-width:0}
+#playerPanel .profile-name{color:var(--gold2);font-weight:750;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:40vw}
+#playerPanel .profile-tools{display:flex;gap:6px;align-items:center;flex-wrap:nowrap}
+#playerPanel .profile-tool{border:1px solid #705724;border-radius:999px;background:#17140e;color:var(--gold2);padding:6px 9px;font:inherit;font-size:.73rem;cursor:pointer;white-space:nowrap}
 #playerPanel #playerAuthForm{display:none;margin-top:10px}
 #playerPanel.profile-editing #playerAuthForm{display:block}
 #playerPanel #playerAuthForm label{display:block;font-size:.8rem;margin:6px 0}
 #playerPanel #playerName{width:100%;padding:9px 11px;border:1px solid #51452c;border-radius:10px;background:#111;color:#fff;font:inherit}
-#playerPanel #playerAuthForm .actions{margin-top:8px}
+#playerPanel #playerAuthForm .actions{margin-top:8px;justify-content:flex-start}
 #playerPanel #playerAuthForm .action{padding:8px 13px;font-size:.82rem}
 #playerPanel #playerMessage{display:none;font-size:.8rem;margin:7px 0 0}
 #playerPanel.profile-editing #playerMessage{display:block}
-#playerPanel .profile-history{display:none;margin-top:12px;border-top:1px solid #514321;padding-top:10px}
+#playerPanel .profile-history{display:none;margin-top:10px;border-top:1px solid #514321;padding-top:9px}
 #playerPanel.profile-history-open .profile-history{display:block}
-#playerPanel .player-history{gap:7px;max-height:300px;overflow:auto}
+#playerPanel .profile-history>p{display:none}
+#playerPanel .player-history{gap:7px;max-height:260px;overflow:auto}
 #playerPanel .history-entry{padding:9px}
 #playerPanel .history-entry strong{font-size:.86rem}
 #playerPanel .history-entry div{font-size:.8rem}
+@media(max-width:390px){#playerPanel{padding:7px 8px}#playerPanel .profile-tools{gap:4px}#playerPanel .profile-tool{padding:6px 7px;font-size:.68rem}#playerPanel .profile-name{max-width:30vw}}
 </style></head><body><main><header><img class="brand-logo" src="logo-lqdd.png" alt="Logotipo oficial LQDD con lobo, corona, laureles y cruz"><div class="kicker">Autoconocimiento · LQDD</div><h1>Tu Verdadero Yo Animal</h1><p class="subtitle">¿Eres un Lobo que lidera, un Búho que calcula o un Zorro que encuentra caminos? Responde y descubre el animal que representa tu forma de ser.</p></header>
 <section class="panel player-panel" id="playerPanel">
  <div class="topline">
   <div class="profile-main"><span>👤</span><strong class="profile-name" id="playerStatus">Jugador local</strong></div>
-  <div class="profile-tools"><button class="profile-tool" id="profileEditToggle" type="button">Cambiar apodo</button><button class="profile-tool" id="profileHistoryToggle" type="button">Mi historial</button></div>
+  <div class="profile-tools"><button class="profile-tool" id="profileEditToggle" type="button">Perfil</button><button class="profile-tool" id="profileHistoryToggle" type="button">Historial</button></div>
  </div>
  <p id="playerMessage">El apodo se guarda en este móvil.</p>
  <div id="playerAuthForm">
