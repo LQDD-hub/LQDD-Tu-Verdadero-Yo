@@ -580,6 +580,22 @@ input,textarea,[contenteditable="true"]{
 }
 </style></head><body><main><header><img class="brand-logo" src="logo-lqdd.png" alt="Logotipo oficial LQDD con lobo, corona, laureles y cruz"><div class="kicker">Autoconocimiento · LQDD</div><h1>Tu Verdadero Yo Animal</h1><p class="subtitle">¿Eres un Lobo que lidera, un Búho que calcula o un Zorro que encuentra caminos? Responde y descubre el animal que representa tu forma de ser.</p></header>
 <div class="stats"><div class="pill">🔥 Racha: <strong id="streak">0 días</strong></div><div class="pill">🏆 Colección: <strong id="collectionCount">0 de 8</strong></div></div>
+<section class="panel" id="playerProfile" aria-label="Mi perfil LQDD" style="margin-top:12px">
+ <div class="topline"><span>👤 Mi perfil LQDD</span><span style="color:var(--gold);font-size:.75rem">Este dispositivo</span></div>
+ <p class="note" style="margin:8px 0">Elige tu apodo para personalizar el juego. No necesitas registrarte ni dar tu correo.</p>
+ <form id="playerProfileForm" style="display:flex;gap:8px;flex-wrap:wrap">
+  <input id="playerNickname" name="nickname" maxlength="24" autocomplete="nickname" placeholder="Tu apodo" aria-label="Tu apodo" style="flex:1;min-width:150px;background:#111113;color:#fff;border:1px solid #705724;border-radius:10px;padding:12px;font:inherit">
+  <button class="action" type="submit">Guardar perfil</button>
+ </form>
+ <p id="playerProfileMessage" class="note" role="status" aria-live="polite" style="margin:8px 0 0"></p>
+ <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:12px">
+  <div style="padding:10px 6px;border:1px solid #514321;border-radius:10px;text-align:center"><strong id="profileAnimalCount" style="display:block;color:#ffdf8a;font-size:1.2rem">0/8</strong><span class="note">Animales</span></div>
+  <div style="padding:10px 6px;border:1px solid #514321;border-radius:10px;text-align:center"><strong id="profileGameCount" style="display:block;color:#ffdf8a;font-size:1.2rem">0</strong><span class="note">Partidas</span></div>
+  <div style="padding:10px 6px;border:1px solid #514321;border-radius:10px;text-align:center"><strong id="profileDuelCount" style="display:block;color:#ffdf8a;font-size:1.2rem">0</strong><span class="note">Duelos</span></div>
+ </div>
+ <div class="actions" style="margin-top:12px"><button class="action secondary" id="profileHistoryButton" type="button">📜 Ver mi historial</button></div>
+ <div id="profileHistory" class="hidden"></div>
+</section>
 
 <section class="panel level-panel" aria-label="Progreso de nivel">
  <div class="level-heading"><span class="kicker">PROGRESO LQDD</span><strong id="levelNumber">NIVEL 0</strong></div>
@@ -1222,5 +1238,30 @@ if("serviceWorker" in navigator){window.addEventListener("load",()=>{navigator.s
 setupDuelInvite();
 
 /* La protección de copia se limita a CSS para no interferir con la X, los botones ni el menú de compartir. */
+</script>
+
+<script>
+(()=> {
+ const profileKey="lqdd_tvy_player_profile_v1";
+ const $p=id=>document.getElementById(id);
+ function getProfile(){try{const p=JSON.parse(localStorage.getItem(profileKey)||"{}");return p&&typeof p==="object"?p:{}}catch(e){return {}}}
+ function historyItems(){try{const h=JSON.parse(localStorage.getItem("lqdd_tvy_daily_history_v1")||"[]");return Array.isArray(h)?h:[]}catch(e){return []}}
+ function refreshProfile(){
+  const p=getProfile(),nick=typeof p.nickname==="string"?p.nickname:"";
+  if($p("playerNickname")&&document.activeElement!==$p("playerNickname"))$p("playerNickname").value=nick;
+  const unlocked=(()=>{try{const d=JSON.parse(localStorage.getItem("lqdd_tvy_data_v1")||"{}");return Array.isArray(d.unlocked)?d.unlocked.length:0}catch(e){return 0}})();
+  const h=historyItems(),games=h.filter(g=>g&&g.type!=="duel").length,duels=h.filter(g=>g&&g.type==="duel").length;
+  if($p("profileAnimalCount"))$p("profileAnimalCount").textContent=Math.min(8,unlocked)+"/8";
+  if($p("profileGameCount"))$p("profileGameCount").textContent=String(games);
+  if($p("profileDuelCount"))$p("profileDuelCount").textContent=String(duels);
+ }
+ const form=$p("playerProfileForm");
+ if(form)form.addEventListener("submit",e=>{e.preventDefault();const nickname=($p("playerNickname").value||"").trim().replace(/\s+/g," ").slice(0,24);try{localStorage.setItem(profileKey,JSON.stringify({nickname,updatedAt:new Date().toISOString()}));$p("playerProfileMessage").textContent=nickname?"Perfil guardado para "+nickname+".":"Apodo eliminado. El perfil sigue siendo local."; }catch(err){$p("playerProfileMessage").textContent="No se pudo guardar en este dispositivo."; }refreshProfile();});
+ const hb=$p("profileHistoryButton");
+ if(hb)hb.addEventListener("click",()=>{const host=$p("profileHistory");if(!host)return;const opening=host.classList.contains("hidden");if(opening){host.classList.remove("hidden");if(typeof showDailyHistory==="function"){const old=$p("todayHistory");if(old){showDailyHistory();host.replaceChildren(...Array.from(old.childNodes).map(n=>n.cloneNode(true)));}else host.textContent="El historial aparecerá aquí cuando completes partidas o duelos."; }else host.textContent="El historial aparecerá aquí cuando completes partidas o duelos.";hb.textContent="✕ Cerrar historial";}else{host.classList.add("hidden");hb.textContent="📜 Ver mi historial";}});
+ refreshProfile();
+ document.addEventListener("click",e=>{if(e.target&&e.target.id==="restart")setTimeout(refreshProfile,300);});
+ window.addEventListener("storage",refreshProfile);
+})();
 </script>
 </body></html>
