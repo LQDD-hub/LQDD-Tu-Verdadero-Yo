@@ -628,12 +628,13 @@ input,textarea,[contenteditable="true"]{
   <div style="padding:10px 6px;border:1px solid #514321;border-radius:10px;text-align:center"><strong id="profileGameCount" style="display:block;color:#ffdf8a;font-size:1.2rem">0</strong><span class="note">Partidas</span></div>
   <div style="padding:10px 6px;border:1px solid #514321;border-radius:10px;text-align:center"><strong id="profileDuelCount" style="display:block;color:#ffdf8a;font-size:1.2rem">0</strong><span class="note">Duelos</span></div>
  </div>
- <div class="actions" style="margin-top:12px"><button class="action secondary" id="profileHistoryButton" type="button">📜 Ver mi historial</button></div>
- <div id="profileHistory" class="hidden"></div>
+ 
 
  </section>
 </div>
 </section>
+
+<section class="panel" id="standaloneHistoryPanel" style="padding:14px 16px"><button class="action secondary" id="standaloneHistoryToggle" type="button" aria-expanded="false" aria-controls="standaloneHistory" style="width:100%">📜 Historial de duelos ▾</button><div id="standaloneHistory" class="hidden" style="margin-top:12px"></div></section>
 
 <section class="panel duel-invite hidden" id="duelInvite"><div class="kicker">⚔️ RETO DE AMIGOS · LQDD</div><h2>¡Te han retado a un duelo animal!</h2><div class="invite-versus"><img id="inviteAnimalImg" alt=""><div><strong id="inviteAnimalName"></strong><span>TE RETA A UN DUELO</span></div></div><p id="inviteText">Haz el test para descubrir quién gana este duelo.</p><p class="note">Al terminar podrás comparar vuestras cartas, porcentajes y cinco habilidades.</p><button class="action hidden" id="viewSharedDuel">Ver resultado del duelo</button></section>
 <section class="panel" id="quiz" aria-live="polite"><div class="topline"><span id="counter"></span><span id="percent"></span></div><div class="track"><div class="fill" id="fill" style="width:10%"></div></div><div class="kicker" style="margin-bottom:10px">¿Qué animal eres?</div><h2 id="question">Preparando el test…</h2><div class="answers" id="answers"></div><p class="note">Las preguntas y respuestas cambian de orden entre partidas. Test orientativo de reflexión personal.</p></section>
@@ -1298,8 +1299,27 @@ setupDuelInvite();
  }
  const form=$p("playerProfileForm");
  if(form)form.addEventListener("submit",e=>{e.preventDefault();const nickname=($p("playerNickname").value||"").trim().replace(/\s+/g," ").slice(0,24);if(!nickname){$p("playerProfileMessage").textContent="Escribe un apodo para crear tu perfil."; $p("playerNickname").focus();return;}try{localStorage.setItem(profileKey,JSON.stringify({nickname,updatedAt:new Date().toISOString()}));$p("playerProfileMessage").textContent="Perfil guardado para "+nickname+"."; }catch(err){$p("playerProfileMessage").textContent="No se pudo guardar en este dispositivo.";return;}refreshProfile();const dropdown=$p("profileDropdown"),toggle=$p("profileDropdownToggle");if(dropdown)dropdown.classList.add("hidden");if(toggle){toggle.setAttribute("aria-expanded","false");toggle.textContent="Editar perfil ✎";}});
- const hb=$p("profileHistoryButton");
- if(hb)hb.addEventListener("click",()=>{const host=$p("profileHistory");if(!host)return;const opening=host.classList.contains("hidden");if(opening){host.classList.remove("hidden");host.replaceChildren();const history=historyItems().filter(g=>g&&(g.type==="duel"||(typeof g.winner==="string")));if(!history.length){const empty=document.createElement("p");empty.className="note";empty.textContent="Todavía no hay partidas ni duelos guardados en este dispositivo.";host.append(empty);}else{history.sort((a,b)=>String(b.date||"").localeCompare(String(a.date||"")));history.forEach(g=>{const row=document.createElement("div");row.style.cssText="padding:9px 0;border-top:1px solid #514321;color:#f5d98d;font-weight:700";if(g.type==="duel"){const a=profiles[g.creator_animal],b=profiles[g.guest_animal];row.textContent="⚔️ Duelo: "+(a?a.title:g.creator_animal)+" contra "+(b?b.title:g.guest_animal)+" · "+(g.date||"");}else{const p=profiles[g.winner];row.textContent="🏆 "+(p?p.title:g.winner)+" · "+(g.date||"")+" · "+(Number(g.pointsAwarded)||pointsForAnimal(g.winner))+" puntos";}host.append(row);});}hb.textContent="✕ Cerrar historial";}else{host.classList.add("hidden");hb.textContent="📜 Ver mi historial";}});
+
+ const historyToggle=document.getElementById("standaloneHistoryToggle"),historyPanel=document.getElementById("standaloneHistory");
+ if(historyToggle&&historyPanel)historyToggle.addEventListener("click",()=>{
+  const opening=historyPanel.classList.contains("hidden");
+  historyPanel.classList.toggle("hidden",!opening);historyToggle.setAttribute("aria-expanded",String(opening));
+  historyToggle.textContent=opening?"✕ Cerrar historial de duelos ▴":"📜 Historial de duelos ▾";
+  if(!opening)return;
+  historyPanel.replaceChildren();
+  const duels=historyItems().filter(g=>g&&g.type==="duel"&&profiles[g.creator_animal]&&profiles[g.guest_animal]).sort((a,b)=>String(b.date||"").localeCompare(String(a.date||""))||String(b.time||"").localeCompare(String(a.time||"")));
+  if(!duels.length){const empty=document.createElement("p");empty.className="note";empty.textContent="Todavía no hay duelos guardados en este dispositivo.";historyPanel.append(empty);return;}
+  duels.forEach(g=>{
+   const row=document.createElement("button");row.type="button";row.style.cssText="display:block;width:100%;text-align:left;padding:12px 4px;border:0;border-top:1px solid #514321;background:transparent;color:#f5d98d;font:inherit;cursor:pointer";
+   const a=profiles[g.creator_animal],b=profiles[g.guest_animal];
+   row.textContent="⚔️ "+(g.creator_nickname||"Atacante")+" · "+a.title+" vs. "+(g.guest_nickname||"Defensor")+" · "+b.title+" — "+(g.date||"");
+   row.addEventListener("click",async()=>{
+    if(g.code){try{const room=await duelRequest({action:"get",code:g.code});if(room&&room.guest_animal){activeDuelRoom=room;duelCode=g.code;openAnimalDuel(room.creator_animal,room.guest_animal,animalPercent(room.creator_animal),animalPercent(room.guest_animal));return;}}catch(e){}}
+    activeDuelRoom=g;duelCode=g.code||"";openAnimalDuel(g.creator_animal,g.guest_animal,animalPercent(g.creator_animal),animalPercent(g.guest_animal));
+   });
+   historyPanel.append(row);
+  });
+ });
  refreshProfile();
  document.addEventListener("click",e=>{if(e.target&&e.target.id==="restart")setTimeout(refreshProfile,300);});
  window.addEventListener("storage",refreshProfile);
