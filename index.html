@@ -578,7 +578,23 @@ html,body,#app,main,header,section,article,footer,p,h1,h2,h3,h4,li,span,label,st
 input,textarea,[contenteditable="true"]{
  -webkit-user-select:text!important;user-select:text!important;-webkit-touch-callout:default!important;
 }
+
+.player-panel label{display:block;color:var(--gold2);font-size:.88rem;margin:10px 0 5px}
+.player-panel input{display:block;width:100%;min-width:0;padding:13px 14px;border:1px solid #51452c;border-radius:12px;background:#111;color:#fff;font:inherit}
+.player-panel input:focus{outline:2px solid var(--gold);outline-offset:1px}
+.player-history{display:grid;gap:10px}.history-entry{border:1px solid #34312a;border-radius:13px;padding:12px;background:#111}.history-entry strong{color:var(--gold2)}.history-meta{color:var(--muted);font-size:.82rem;margin-top:5px}.player-status-ok{color:#a8d6a0}
 </style></head><body><main><header><img class="brand-logo" src="logo-lqdd.png" alt="Logotipo oficial LQDD con lobo, corona, laureles y cruz"><div class="kicker">Autoconocimiento · LQDD</div><h1>Tu Verdadero Yo Animal</h1><p class="subtitle">¿Eres un Lobo que lidera, un Búho que calcula o un Zorro que encuentra caminos? Responde y descubre el animal que representa tu forma de ser.</p></header>
+<section class="panel player-panel" id="playerPanel">
+ <div class="topline"><span>👤 PERFIL LQDD</span><span id="playerStatus">Sin iniciar sesión</span></div>
+ <p class="note" id="playerMessage">Crea tu perfil para conservar tus tests y duelos aunque cambies de móvil.</p>
+ <div id="playerAuthForm">
+  <label for="playerName">Nombre o apodo</label><input id="playerName" maxlength="24" autocomplete="nickname" placeholder="Tu nombre en LQDD">
+  <label for="playerEmail">Correo electrónico</label><input id="playerEmail" type="email" autocomplete="email" placeholder="tu@correo.com">
+  <label for="playerPassword">Contraseña</label><input id="playerPassword" type="password" minlength="8" autocomplete="current-password" placeholder="Mínimo 8 caracteres">
+  <div class="actions"><button class="action" id="playerSignup">Crear perfil</button><button class="action secondary" id="playerLogin">Ya tengo perfil</button></div>
+ </div>
+ <div class="actions hidden" id="playerSignedIn"><button class="action secondary" id="playerRename">Cambiar apodo</button><button class="action secondary" id="playerLogout">Cerrar sesión</button></div>
+</section>
 <div class="stats"><div class="pill">🔥 Racha: <strong id="streak">0 días</strong></div><div class="pill">🏆 Colección: <strong id="collectionCount">0 de 8</strong></div></div>
 
 <section class="panel level-panel" aria-label="Progreso de nivel">
@@ -591,6 +607,11 @@ input,textarea,[contenteditable="true"]{
 <section class="panel duel-invite hidden" id="duelInvite"><div class="kicker">⚔️ RETO DE AMIGOS · LQDD</div><h2>¡Te han retado a un duelo animal!</h2><div class="invite-versus"><img id="inviteAnimalImg" alt=""><div><strong id="inviteAnimalName"></strong><span>TE RETA A UN DUELO</span></div></div><p id="inviteText">Haz el test para descubrir quién gana este duelo.</p><p class="note">Al terminar podrás comparar vuestras cartas, porcentajes y cinco habilidades.</p><button class="action hidden" id="viewSharedDuel">Ver resultado del duelo</button></section>
 <section class="panel" id="quiz" aria-live="polite"><div class="topline"><span id="counter"></span><span id="percent"></span></div><div class="track"><div class="fill" id="fill" style="width:10%"></div></div><div class="kicker" style="margin-bottom:10px">¿Qué animal eres?</div><h2 id="question">Preparando el test…</h2><div class="answers" id="answers"></div><p class="note">Las preguntas y respuestas cambian de orden entre partidas. Test orientativo de reflexión personal.</p></section>
 <section class="panel result hidden" id="result" aria-live="polite"><div class="kicker">TU RESULTADO LQDD</div><img class="result-symbol" id="symbol" src="oso.png" alt="Animal de tu resultado" width="220" height="220"><div class="gold-animal" id="goldAnimal" aria-label="Símbolo dorado del animal">🐾</div><video class="result-video hidden" id="resultVideo" playsinline autoplay loop preload="metadata" controlslist="nodownload nofullscreen noremoteplayback" disablepictureinpicture disableremoteplayback tabindex="-1" aria-label="Vídeo animado del animal"></video><div id="badge"></div><div id="secretTag" class="kicker hidden">✦ PERFIL SECRETO DESBLOQUEADO ✦</div><h2 id="resultTitle"></h2><div class="result-points" id="resultPoints">0/15</div><p class="tag" id="shareLine"></p><p id="resultText"></p><ul class="strengths" id="strengths"></ul><p class="second" id="second"></p><div class="bars" id="bars"></div><p id="compatibility"></p><p class="muted" id="collectionMessage"></p><div class="actions"><button class="action hidden" id="viewDuel">Ver resultado del duelo</button><button class="action" id="share" style="background:linear-gradient(135deg,#ffdf8a,#d8a83d);color:#18140a;border-color:var(--gold);box-shadow:0 7px 22px #e7bd5740">⚔️ Duelo con amigo ⚔️</button><button class="action secondary" id="restart">Otra partida</button></div></section>
+<section class="panel" id="playerHistoryPanel">
+ <div class="topline"><span>📜 Historial de partidas</span><span id="historyCount">0 partidas</span></div>
+ <p class="note" id="historyMessage">Inicia sesión para guardar y consultar tu historial en cualquier dispositivo.</p>
+ <div id="playerHistory" class="player-history"></div>
+</section>
 <section class="panel"><div class="topline"><span>🏆 Tu colección</span><span id="collectionSub">Perfiles descubiertos</span></div><div class="collection" id="collection"></div><p class="note">Toca cualquier animal descubierto para abrir su tarjeta y compartirla. Puedes compartir todas las tarjetas que hayas desbloqueado; los perfiles bloqueados se desbloquean al completar tests.</p></section><div class="meaning-overlay hidden" id="meaningOverlay" role="dialog" aria-modal="true" aria-labelledby="meaningTitle"><article class="meaning-card"><button class="meaning-close" id="meaningClose" aria-label="Cerrar tarjeta">×</button><div class="kicker">✦ SIGNIFICADO DE TU ANIMAL ✦</div><div id="meaningRarity" class="rarity-chip tier-normal">● ANIMAL NORMAL</div><img id="meaningImage" src="" alt=""><div class="gold-animal" id="meaningGoldAnimal" aria-label="Símbolo dorado del animal">🐾</div><video class="meaning-video hidden" id="meaningVideo" playsinline autoplay loop preload="auto" controls controlslist="nodownload nofullscreen noremoteplayback" aria-label="Vídeo del animal; usa el control de volumen para escuchar el sonido"></video><h2 id="meaningTitle"></h2><p class="meaning-quote" id="meaningQuote"></p><p id="meaningText"></p><div class="actions"><button class="action" id="meaningChallenge">⚔️ Retar a un amigo</button><button class="action secondary" id="meaningDone">Cerrar tarjeta</button></div></article></div><footer>© LQDD · Tu Verdadero Yo Animal</footer></main><div class="duel-overlay hidden" id="duelOverlay" role="dialog" aria-modal="true" aria-labelledby="duelTitle"><section class="duel-box"><button class="duel-close" id="duelClose" aria-label="Cerrar duelo">×</button><div class="kicker">✦ DUELO LQDD ✦</div><h2 id="duelTitle">¿Quién gana?</h2><p class="duel-subtitle" id="duelSubtitle">Dos animales. Un ganador.</p><div class="duel-cards"><article class="duel-animal" id="duelMine"><div class="duel-winner hidden">🏆 GANADOR</div><img id="duelMineImg" alt=""><h3 id="duelMineName"></h3><div class="duel-percent" id="duelMinePercent">0%</div><div class="duel-track"><i id="duelMineBar"></i></div><span class="duel-owner">TU ANIMAL</span></article><div class="duel-vs">VS</div><article class="duel-animal" id="duelFriend"><div class="duel-winner hidden">🏆 GANADOR</div><img id="duelFriendImg" alt=""><h3 id="duelFriendName"></h3><div class="duel-percent" id="duelFriendPercent">0%</div><div class="duel-track"><i id="duelFriendBar"></i></div><span class="duel-owner">ANIMAL DEL AMIGO</span></article></div><div class="duel-verdict" id="duelVerdict"></div><div class="duel-skills" id="duelSkills"></div><p class="duel-note">Los porcentajes de habilidades son atributos de juego de LQDD, no una medición científica de la personalidad.</p><button class="action" id="duelOk">¡Entendido!</button></section></div>
 <script>
 const questions=[
@@ -932,7 +953,7 @@ document.addEventListener("keydown",e=>{if(e.key==="Escape")closeMeaning()});
 function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
 let qs=[],i=0,score={},chosen=[],last=null;
 const dailyPlayKey="lqdd_tvy_daily_play_v1",dailyCountKey="lqdd_tvy_daily_count_v1",dailyResultKey="lqdd_tvy_daily_result_v1",dailyHistoryKey="lqdd_tvy_daily_history_v1",dailyLimit=3;function todayKey(){const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}function playsToday(){try{const saved=JSON.parse(localStorage.getItem(dailyCountKey)||"null");if(saved&&saved.date===todayKey())return Math.max(0,Math.min(dailyLimit,Number(saved.count)||0));return localStorage.getItem(dailyPlayKey)===todayKey()?1:0}catch(e){return 0}}function playedToday(){return playsToday()>=dailyLimit}function applyResultRarity(id){const panel=$("result");panel.classList.remove("rarity-normal","rarity-secret","rarity-supreme");const p=profiles[id];const tier=id==="protector"?"supreme":p&&p.secret?"secret":"normal";panel.classList.add("rarity-"+tier);const tag=$("secretTag");tag.classList.remove("hidden");tag.className="kicker rarity-label tier-"+tier;tag.textContent=tier==="supreme"?"✦ SECRETO SUPREMO DESBLOQUEADO ✦":tier==="secret"?"◆ PERFIL SECRETO DESBLOQUEADO ◆":"● ANIMAL NORMAL DESCUBIERTO ●";panel.style.setProperty("--tier",tier==="supreme"?"#ffdf8a":tier==="secret"?"#c5a0ff":"#78d9a4");}function setRarityBadge(id,fresh){const p=profiles[id],tier=id==="protector"?"supreme":p&&p.secret?"secret":"normal";const label=tier==="supreme"?"SECRETO SUPREMO":tier==="secret"?"PERFIL SECRETO":"ANIMAL NORMAL";$("badge").innerHTML='<span class="rarity-chip tier-'+tier+'">'+(fresh?"★ NUEVO · ":"✦ ")+label+" · "+pointsForAnimal(id)+" PUNTOS PARA DESBLOQUEAR"+(fresh?" · DESCUBIERTO":"")+"</span>";}
-function showSavedResult(){let saved=null;try{saved=JSON.parse(localStorage.getItem(dailyResultKey)||"null")}catch(e){}if(!saved||saved.date!==todayKey()||!profiles[saved.winner]){showDailyHistory();return}const winner=saved.winner,p=profiles[winner],stats=getAnimalStats();last=winner;applyResultRarity(winner);$("quiz").classList.add("hidden");$("dailyLimit").classList.add("hidden");$("result").classList.remove("hidden");$("result").classList.remove("reveal-active");setRarityBadge(winner,false);$("resultTitle").textContent=p.title;const resultPoints=$("resultPoints");if(resultPoints){resultPoints.textContent="Aciertos: "+correctAnswers+" de "+qs.length;resultPoints.style.display="block";}$("shareLine").textContent="";$("shareLine").classList.add("hidden");$("resultText").textContent=p.text;$("strengths").replaceChildren(...(p.strengths||[]).map(s=>{let li=document.createElement("li");li.textContent=s;return li}));$("second").textContent="Este es el perfil que has obtenido en el reto de hoy.";$("bars").replaceChildren();const savedAffinity=affinityPercent(winner,10,10);const savedRow=document.createElement("div");savedRow.className="row discovered-result-row";savedRow.innerHTML="<span></span><div class=\"bar\"><i></i></div><b></b>";savedRow.children[0].textContent="Afinidad";savedRow.children[1].firstChild.style.width=savedAffinity+"%";savedRow.children[2].textContent=savedAffinity+" %";$("bars").append(savedRow);$("collectionMessage").textContent="Tu resultado de hoy está guardado en este dispositivo.";$("compatibility").textContent="";const rv=$("resultVideo");rv.pause();rv.removeAttribute("src");rv.classList.remove("hidden");rv.loop=false;rv.muted=false;rv.defaultMuted=false;rv.currentTime=0;rv.src=animalVideos[winner];rv.load();rv.play().catch(()=>{});const resultPanel=$("result");resultPanel.classList.remove("gold-reveal");void resultPanel.offsetWidth;resultPanel.classList.add("gold-reveal");setTimeout(()=>resultPanel.classList.remove("gold-reveal"),2400);resultPanel.scrollIntoView({behavior:"smooth",block:"start"})}function showDailyLimit(){let box=$("dailyLimit");if(!box){box=document.createElement("section");box.id="dailyLimit";box.className="panel";box.innerHTML="<div class='kicker'>✦ LQDD · RETO DIARIO ✦</div><h2>Ya has completado tus tres juegos de hoy</h2><p class='subtitle'>Consulta los animales y puntos de tus partidas.</p><div class='actions'><button class='action' id='viewTodayResult' type='button'>🏆 Ver mi juego de hoy</button></div><div id='todayHistory' class='hidden'></div>";$("quiz").before(box)}box.classList.remove("hidden");const btn=$("viewTodayResult"),host=$("todayHistory");if(btn)btn.onclick=()=>{if(host.classList.contains("hidden")){showDailyHistory();host.classList.remove("hidden");btn.textContent="🏆 Cerrar mi juego de hoy"}else{host.classList.add("hidden");btn.textContent="🏆 Ver mi juego de hoy"}}}function showDailyHistory(){const host=$("todayHistory");if(!host)return;let history=[];try{history=JSON.parse(localStorage.getItem(dailyHistoryKey)||"[]")}catch(e){}if(!Array.isArray(history))history=[];history=history.filter(g=>g&&(g.type==="duel"?(profiles[g.creator_animal]&&profiles[g.guest_animal]):profiles[g.winner])).sort((a,b)=>String(b.date||"").localeCompare(String(a.date||""))||(a.number||999)-(b.number||999));host.replaceChildren();const total=history.reduce((sum,g)=>sum+(Number(g.pointsAwarded)||pointsForAnimal(g.winner)),0);host.style.cssText="margin-top:12px";host.style.cssText="margin-top:8px;padding:8px 10px;border:1px solid #514321;border-radius:12px;background:#111113";const head=document.createElement("div");head.style.cssText="font-weight:800;color:#ffdf8a;font-size:.78rem;margin:0 0 6px";head.textContent="Mi historial · Partidas y duelos";host.append(head);if(!history.length){const empty=document.createElement("p");empty.className="note";empty.textContent="Todavía no hay partidas ni duelos guardados en este dispositivo.";host.append(empty);return}history.forEach(g=>{
+function showSavedResult(){let saved=null;try{saved=JSON.parse(localStorage.getItem(dailyResultKey)||"null")}catch(e){}if(!saved||saved.date!==todayKey()||!profiles[saved.winner]){showDailyHistory();return}const winner=saved.winner,p=profiles[winner],stats=getAnimalStats();last=winner;savePlayerHistory({mode:"individual",animal_id:winner,correct_answers:correctAnswers,total_questions:qs.length,metadata:{answers:chosen.slice()}});applyResultRarity(winner);$("quiz").classList.add("hidden");$("dailyLimit").classList.add("hidden");$("result").classList.remove("hidden");$("result").classList.remove("reveal-active");setRarityBadge(winner,false);$("resultTitle").textContent=p.title;const resultPoints=$("resultPoints");if(resultPoints){resultPoints.textContent="Aciertos: "+correctAnswers+" de "+qs.length;resultPoints.style.display="block";}$("shareLine").textContent="";$("shareLine").classList.add("hidden");$("resultText").textContent=p.text;$("strengths").replaceChildren(...(p.strengths||[]).map(s=>{let li=document.createElement("li");li.textContent=s;return li}));$("second").textContent="Este es el perfil que has obtenido en el reto de hoy.";$("bars").replaceChildren();const savedAffinity=affinityPercent(winner,10,10);const savedRow=document.createElement("div");savedRow.className="row discovered-result-row";savedRow.innerHTML="<span></span><div class=\"bar\"><i></i></div><b></b>";savedRow.children[0].textContent="Afinidad";savedRow.children[1].firstChild.style.width=savedAffinity+"%";savedRow.children[2].textContent=savedAffinity+" %";$("bars").append(savedRow);$("collectionMessage").textContent="Tu resultado de hoy está guardado en este dispositivo.";$("compatibility").textContent="";const rv=$("resultVideo");rv.pause();rv.removeAttribute("src");rv.classList.remove("hidden");rv.loop=false;rv.muted=false;rv.defaultMuted=false;rv.currentTime=0;rv.src=animalVideos[winner];rv.load();rv.play().catch(()=>{});const resultPanel=$("result");resultPanel.classList.remove("gold-reveal");void resultPanel.offsetWidth;resultPanel.classList.add("gold-reveal");setTimeout(()=>resultPanel.classList.remove("gold-reveal"),2400);resultPanel.scrollIntoView({behavior:"smooth",block:"start"})}function showDailyLimit(){let box=$("dailyLimit");if(!box){box=document.createElement("section");box.id="dailyLimit";box.className="panel";box.innerHTML="<div class='kicker'>✦ LQDD · RETO DIARIO ✦</div><h2>Ya has completado tus tres juegos de hoy</h2><p class='subtitle'>Consulta los animales y puntos de tus partidas.</p><div class='actions'><button class='action' id='viewTodayResult' type='button'>🏆 Ver mi juego de hoy</button></div><div id='todayHistory' class='hidden'></div>";$("quiz").before(box)}box.classList.remove("hidden");const btn=$("viewTodayResult"),host=$("todayHistory");if(btn)btn.onclick=()=>{if(host.classList.contains("hidden")){showDailyHistory();host.classList.remove("hidden");btn.textContent="🏆 Cerrar mi juego de hoy"}else{host.classList.add("hidden");btn.textContent="🏆 Ver mi juego de hoy"}}}function showDailyHistory(){const host=$("todayHistory");if(!host)return;let history=[];try{history=JSON.parse(localStorage.getItem(dailyHistoryKey)||"[]")}catch(e){}if(!Array.isArray(history))history=[];history=history.filter(g=>g&&(g.type==="duel"?(profiles[g.creator_animal]&&profiles[g.guest_animal]):profiles[g.winner])).sort((a,b)=>String(b.date||"").localeCompare(String(a.date||""))||(a.number||999)-(b.number||999));host.replaceChildren();const total=history.reduce((sum,g)=>sum+(Number(g.pointsAwarded)||pointsForAnimal(g.winner)),0);host.style.cssText="margin-top:12px";host.style.cssText="margin-top:8px;padding:8px 10px;border:1px solid #514321;border-radius:12px;background:#111113";const head=document.createElement("div");head.style.cssText="font-weight:800;color:#ffdf8a;font-size:.78rem;margin:0 0 6px";head.textContent="Mi historial · Partidas y duelos";host.append(head);if(!history.length){const empty=document.createElement("p");empty.className="note";empty.textContent="Todavía no hay partidas ni duelos guardados en este dispositivo.";host.append(empty);return}history.forEach(g=>{
  const row=document.createElement("button");row.type="button";row.style.cssText="display:flex;width:100%;align-items:center;gap:8px;text-align:left;padding:8px 0;border:0;border-top:1px solid #514321;background:transparent;color:inherit;cursor:pointer";
  const info=document.createElement("div");info.style.cssText="flex:1;min-width:0";
  const title=document.createElement("div");title.style.cssText="font-weight:800;color:#f5d98d;font-size:.78rem;margin-bottom:2px";
@@ -1215,11 +1236,109 @@ function setMusicPhase(phase){
 }
 
 
+
+const PLAYER_AUTH_URL="https://ghsbkpetgsfixpjeuroa.supabase.co/auth/v1";
+const PLAYER_REST_URL="https://ghsbkpetgsfixpjeuroa.supabase.co/rest/v1";
+const PLAYER_SESSION_KEY="lqdd_player_session_v1";
+let playerSession=null,playerProfile=null,historyLoaded=false;
+try{playerSession=JSON.parse(localStorage.getItem(PLAYER_SESSION_KEY)||"null")}catch(e){playerSession=null}
+function playerHeaders(extra={}){return{"apikey":DUEL_API_KEY,"Authorization":"Bearer "+(playerSession?.access_token||DUEL_API_KEY),"Content-Type":"application/json",...extra}}
+async function playerAuth(path,body){
+ const r=await fetch(PLAYER_AUTH_URL+path,{method:"POST",headers:{"apikey":DUEL_API_KEY,"Content-Type":"application/json"},body:JSON.stringify(body)});
+ const d=await r.json().catch(()=>({}));
+ if(!r.ok)throw new Error(d.msg||d.message||d.error_description||d.error||"No se pudo completar el acceso.");
+ return d;
+}
+async function refreshPlayerSession(){
+ if(!playerSession?.refresh_token)return false;
+ try{const d=await playerAuth("/token?grant_type=refresh_token",{refresh_token:playerSession.refresh_token});playerSession=d;localStorage.setItem(PLAYER_SESSION_KEY,JSON.stringify(d));return true}catch(e){playerSession=null;localStorage.removeItem(PLAYER_SESSION_KEY);return false}
+}
+async function playerFetch(url,options={}){
+ let r=await fetch(url,{...options,headers:{...playerHeaders(),...(options.headers||{})}});
+ if(r.status===401&&await refreshPlayerSession())r=await fetch(url,{...options,headers:{...playerHeaders(),...(options.headers||{})}});
+ if(!r.ok){const d=await r.json().catch(()=>({}));throw new Error(d.message||d.error_description||d.error||"No se pudo guardar la información.");}
+ return r.status===204?null:r.json();
+}
+function setPlayerMessage(text,isError=false){$("playerMessage").textContent=text;$("playerMessage").style.color=isError?"#ff9b8e":""}
+function playerName(){return playerProfile?.display_name||playerSession?.user?.user_metadata?.display_name||$("playerName").value.trim()||"Jugador LQDD"}
+async function loadPlayerProfile(){
+ if(!playerSession?.access_token){renderPlayerAuth();return}
+ try{
+  const rows=await playerFetch(PLAYER_REST_URL+"/player_profiles?select=user_id,display_name&limit=1");
+  playerProfile=rows?.[0]||null;
+  if(!playerProfile){const n=playerSession.user?.user_metadata?.display_name||"Jugador LQDD";await savePlayerProfile(n)}
+  renderPlayerAuth();await loadPlayerHistory();
+ }catch(e){setPlayerMessage("No se pudo cargar el perfil: "+e.message,true);renderPlayerAuth()}
+}
+async function savePlayerProfile(name){
+ const display_name=String(name||"").trim().slice(0,24);
+ if(display_name.length<2)throw new Error("El apodo debe tener al menos dos caracteres.");
+ await playerFetch(PLAYER_REST_URL+"/player_profiles?on_conflict=user_id",{method:"POST",headers:{"Prefer":"resolution=merge-duplicates,return=representation"},body:JSON.stringify({user_id:playerSession.user.id,display_name,updated_at:new Date().toISOString()})});
+ playerProfile={user_id:playerSession.user.id,display_name};
+}
+function renderPlayerAuth(){
+ const logged=!!playerSession?.access_token;
+ $("playerAuthForm").classList.toggle("hidden",logged);
+ $("playerSignedIn").classList.toggle("hidden",!logged);
+ $("playerStatus").textContent=logged?playerName():"Sin iniciar sesión";
+ $("playerStatus").classList.toggle("player-status-ok",logged);
+ if(logged){$("playerName").value=playerName();setPlayerMessage("Perfil guardado. Tus tests y duelos se sincronizan con tu cuenta.")}else{$("historyMessage").textContent="Inicia sesión para guardar y consultar tu historial en cualquier dispositivo."}
+}
+async function doPlayerAuth(mode){
+ const name=$("playerName").value.trim(),email=$("playerEmail").value.trim(),password=$("playerPassword").value;
+ if(!email||!password){setPlayerMessage("Escribe tu correo y contraseña.",true);return}
+ if(mode==="signup"&&name.length<2){setPlayerMessage("Escribe el apodo que verán tus amigos (mínimo dos caracteres).",true);return}
+ try{
+  setPlayerMessage(mode==="signup"?"Creando perfil…":"Iniciando sesión…");
+  if(mode==="signup"){
+   const d=await playerAuth("/signup",{email,password,data:{display_name:name}});
+   if(!d.access_token){
+    setPlayerMessage("Cuenta creada. Si Supabase pide confirmar el correo, confirma el mensaje recibido y después pulsa «Ya tengo perfil».");
+    return;
+   }
+   playerSession=d;
+  }else{
+   playerSession=await playerAuth("/token?grant_type=password",{email,password});
+  }
+  localStorage.setItem(PLAYER_SESSION_KEY,JSON.stringify(playerSession));
+  await savePlayerProfile(name||playerSession.user?.user_metadata?.display_name||"Jugador LQDD");
+  renderPlayerAuth();await loadPlayerHistory();
+ }catch(e){setPlayerMessage(e.message||"No se pudo iniciar sesión.",true)}
+}
+async function savePlayerHistory(entry){
+ if(!playerSession?.access_token)return;
+ try{
+  await playerFetch(PLAYER_REST_URL+"/player_game_history",{method:"POST",headers:{"Prefer":"return=minimal"},body:JSON.stringify({...entry,user_id:playerSession.user.id})});
+  await loadPlayerHistory();
+ }catch(e){console.warn("No se pudo guardar el historial LQDD:",e);setPlayerMessage("Partida jugada, pero no se pudo sincronizar el historial: "+e.message,true)}
+}
+async function loadPlayerHistory(){
+ if(!playerSession?.access_token){$("playerHistory").replaceChildren();$("historyCount").textContent="0 partidas";return}
+ try{
+  const rows=await playerFetch(PLAYER_REST_URL+"/player_game_history?select=id,mode,animal_id,opponent_name,opponent_animal,winner_animal,correct_answers,total_questions,created_at&order=created_at.desc&limit=100");
+  const host=$("playerHistory");host.replaceChildren();
+  rows.forEach(item=>{
+   const card=document.createElement("article");card.className="history-entry";
+   const title=document.createElement("strong");title.textContent=item.mode==="duel"?"⚔️ Duelo contra "+(item.opponent_name||"Amigo"):"🧠 Test individual";
+   const detail=document.createElement("div");detail.textContent=(profiles[item.animal_id]?.title||item.animal_id)+(item.mode==="duel"?" vs. "+(profiles[item.opponent_animal]?.title||item.opponent_animal||"pendiente"):" · "+(item.correct_answers??"—")+"/"+(item.total_questions??"—")+" aciertos");
+   const meta=document.createElement("div");meta.className="history-meta";meta.textContent=new Date(item.created_at).toLocaleString("es-ES",{dateStyle:"medium",timeStyle:"short"})+(item.winner_animal?" · Ganador: "+(profiles[item.winner_animal]?.title||item.winner_animal):"");
+   card.append(title,detail,meta);host.append(card);
+  });
+  $("historyCount").textContent=rows.length+" partidas";
+  $("historyMessage").textContent=rows.length?"Tu historial está sincronizado con tu perfil.":"Todavía no hay partidas guardadas. Completa un test o un duelo.";
+ }catch(e){$("historyMessage").textContent="No se pudo cargar el historial: "+e.message}
+}
+$("playerSignup").addEventListener("click",()=>doPlayerAuth("signup"));
+$("playerLogin").addEventListener("click",()=>doPlayerAuth("login"));
+$("playerLogout").addEventListener("click",()=>{playerSession=null;playerProfile=null;localStorage.removeItem(PLAYER_SESSION_KEY);renderPlayerAuth();loadPlayerHistory();setPlayerMessage("Has cerrado sesión. Tus partidas guardadas seguirán vinculadas a tu cuenta.")});
+$("playerRename").addEventListener("click",async()=>{const name=prompt("Nuevo apodo LQDD:",playerName());if(name===null)return;try{await savePlayerProfile(name);renderPlayerAuth()}catch(e){setPlayerMessage(e.message,true)}});
+
 try{paint()}catch(initError){console.error("LQDD paint error",initError)}try{start()}catch(initError){console.error("LQDD start error",initError);$("quiz").classList.remove("hidden");$("question").textContent="Error al iniciar el test. Pulsa «Reintentar test»."; $("answers").replaceChildren();$("restart").textContent="Reintentar test";}
 if("serviceWorker" in navigator){window.addEventListener("load",()=>{navigator.serviceWorker.register("./sw.js").catch(()=>{});});}
 
 /* Sin tonos artificiales al pulsar botones. */
 setupDuelInvite();
+loadPlayerProfile();
 
 /* La protección de copia se limita a CSS para no interferir con la X, los botones ni el menú de compartir. */
 </script>
