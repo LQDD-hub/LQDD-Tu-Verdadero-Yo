@@ -587,11 +587,27 @@ input,textarea,[contenteditable="true"]{
 .profile-chevron{font-size:1.2rem;transition:transform .18s ease}
 .profile-dropdown[open] .profile-chevron{transform:rotate(180deg)}
 .profile-dropdown #playerProfile{border:0;box-shadow:none;padding:12px;margin:0;background:transparent}
+
+.profile-level-window{margin-top:12px;padding:14px;border:1px solid #514321;border-radius:18px;background:rgba(24,23,24,.94)}
+.profile-level-top{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+.profile-level-title{display:flex;align-items:center;gap:8px;min-width:0;color:#f5d98d;font-weight:750}
+.profile-level-window .profile-summary-nick{margin-left:auto;color:#bcb5a6;font-size:.78rem;font-weight:400;max-width:34%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.profile-mini-toggle{border:1px solid #80652e;border-radius:999px;padding:7px 12px;background:#211b11;color:#ffdf8a;font:inherit;font-size:.84rem;cursor:pointer}
+.profile-level-window .level-panel{margin:0!important;padding:10px 0 4px!important;border:0!important;box-shadow:none!important;background:transparent!important}
+.profile-dropdown-content{margin-top:12px;padding-top:12px;border-top:1px solid #514321}
+.profile-dropdown-content.hidden{display:none!important}
+.profile-dropdown-content #playerProfile{padding:0!important;margin:0!important;border:0!important;background:transparent!important;box-shadow:none!important}
 </style></head><body><main><header><img class="brand-logo" src="logo-lqdd.png" alt="Logotipo oficial LQDD con lobo, corona, laureles y cruz"><div class="kicker">Autoconocimiento · LQDD</div><h1>Tu Verdadero Yo Animal</h1><p class="subtitle">¿Eres un Lobo que lidera, un Búho que calcula o un Zorro que encuentra caminos? Responde y descubre el animal que representa tu forma de ser.</p></header>
 <div class="stats"><div class="pill">🔥 Racha: <strong id="streak">0 días</strong></div><div class="pill">🏆 Colección: <strong id="collectionCount">0 de 8</strong></div></div>
-<details id="profileDropdown" class="profile-dropdown">
- <summary><span>👤 Mi perfil LQDD</span><span id="profileSummaryNickname" class="profile-summary-nick">Este dispositivo</span><span class="profile-chevron" aria-hidden="true">⌄</span></summary>
- <section class="panel" id="playerProfile" aria-label="Mi perfil LQDD" style="margin-top:8px">
+<section class="panel profile-level-window" aria-label="Perfil y progreso LQDD">
+ <div class="profile-level-top"><div class="profile-level-title"><span>👤 Mi perfil LQDD</span><span id="profileSummaryNickname" class="profile-summary-nick">Este dispositivo</span></div><button type="button" id="profileDropdownToggle" class="profile-mini-toggle" aria-expanded="false" aria-controls="profileDropdown">Abrir perfil ⌄</button></div>
+ <section class="panel level-panel" aria-label="Progreso de nivel">
+ <div class="level-heading"><span class="kicker">PROGRESO LQDD</span><strong id="levelNumber">NIVEL 0</strong></div>
+ <div class="level-track" role="progressbar" aria-label="Progreso hacia el nivel ocho" aria-valuemin="0" aria-valuemax="8" aria-valuenow="0" id="levelProgress"><div class="level-fill" id="levelFill" style="width:0%"></div></div>
+ <div class="level-foot"><span id="levelProgressText">0 de 8 animales descubiertos</span><span id="nextLevel">Siguiente: nivel 1</span></div>
+ <p class="level-message" id="levelMessage">Descubre animales para subir de nivel. Cada nuevo perfil te acerca al nivel 8.</p>
+</section>
+ <div id="profileDropdown" class="profile-dropdown-content hidden"><section class="panel" id="playerProfile" aria-label="Mi perfil LQDD" style="margin-top:8px">
 
 <p class="note" style="margin:8px 0">Elige tu apodo para personalizar el juego. No necesitas registrarte ni dar tu correo.</p>
  <form id="playerProfileForm" style="display:flex;gap:8px;flex-wrap:wrap">
@@ -608,13 +624,7 @@ input,textarea,[contenteditable="true"]{
  <div id="profileHistory" class="hidden"></div>
 
  </section>
-</details>
-
-<section class="panel level-panel" aria-label="Progreso de nivel">
- <div class="level-heading"><span class="kicker">PROGRESO LQDD</span><strong id="levelNumber">NIVEL 0</strong></div>
- <div class="level-track" role="progressbar" aria-label="Progreso hacia el nivel ocho" aria-valuemin="0" aria-valuemax="8" aria-valuenow="0" id="levelProgress"><div class="level-fill" id="levelFill" style="width:0%"></div></div>
- <div class="level-foot"><span id="levelProgressText">0 de 8 animales descubiertos</span><span id="nextLevel">Siguiente: nivel 1</span></div>
- <p class="level-message" id="levelMessage">Descubre animales para subir de nivel. Cada nuevo perfil te acerca al nivel 8.</p>
+</div>
 </section>
 
 <section class="panel duel-invite hidden" id="duelInvite"><div class="kicker">⚔️ RETO DE AMIGOS · LQDD</div><h2>¡Te han retado a un duelo animal!</h2><div class="invite-versus"><img id="inviteAnimalImg" alt=""><div><strong id="inviteAnimalName"></strong><span>TE RETA A UN DUELO</span></div></div><p id="inviteText">Haz el test para descubrir quién gana este duelo.</p><p class="note">Al terminar podrás comparar vuestras cartas, porcentajes y cinco habilidades.</p><button class="action hidden" id="viewSharedDuel">Ver resultado del duelo</button></section>
@@ -1280,4 +1290,4 @@ setupDuelInvite();
  window.addEventListener("storage",refreshProfile);
 })();
 </script>
-</body></html>
+<script>(()=>{const b=document.getElementById("profileDropdownToggle"),p=document.getElementById("profileDropdown");if(!b||!p)return;b.addEventListener("click",()=>{const opening=p.classList.contains("hidden");p.classList.toggle("hidden",!opening);b.setAttribute("aria-expanded",String(opening));b.textContent=opening?"Cerrar perfil ⌃":"Abrir perfil ⌄";});})();</script></body></html>
