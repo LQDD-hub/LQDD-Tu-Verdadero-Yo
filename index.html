@@ -599,15 +599,13 @@ input,textarea,[contenteditable="true"]{
 #playerPanel #playerAuthForm .action{padding:8px 13px;font-size:.82rem}
 #playerPanel #playerMessage{display:none;font-size:.8rem;margin:7px 0 0}
 #playerPanel.profile-editing #playerMessage{display:block}
-#playerPanel .profile-history{display:none;margin-top:10px;border-top:1px solid #514321;padding-top:9px}
-#playerPanel.profile-history-open .profile-history{display:block}
-#playerPanel .profile-history>p{display:none}
 #playerPanel .player-history{gap:7px;max-height:260px;overflow:auto}
 #playerPanel .history-entry{padding:9px}
 #playerPanel .history-entry strong{font-size:.86rem}
 #playerPanel .history-entry div{font-size:.8rem}
 @media(max-width:390px){#playerPanel{padding:7px 8px}#playerPanel .profile-tools{gap:4px}#playerPanel .profile-tool{padding:6px 7px;font-size:.68rem}#playerPanel .profile-name{max-width:30vw}}
-</style></head><body><main><header><img class="brand-logo" src="logo-lqdd.png" alt="Logotipo oficial LQDD con lobo, corona, laureles y cruz"><div class="kicker">Autoconocimiento · LQDD</div><h1>Tu Verdadero Yo Animal</h1><p class="subtitle">¿Eres un Lobo que lidera, un Búho que calcula o un Zorro que encuentra caminos? Responde y descubre el animal que representa tu forma de ser.</p></header>
+
+#playerHistoryPanel{display:none!important}#playerHistoryPanel.local-history-open{display:block!important}</style></head><body><main><header><img class="brand-logo" src="logo-lqdd.png" alt="Logotipo oficial LQDD con lobo, corona, laureles y cruz"><div class="kicker">Autoconocimiento · LQDD</div><h1>Tu Verdadero Yo Animal</h1><p class="subtitle">¿Eres un Lobo que lidera, un Búho que calcula o un Zorro que encuentra caminos? Responde y descubre el animal que representa tu forma de ser.</p></header>
 <section class="panel player-panel" id="playerPanel">
  <div class="topline">
   <div class="profile-main"><span>👤</span><strong class="profile-name" id="playerStatus">Jugador local</strong></div>
@@ -617,11 +615,6 @@ input,textarea,[contenteditable="true"]{
  <div id="playerAuthForm">
   <label for="playerName">Nombre o apodo</label><input id="playerName" maxlength="24" autocomplete="nickname" placeholder="Tu nombre en LQDD">
   <div class="actions"><button class="action" id="playerSignup" type="button">Guardar apodo</button><button class="action secondary" id="profileEditCancel" type="button">Cancelar</button></div>
- </div>
- <div class="profile-history">
-  <div class="topline"><strong>📜 HISTORIAL</strong><span id="historyCount">0 partidas</span></div>
-  <p class="note" id="historyMessage">Tus partidas aparecerán aquí en este dispositivo.</p>
-  <div class="player-history" id="playerHistory"></div>
  </div>
 </section>
 <div class="stats"><div class="pill">🔥 Racha: <strong id="streak">0 días</strong></div><div class="pill">🏆 Colección: <strong id="collectionCount">0 de 8</strong></div></div>
