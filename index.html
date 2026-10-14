@@ -1262,6 +1262,7 @@ setupDuelInvite();
  function refreshProfile(){
   const p=getProfile(),nick=typeof p.nickname==="string"?p.nickname:"";
   if($p("playerNickname")&&document.activeElement!==$p("playerNickname"))$p("playerNickname").value=nick;
+  if($p("profileSummaryNickname"))$p("profileSummaryNickname").textContent=nick||"Este dispositivo";
   const unlocked=(()=>{try{const d=typeof getData==="function"?getData():{};return Array.isArray(d.unlocked)?d.unlocked.length:0}catch(e){return 0}})();
   const h=historyItems(),games=h.filter(g=>g&&g.type!=="duel").length,duels=h.filter(g=>g&&g.type==="duel").length;
   if($p("profileAnimalCount"))$p("profileAnimalCount").textContent=Math.min(8,unlocked)+"/8";
