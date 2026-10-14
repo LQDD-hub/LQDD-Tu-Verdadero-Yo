@@ -1306,7 +1306,7 @@ $("playerRename").addEventListener("click",()=>{const name=prompt("Nuevo apodo L
 renderPlayerAuth();loadPlayerHistory();
 $("profileEditToggle").addEventListener("click",()=>{const panel=$("playerPanel");panel.classList.toggle("profile-editing");if(panel.classList.contains("profile-editing"))$("playerName").focus()});
 $("profileEditCancel").addEventListener("click",()=>{renderPlayerAuth()});
-$("profileHistoryToggle").addEventListener("click",()=>{const panel=$("playerPanel");panel.classList.toggle("profile-history-open");$("profileHistoryToggle").textContent=panel.classList.contains("profile-history-open")?"Cerrar historial":"Mi historial"});
+$("profileHistoryToggle").addEventListener("click",()=>{const history=$("playerHistoryPanel");history.classList.toggle("local-history-open");$("profileHistoryToggle").textContent=history.classList.contains("local-history-open")?"Cerrar historial":"Historial";if(history.classList.contains("local-history-open"))history.scrollIntoView({behavior:"smooth",block:"start"})});
 
 try{paint()}catch(initError){console.error("LQDD paint error",initError)}try{start()}catch(initError){console.error("LQDD start error",initError);$("quiz").classList.remove("hidden");$("question").textContent="Error al iniciar el test. Pulsa «Reintentar test»."; $("answers").replaceChildren();$("restart").textContent="Reintentar test";}
 if("serviceWorker" in navigator){window.addEventListener("load",()=>{navigator.serviceWorker.register("./sw.js").catch(()=>{});});}
