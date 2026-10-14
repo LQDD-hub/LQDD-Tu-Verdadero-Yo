@@ -578,11 +578,22 @@ html,body,#app,main,header,section,article,footer,p,h1,h2,h3,h4,li,span,label,st
 input,textarea,[contenteditable="true"]{
  -webkit-user-select:text!important;user-select:text!important;-webkit-touch-callout:default!important;
 }
+
+/* Perfil compacto y desplegable para móvil */
+.profile-dropdown{margin:12px 0 0;border:1px solid #514321;border-radius:16px;background:rgba(24,23,24,.92);overflow:hidden;color:#f4ead0}
+.profile-dropdown>summary{list-style:none;display:flex;align-items:center;gap:8px;min-height:48px;padding:11px 14px;cursor:pointer;font-weight:700;color:#f5d98d}
+.profile-dropdown>summary::-webkit-details-marker{display:none}
+.profile-summary-nick{margin-left:auto;color:#bcb5a6;font-size:.78rem;font-weight:400;max-width:38%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.profile-chevron{font-size:1.2rem;transition:transform .18s ease}
+.profile-dropdown[open] .profile-chevron{transform:rotate(180deg)}
+.profile-dropdown #playerProfile{border:0;box-shadow:none;padding:12px;margin:0;background:transparent}
 </style></head><body><main><header><img class="brand-logo" src="logo-lqdd.png" alt="Logotipo oficial LQDD con lobo, corona, laureles y cruz"><div class="kicker">Autoconocimiento · LQDD</div><h1>Tu Verdadero Yo Animal</h1><p class="subtitle">¿Eres un Lobo que lidera, un Búho que calcula o un Zorro que encuentra caminos? Responde y descubre el animal que representa tu forma de ser.</p></header>
 <div class="stats"><div class="pill">🔥 Racha: <strong id="streak">0 días</strong></div><div class="pill">🏆 Colección: <strong id="collectionCount">0 de 8</strong></div></div>
-<section class="panel" id="playerProfile" aria-label="Mi perfil LQDD" style="margin-top:12px">
- <div class="topline"><span>👤 Mi perfil LQDD</span><span style="color:var(--gold);font-size:.75rem">Este dispositivo</span></div>
- <p class="note" style="margin:8px 0">Elige tu apodo para personalizar el juego. No necesitas registrarte ni dar tu correo.</p>
+<details id="profileDropdown" class="profile-dropdown">
+ <summary><span>👤 Mi perfil LQDD</span><span id="profileSummaryNickname" class="profile-summary-nick">Este dispositivo</span><span class="profile-chevron" aria-hidden="true">⌄</span></summary>
+ <section class="panel" id="playerProfile" aria-label="Mi perfil LQDD" style="margin-top:8px">
+
+<p class="note" style="margin:8px 0">Elige tu apodo para personalizar el juego. No necesitas registrarte ni dar tu correo.</p>
  <form id="playerProfileForm" style="display:flex;gap:8px;flex-wrap:wrap">
   <input id="playerNickname" name="nickname" maxlength="24" autocomplete="nickname" placeholder="Tu apodo" aria-label="Tu apodo" style="flex:1;min-width:150px;background:#111113;color:#fff;border:1px solid #705724;border-radius:10px;padding:12px;font:inherit">
   <button class="action" type="submit">Guardar perfil</button>
@@ -595,7 +606,9 @@ input,textarea,[contenteditable="true"]{
  </div>
  <div class="actions" style="margin-top:12px"><button class="action secondary" id="profileHistoryButton" type="button">📜 Ver mi historial</button></div>
  <div id="profileHistory" class="hidden"></div>
-</section>
+
+ </section>
+</details>
 
 <section class="panel level-panel" aria-label="Progreso de nivel">
  <div class="level-heading"><span class="kicker">PROGRESO LQDD</span><strong id="levelNumber">NIVEL 0</strong></div>
