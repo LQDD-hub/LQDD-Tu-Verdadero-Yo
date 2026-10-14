@@ -869,6 +869,7 @@ async function shareAnimalProfile(profileId,button){
 
 $("meaningChallenge").onclick=async()=>{
  const id=currentMeaningId,p=profiles[id],button=$("meaningChallenge");if(!p)return;
+ requestDuelNotificationPermission();
  const old=button.textContent;button.disabled=true;button.textContent="Creando duelo…";
  try{
   const room=await duelRequest({action:"create",creatorAnimal:id});
