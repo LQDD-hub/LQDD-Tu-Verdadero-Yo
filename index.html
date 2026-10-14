@@ -1249,7 +1249,7 @@ setupDuelInvite();
  function refreshProfile(){
   const p=getProfile(),nick=typeof p.nickname==="string"?p.nickname:"";
   if($p("playerNickname")&&document.activeElement!==$p("playerNickname"))$p("playerNickname").value=nick;
-  const unlocked=(()=>{try{const d=JSON.parse(localStorage.getItem("lqdd_tvy_data_v1")||"{}");return Array.isArray(d.unlocked)?d.unlocked.length:0}catch(e){return 0}})();
+  const unlocked=(()=>{try{const d=typeof getData==="function"?getData():{};return Array.isArray(d.unlocked)?d.unlocked.length:0}catch(e){return 0}})();
   const h=historyItems(),games=h.filter(g=>g&&g.type!=="duel").length,duels=h.filter(g=>g&&g.type==="duel").length;
   if($p("profileAnimalCount"))$p("profileAnimalCount").textContent=Math.min(8,unlocked)+"/8";
   if($p("profileGameCount"))$p("profileGameCount").textContent=String(games);
@@ -1258,7 +1258,7 @@ setupDuelInvite();
  const form=$p("playerProfileForm");
  if(form)form.addEventListener("submit",e=>{e.preventDefault();const nickname=($p("playerNickname").value||"").trim().replace(/\s+/g," ").slice(0,24);try{localStorage.setItem(profileKey,JSON.stringify({nickname,updatedAt:new Date().toISOString()}));$p("playerProfileMessage").textContent=nickname?"Perfil guardado para "+nickname+".":"Apodo eliminado. El perfil sigue siendo local."; }catch(err){$p("playerProfileMessage").textContent="No se pudo guardar en este dispositivo."; }refreshProfile();});
  const hb=$p("profileHistoryButton");
- if(hb)hb.addEventListener("click",()=>{const host=$p("profileHistory");if(!host)return;const opening=host.classList.contains("hidden");if(opening){host.classList.remove("hidden");if(typeof showDailyHistory==="function"){const old=$p("todayHistory");if(old){showDailyHistory();host.replaceChildren(...Array.from(old.childNodes).map(n=>n.cloneNode(true)));}else host.textContent="El historial aparecerá aquí cuando completes partidas o duelos."; }else host.textContent="El historial aparecerá aquí cuando completes partidas o duelos.";hb.textContent="✕ Cerrar historial";}else{host.classList.add("hidden");hb.textContent="📜 Ver mi historial";}});
+ if(hb)hb.addEventListener("click",()=>{const host=$p("profileHistory");if(!host)return;const opening=host.classList.contains("hidden");if(opening){host.classList.remove("hidden");host.replaceChildren();const history=historyItems().filter(g=>g&&(g.type==="duel"||(typeof g.winner==="string")));if(!history.length){const empty=document.createElement("p");empty.className="note";empty.textContent="Todavía no hay partidas ni duelos guardados en este dispositivo.";host.append(empty);}else{history.sort((a,b)=>String(b.date||"").localeCompare(String(a.date||"")));history.forEach(g=>{const row=document.createElement("div");row.style.cssText="padding:9px 0;border-top:1px solid #514321;color:#f5d98d;font-weight:700";if(g.type==="duel"){const a=profiles[g.creator_animal],b=profiles[g.guest_animal];row.textContent="⚔️ Duelo: "+(a?a.title:g.creator_animal)+" contra "+(b?b.title:g.guest_animal)+" · "+(g.date||"");}else{const p=profiles[g.winner];row.textContent="🏆 "+(p?p.title:g.winner)+" · "+(g.date||"")+" · "+(Number(g.pointsAwarded)||pointsForAnimal(g.winner))+" puntos";}host.append(row);});}hb.textContent="✕ Cerrar historial";}else{host.classList.add("hidden");hb.textContent="📜 Ver mi historial";}});
  refreshProfile();
  document.addEventListener("click",e=>{if(e.target&&e.target.id==="restart")setTimeout(refreshProfile,300);});
  window.addEventListener("storage",refreshProfile);
