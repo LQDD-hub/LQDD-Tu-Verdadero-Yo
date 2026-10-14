@@ -991,7 +991,7 @@ function showSavedResult(){let saved=null;try{saved=JSON.parse(localStorage.getI
  if(g.type==="duel"){
   const a=profiles[g.creator_animal],b=profiles[g.guest_animal];row.setAttribute("aria-label","Ver duelo: atacante "+a.title+" contra defensor "+b.title);
   row.style.cssText+=";flex-wrap:wrap";
-  row.onclick=()=>openAnimalDuel(g.creator_animal,g.guest_animal,animalPercent(g.creator_animal),animalPercent(g.guest_animal));
+  row.onclick=async()=>{if(g.code){try{const room=await duelRequest({action:"get",code:g.code});activeDuelRoom=room;if(room&&room.guest_animal){duelCode=g.code;openAnimalDuel(room.creator_animal,room.guest_animal,animalPercent(room.creator_animal),animalPercent(room.guest_animal));return;}}catch(e){}}openAnimalDuel(g.creator_animal,g.guest_animal,animalPercent(g.creator_animal),animalPercent(g.guest_animal));};
   img.remove();
   const duelCards=document.createElement("div");duelCards.style.cssText="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px;width:100%;";
   [[a,"ATACANTE"],[b,"DEFENSOR"]].forEach(([p,role])=>{
@@ -1002,7 +1002,7 @@ function showSavedResult(){let saved=null;try{saved=JSON.parse(localStorage.getI
    const animalName=document.createElement("strong");animalName.style.cssText="font-size:.72rem;line-height:1.2;color:#f5d98d;overflow-wrap:anywhere";animalName.textContent=p.title;
    labels.append(roleText,animalName);card.append(animalImg,labels);duelCards.append(card);
   });
-  title.textContent="⚔️ Duelo · "+(g.date===todayKey()?"Hoy":g.date||"Otro día")+" · "+(g.time||"");
+  const savedNick=(()=>{try{return (JSON.parse(localStorage.getItem("lqdd_tvy_player_profile_v1")||"{}").nickname||"").trim()}catch(e){return ""}})();const opponentNick=g.creator_nickname||g.guest_nickname||"";title.textContent="⚔️ "+(savedNick||"Tú")+" · "+(opponentNick||"Amigo")+" · "+(g.date===todayKey()?"Hoy":g.date||"Otro día")+" · "+(g.time||"");
   pts.textContent="Toca para ver la comparación";
   info.append(title,pts);row.append(duelCards,info);host.append(row);return;
  }else{
