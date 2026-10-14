@@ -1036,6 +1036,8 @@ async function finish(){const winner=correctAnswers<=3?"inventor":correctAnswers
   $("duelInvite").classList.add("hidden");
   const sharedButton=$("viewSharedDuel");if(sharedButton){sharedButton.classList.remove("hidden");sharedButton.onclick=()=>openAnimalDuel(room.creator_animal,room.guest_animal,animalPercent(room.creator_animal),animalPercent(room.guest_animal));}
   const dailyBox=$("dailyLimit");if(dailyBox){dailyBox.classList.remove("hidden");const host=$("todayHistory");if(host){host.classList.remove("hidden");showDailyHistory();}}
+  // Mostrar también el duelo automáticamente en la pantalla del defensor al terminar su test.
+  setTimeout(()=>openAnimalDuel(room.creator_animal,room.guest_animal,animalPercent(room.creator_animal),animalPercent(room.guest_animal)),150);
  }catch(error){
   $("compatibility").textContent="No se pudo guardar el resultado compartido: "+(error.message||"error de conexión")+". Comprueba tu conexión y vuelve a intentarlo.";
   if(challengeAnimal&&profiles[challengeAnimal]){
