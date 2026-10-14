@@ -774,8 +774,10 @@ async function enableDuelPush(roomCode){
 }
 
 let activeDuelRoom=null,roomResultShown=false,roomPollHandle=null;
+function getDuelPlayerName(){try{const p=JSON.parse(localStorage.getItem("lqdd_tvy_player_profile_v1")||"{}");const n=typeof p.nickname==="string"?p.nickname.trim().replace(/\s+/g," ").slice(0,24):"";return n.length>=2?n:"Jugador LQDD"}catch(e){return "Jugador LQDD"}}
 async function duelRequest(payload){
- const response=await fetch(DUEL_API_URL,{method:"POST",headers:{"Content-Type":"application/json","apikey":DUEL_API_KEY,"Authorization":"Bearer "+DUEL_API_KEY},body:JSON.stringify(payload),cache:"no-store"});
+ const requestPayload={...payload,playerName:getDuelPlayerName()};
+ const response=await fetch(DUEL_API_URL,{method:"POST",headers:{"Content-Type":"application/json","apikey":DUEL_API_KEY,"Authorization":"Bearer "+DUEL_API_KEY},body:JSON.stringify(requestPayload),cache:"no-store"});
  let data={};try{data=await response.json()}catch(e){}
  if(!response.ok)throw new Error(data.error||"No se pudo conectar con el duelo.");
  return data.room;
@@ -787,7 +789,7 @@ function saveDuelToTodayHistory(room){
   const day=todayKey();let history=JSON.parse(localStorage.getItem(dailyHistoryKey)||"[]");
   if(!Array.isArray(history))history=[];
   history=history.filter(g=>g&&!(g.type==="duel"&&g.code===room.code));
-  history.push({type:"duel",code:room.code,date:day,number:0,creator_animal:room.creator_animal,guest_animal:room.guest_animal,time:new Date().toLocaleTimeString("es-ES",{hour:"2-digit",minute:"2-digit"})});
+  history.push({type:"duel",code:room.code,date:day,number:0,creator_animal:room.creator_animal,guest_animal:room.guest_animal,creator_name:room.creator_name||"",guest_name:room.guest_name||"",time:new Date().toLocaleTimeString("es-ES",{hour:"2-digit",minute:"2-digit"})});
   localStorage.setItem(dailyHistoryKey,JSON.stringify(history.slice(-10)));
  }catch(e){}
 }
@@ -1003,7 +1005,7 @@ function showSavedResult(){let saved=null;try{saved=JSON.parse(localStorage.getI
    const animalName=document.createElement("strong");animalName.style.cssText="font-size:.72rem;line-height:1.2;color:#f5d98d;overflow-wrap:anywhere";animalName.textContent=p.title;
    labels.append(roleText,animalName);card.append(animalImg,labels);duelCards.append(card);
   });
-  const savedNick=(()=>{try{return (JSON.parse(localStorage.getItem("lqdd_tvy_player_profile_v1")||"{}").nickname||"").trim()}catch(e){return ""}})();const opponentNick=g.creator_nickname||g.guest_nickname||"";title.textContent="⚔️ "+(savedNick||"Tú")+" · "+(opponentNick||"Amigo")+" · "+(g.date===todayKey()?"Hoy":g.date||"Otro día")+" · "+(g.time||"");
+  const names=[g.creator_name,g.guest_name].filter(Boolean);title.textContent="⚔️ "+(names.length?names.join(" vs. "):"Duelo LQDD")+" · "+(g.date===todayKey()?"Hoy":g.date||"Otro día")+" · "+(g.time||"");
   pts.textContent="Toca para ver la comparación";
   info.append(title,pts);row.append(duelCards,info);host.append(row);return;
  }else{
@@ -1061,10 +1063,11 @@ const duelSkillBases={
 function openAnimalDuel(mineId,friendId,minePct,friendPct){
  const mine=profiles[mineId],friend=profiles[friendId];if(!mine||!friend)return;
  const mineRank=animalPercent(mineId),friendRank=animalPercent(friendId);const mineWins=mineRank>friendRank,friendWins=friendRank>mineRank;
- const challengerId=duelCode&&activeDuelRoom?activeDuelRoom.creator_animal:mineId;
- const challengedId=duelCode&&activeDuelRoom?activeDuelRoom.guest_animal:friendId;
- const mineLabel=challengerId===mineId?"ATACANTE":"DEFENSOR";
- const friendLabel=challengedId===friendId?"DEFENSOR":"ATACANTE";
+ const sharedRoom=activeDuelRoom&&activeDuelRoom.guest_animal?activeDuelRoom:null;
+ const mineIsCreator=sharedRoom&&mineId===sharedRoom.creator_animal;
+ const friendIsCreator=sharedRoom&&friendId===sharedRoom.creator_animal;
+ const mineLabel=sharedRoom?(mineIsCreator?(sharedRoom.creator_name||"Atacante"):(sharedRoom.guest_name||"Defensor")):"TU ANIMAL";
+ const friendLabel=sharedRoom?(friendIsCreator?(sharedRoom.creator_name||"Atacante"):(sharedRoom.guest_name||"Defensor")):"ANIMAL DEL AMIGO";
  const setCard=(side,pct,p,isWinner,role)=>{
   const card=$("duel"+side),img=$( "duel"+side+"Img"),name=$("duel"+side+"Name"),percent=$("duel"+side+"Percent"),bar=$("duel"+side+"Bar");
   img.src=p.img;img.alt=p.title;name.textContent=p.title;percent.textContent=pct+"%";bar.style.width=pct+"%";card.classList.toggle("is-winner",isWinner);card.querySelector(".duel-winner").classList.toggle("hidden",!isWinner);
@@ -1072,9 +1075,9 @@ function openAnimalDuel(mineId,friendId,minePct,friendPct){
  };
  setCard("Mine",minePct,mine,mineWins,mineLabel);setCard("Friend",friendPct,friend,friendWins,friendLabel);
  const verdict=$("duelVerdict");
- if(mineRank===friendRank){$("duelTitle").textContent="¡Duelo igualado!";verdict.textContent="🤝 ¡EMPATE! "+mine.title+" y "+friend.title+" tienen la misma afinidad."}
- else if(mineWins){$("duelTitle").textContent="¡Tenemos ganador!";verdict.textContent="🏆 ¡GANA "+mine.title.toLocaleUpperCase("es-ES")+"!"; }
- else{$("duelTitle").textContent="¡Tenemos ganador!";verdict.textContent="🏆 ¡GANA "+friend.title.toLocaleUpperCase("es-ES")+"!";}
+ if(mineRank===friendRank){$("duelTitle").textContent="¡Duelo igualado!";verdict.textContent="🤝 ¡EMPATE! "+(sharedRoom?(mineLabel+" y "+friendLabel):(mine.title+" y "+friend.title))+"."}
+ else if(mineWins){$("duelTitle").textContent="¡Tenemos ganador!";verdict.textContent="🏆 ¡GANA "+(sharedRoom?mineLabel:mine.title).toLocaleUpperCase("es-ES")+" ("+mine.title.toLocaleUpperCase("es-ES")+")!"; }
+ else{$("duelTitle").textContent="¡Tenemos ganador!";verdict.textContent="🏆 ¡GANA "+(sharedRoom?friendLabel:friend.title).toLocaleUpperCase("es-ES")+" ("+friend.title.toLocaleUpperCase("es-ES")+")!";}
  $("duelSubtitle").textContent=mine.title+" vs. "+friend.title;
  const mineBase=duelSkillBases[mineId]||[70,70,70,70,70],friendBase=duelSkillBases[friendId]||[70,70,70,70,70];
  const skillRoot=$("duelSkills");skillRoot.replaceChildren();const winnerReasons=[];
