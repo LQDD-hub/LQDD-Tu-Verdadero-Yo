@@ -609,7 +609,7 @@ input,textarea,[contenteditable="true"]{
 </style></head><body><main><header><img class="brand-logo" src="logo-lqdd.png" alt="Logotipo oficial LQDD con lobo, corona, laureles y cruz"><div class="kicker">Autoconocimiento · LQDD</div><h1>Tu Verdadero Yo Animal</h1><p class="subtitle">¿Eres un Lobo que lidera, un Búho que calcula o un Zorro que encuentra caminos? Responde y descubre el animal que representa tu forma de ser.</p></header>
 <div class="stats"><div class="pill">🔥 Racha: <strong id="streak">0 días</strong></div><div class="pill">🏆 Colección: <strong id="collectionCount">0 de 8</strong></div></div>
 <section class="panel profile-level-window" aria-label="Perfil y progreso LQDD">
- <div class="profile-level-top"><div class="profile-level-title"><span>👤 Mi perfil LQDD</span><span id="profileSummaryNickname" class="profile-summary-nick">Este dispositivo</span></div><button type="button" id="profileDropdownToggle" class="profile-mini-toggle" aria-expanded="false" aria-controls="profileDropdown">Editar perfil ✎</button></div>
+ <div class="profile-level-top"><div class="profile-level-title"><span>👤 Mi perfil LQDD</span><span id="profileSummaryNickname" class="profile-summary-nick">Este dispositivo</span></div><div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:flex-end"><button type="button" id="standaloneHistoryToggle" class="profile-mini-toggle" aria-expanded="false" aria-controls="standaloneHistory" style="padding:8px 10px;font-size:.82rem;white-space:nowrap">📜 Historial ▾</button><button type="button" id="profileDropdownToggle" class="profile-mini-toggle" aria-expanded="false" aria-controls="profileDropdown">Editar perfil ✎</button></div></div><div id="standaloneHistory" class="hidden" style="margin-top:10px;padding:10px;border:1px solid #514321;border-radius:12px;background:#111113"></div>
  <section class="panel level-panel" aria-label="Progreso de nivel">
  <div class="level-heading"><span class="kicker">PROGRESO LQDD</span><strong id="levelNumber">NIVEL 0</strong></div>
  <div class="level-track" role="progressbar" aria-label="Progreso hacia el nivel ocho" aria-valuemin="0" aria-valuemax="8" aria-valuenow="0" id="levelProgress"><div class="level-fill" id="levelFill" style="width:0%"></div></div>
@@ -632,7 +632,6 @@ input,textarea,[contenteditable="true"]{
  
 
  </section>
-<div style="margin-top:12px;padding-top:10px;border-top:1px solid #514321"><button class="action secondary" id="standaloneHistoryToggle" type="button" aria-expanded="false" aria-controls="standaloneHistory" style="width:100%">📜 Historial de duelos ▾</button><div id="standaloneHistory" class="hidden" style="margin-top:12px"></div></div>
 </div>
 </section>
 
@@ -1313,7 +1312,7 @@ setupDuelInvite();
   duels.forEach(g=>{
    const row=document.createElement("button");row.type="button";row.style.cssText="display:block;width:100%;text-align:left;padding:12px 4px;border:0;border-top:1px solid #514321;background:transparent;color:#f5d98d;font:inherit;cursor:pointer";
    const a=profiles[g.creator_animal],b=profiles[g.guest_animal];
-   row.textContent="⚔️ "+(g.creator_nickname||"Atacante")+" · "+a.title+" vs. "+(g.guest_nickname||"Defensor")+" · "+b.title+" — "+(g.date||"");
+   row.textContent="⚔️ Partida "+(g.number||g.gameNumber||"—")+" · "+(g.creator_nickname||"Atacante")+" · "+a.title+" vs. "+(g.guest_nickname||"Defensor")+" · "+b.title+" — "+(g.date||"");
    row.addEventListener("click",async()=>{
     if(g.code){try{const room=await duelRequest({action:"get",code:g.code});if(room&&room.guest_animal){activeDuelRoom=room;duelCode=g.code;openAnimalDuel(room.creator_animal,room.guest_animal,animalPercent(room.creator_animal),animalPercent(room.guest_animal));return;}}catch(e){}}
     activeDuelRoom=g;duelCode=g.code||"";openAnimalDuel(g.creator_animal,g.guest_animal,animalPercent(g.creator_animal),animalPercent(g.guest_animal));
