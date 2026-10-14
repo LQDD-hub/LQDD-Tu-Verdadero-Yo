@@ -889,11 +889,26 @@ $("meaningChallenge").onclick=async()=>{
   const room=await duelRequest({action:"create",creatorAnimal:id});
   const u=new URL(location.href);u.search="";u.searchParams.set("duel",room.code);
   const msg="⚔️ ¡Te reto a un duelo LQDD! Mi animal elegido es "+p.title+". Abre el enlace, completa tus tres partidas y compara tu resultado conmigo.";
-  if(navigator.share){await navigator.share({title:"Duelo LQDD",text:msg,url:u.href});}
-  else{try{await navigator.clipboard.writeText(msg+" "+u.href);button.textContent="¡Enlace del duelo copiado!";setTimeout(()=>button.textContent=old,2200)}catch(e){prompt("Copia el enlace para retar a un amigo:",u.href)}}
+  if(navigator.share){
+   try{await navigator.share({title:"Duelo LQDD",text:msg,url:u.href});}
+   catch(shareError){if(!shareError||shareError.name!=="AbortError")showDuelShareOptions(msg,u.href);}
+  }else{showDuelShareOptions(msg,u.href);}
  }catch(e){if(!e||e.name!=="AbortError")alert("No se pudo crear el duelo: "+(e.message||"error de conexión"));}
  finally{button.disabled=false;if(button.textContent==="Creando duelo…")button.textContent=old;}
 };
+function showDuelShareOptions(message,url){
+ const existing=document.getElementById("duelShareOptions");if(existing)existing.remove();
+ const overlay=document.createElement("div");overlay.id="duelShareOptions";overlay.className="meaning-overlay";
+ const card=document.createElement("div");card.className="meaning-card";
+ const title=document.createElement("h2");title.textContent="Compartir duelo";card.append(title);
+ const description=document.createElement("p");description.textContent="Elige cómo quieres enviar el reto. No se copiará nada sin que lo decidas.";card.append(description);
+ const actions=document.createElement("div");actions.className="actions";
+ const share=document.createElement("button");share.className="action";share.textContent="Compartir…";share.onclick=async()=>{if(navigator.share){try{await navigator.share({title:"Duelo LQDD",text:message,url});overlay.remove()}catch(e){if(e&&e.name==="AbortError")return;copyOption()}}else{copyOption()}};
+ const copy=document.createElement("button");copy.className="action secondary";copy.textContent="Copiar enlace";copy.onclick=copyOption;
+ const cancel=document.createElement("button");cancel.className="action secondary";cancel.textContent="Cancelar";cancel.onclick=()=>overlay.remove();
+ function copyOption(){const text=message+" "+url;if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(()=>{description.textContent="Enlace copiado. Ya puedes pegarlo donde quieras.";copy.textContent="¡Copiado!"}).catch(()=>{const field=document.createElement("textarea");field.value=text;field.style.width="100%";card.insertBefore(field,actions);field.focus();field.select();description.textContent="Selecciona y copia el enlace."})}else{const field=document.createElement("textarea");field.value=text;field.style.width="100%";card.insertBefore(field,actions);field.focus();field.select();description.textContent="Selecciona y copia el enlace."}}
+ actions.append(share,copy,cancel);card.append(actions);overlay.append(card);document.body.append(overlay);
+}
 function closeMeaning(){
  const mv=$("meaningVideo");
  if(mv){mv.pause();mv.muted=true;mv.currentTime=0;mv.removeAttribute("src");mv.load();mv.classList.add("hidden");}
