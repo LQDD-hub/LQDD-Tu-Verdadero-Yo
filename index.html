@@ -759,10 +759,10 @@ function showRoomResult(room){
  // Mostrar el resultado al creador en cuanto el invitado termina la partida.
  setTimeout(showResult,150);
 }
-async function refreshDuelRoom(){
- if(!duelCode)return;
+async function refreshDuelRoom(code=duelCode){
+ if(!code)return;
  try{
-  const room=await duelRequest({action:"get",code:duelCode});
+  const room=await duelRequest({action:"get",code});
   activeDuelRoom=room;
   if(room.guest_animal)showRoomResult(room);
   else if($("inviteText"))$("inviteText").textContent="Tu amigo te reta con "+(profiles[room.creator_animal]?.title||"su animal")+". Completa el test; al terminar, el resultado se guardará para que ambos podáis consultar el duelo desde este enlace.";
@@ -774,6 +774,11 @@ const animalPercentages={inventor:65,creator:68,freeSpirit:70,strategist:72,visi
 function animalPercent(id){return animalPercentages[id]??50}
 function duelPercent(id,rawScore,total){return animalPercent(id)}
 
+function watchDuelRoom(code){
+ if(!code)return;
+ refreshDuelRoom(code);
+ if(!roomPollHandle)roomPollHandle=setInterval(()=>{if(document.visibilityState!=="hidden")refreshDuelRoom(code)},8000);
+}
 function setupDuelInvite(){
  const invite=$("duelInvite");if(!invite||(!challengeAnimal&&!duelCode))return;
  const inviteId=challengeAnimal||(activeDuelRoom&&activeDuelRoom.creator_animal);
@@ -895,10 +900,9 @@ $("meaningChallenge").onclick=async()=>{
  const old=button.textContent;button.disabled=true;button.textContent="Creando duelo…";
  try{
   const room=await duelRequest({action:"create",creatorAnimal:id});
-  duelCode=room.code;activeDuelRoom=room;roomResultShown=false;
-  const u=new URL(location.href);u.search="";u.searchParams.set("duel",room.code);
-  history.replaceState(null,"",u.href);
-  setupDuelInvite();
+  activeDuelRoom=room;roomResultShown=false;
+  const u=new URL(location.href);u.search="";u.searchParams.set("compat",id);u.searchParams.set("pct",String(animalPercent(id)));u.searchParams.set("duel",room.code);
+  watchDuelRoom(room.code);
   const msg="⚔️ ¡Te reto a un duelo LQDD! Mi animal elegido es "+p.title+". Abre el enlace, completa el test y compara tu resultado conmigo.";
   if(navigator.share){
    await navigator.share({title:"Duelo LQDD",text:msg,url:u.href});
@@ -1125,11 +1129,10 @@ $("share").onclick=async()=>{
  let roomCreated=false;
  try{
   const created=await duelRequest({action:"create",creatorAnimal:last});
-  duelCode=created.code;activeDuelRoom=created;
+  activeDuelRoom=created;
   enableDuelPush(created.code);
   u.searchParams.set("duel",created.code);
-  history.replaceState(null,"",u.href);
-  setupDuelInvite();
+  watchDuelRoom(created.code);
   roomCreated=true;
   // Los PNG nuevos ya son tarjetas completas: se comparten tal cual, sin incrustarlas en otra tarjeta.
   const cardUrl=new URL(p.shareImg||p.img,location.href).href;
