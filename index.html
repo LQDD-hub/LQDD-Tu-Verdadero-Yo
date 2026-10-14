@@ -584,26 +584,43 @@ input,textarea,[contenteditable="true"]{
 .player-panel input:focus{outline:2px solid var(--gold);outline-offset:1px}
 .player-history{display:grid;gap:10px}.history-entry{border:1px solid #34312a;border-radius:13px;padding:12px;background:#111}.history-entry strong{color:var(--gold2)}.history-meta{color:var(--muted);font-size:.82rem;margin-top:5px}.player-status-ok{color:#a8d6a0}
 
-/* Perfil e historial locales: sin registro ni bloqueo del juego. */
-#playerPanel{max-width:540px;margin:0 auto 16px}
-#playerPanel .topline{font-family:Georgia,serif;font-size:1.05rem;color:var(--gold2)}
-#playerMessage{font-size:.92rem;line-height:1.5}
-#playerAuthForm .actions{display:flex;gap:10px;flex-wrap:wrap}
-#playerName{padding:12px}
-#playerEmail,#playerPassword{display:none!important}
-
+/* Perfil compacto: el apodo queda en la cabecera y el historial se abre solo cuando se necesita. */
+#playerPanel{max-width:760px;margin:0 auto 12px;padding:10px 13px;border-radius:15px}
+#playerPanel .topline{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0;font-size:.9rem}
+#playerPanel .profile-main{display:flex;align-items:center;gap:8px;min-width:0}
+#playerPanel .profile-name{color:var(--gold2);font-weight:750;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:48vw}
+#playerPanel .profile-tools{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+#playerPanel .profile-tool{border:1px solid #705724;border-radius:999px;background:#17140e;color:var(--gold2);padding:7px 10px;font:inherit;font-size:.78rem;cursor:pointer}
+#playerPanel #playerAuthForm{display:none;margin-top:10px}
+#playerPanel.profile-editing #playerAuthForm{display:block}
+#playerPanel #playerAuthForm label{display:block;font-size:.8rem;margin:6px 0}
+#playerPanel #playerName{width:100%;padding:9px 11px;border:1px solid #51452c;border-radius:10px;background:#111;color:#fff;font:inherit}
+#playerPanel #playerAuthForm .actions{margin-top:8px}
+#playerPanel #playerAuthForm .action{padding:8px 13px;font-size:.82rem}
+#playerPanel #playerMessage{display:none;font-size:.8rem;margin:7px 0 0}
+#playerPanel.profile-editing #playerMessage{display:block}
+#playerPanel .profile-history{display:none;margin-top:12px;border-top:1px solid #514321;padding-top:10px}
+#playerPanel.profile-history-open .profile-history{display:block}
+#playerPanel .player-history{gap:7px;max-height:300px;overflow:auto}
+#playerPanel .history-entry{padding:9px}
+#playerPanel .history-entry strong{font-size:.86rem}
+#playerPanel .history-entry div{font-size:.8rem}
 </style></head><body><main><header><img class="brand-logo" src="logo-lqdd.png" alt="Logotipo oficial LQDD con lobo, corona, laureles y cruz"><div class="kicker">Autoconocimiento · LQDD</div><h1>Tu Verdadero Yo Animal</h1><p class="subtitle">¿Eres un Lobo que lidera, un Búho que calcula o un Zorro que encuentra caminos? Responde y descubre el animal que representa tu forma de ser.</p></header>
 <section class="panel player-panel" id="playerPanel">
- <div class="topline"><span>👤 PERFIL LQDD</span><span id="playerStatus">Jugador local</span></div>
- <p class="note" id="playerMessage">Tu apodo, tus tests y tu historial se guardan solo en este móvil y navegador. No necesitas registrarte.</p>
+ <div class="topline">
+  <div class="profile-main"><span>👤</span><strong class="profile-name" id="playerStatus">Jugador local</strong></div>
+  <div class="profile-tools"><button class="profile-tool" id="profileEditToggle" type="button">Cambiar apodo</button><button class="profile-tool" id="profileHistoryToggle" type="button">Mi historial</button></div>
+ </div>
+ <p id="playerMessage">El apodo se guarda en este móvil.</p>
  <div id="playerAuthForm">
   <label for="playerName">Nombre o apodo</label><input id="playerName" maxlength="24" autocomplete="nickname" placeholder="Tu nombre en LQDD">
-  <div class="actions"><button class="action" id="playerSignup">Guardar apodo</button></div>
+  <div class="actions"><button class="action" id="playerSignup" type="button">Guardar apodo</button><button class="action secondary" id="profileEditCancel" type="button">Cancelar</button></div>
  </div>
- <div class="actions hidden" id="playerSignedIn"><button class="action secondary" id="playerRename">Cambiar apodo</button></div>
- <div class="topline" style="margin-top:18px"><span>📜 HISTORIAL</span><span id="historyCount">0 partidas</span></div>
- <p class="note" id="historyMessage">Tus partidas aparecerán aquí en este dispositivo.</p>
- <div class="player-history" id="playerHistory"></div>
+ <div class="profile-history">
+  <div class="topline"><strong>📜 HISTORIAL</strong><span id="historyCount">0 partidas</span></div>
+  <p class="note" id="historyMessage">Tus partidas aparecerán aquí en este dispositivo.</p>
+  <div class="player-history" id="playerHistory"></div>
+ </div>
 </section>
 <div class="stats"><div class="pill">🔥 Racha: <strong id="streak">0 días</strong></div><div class="pill">🏆 Colección: <strong id="collectionCount">0 de 8</strong></div></div>
 
@@ -1258,20 +1275,13 @@ let playerProfile=null,historyLoaded=false;
 try{playerProfile=JSON.parse(localStorage.getItem(PLAYER_LOCAL_KEY)||"null")}catch(e){playerProfile=null}
 function playerName(){return playerProfile?.display_name||"Jugador LQDD"}
 function setPlayerMessage(text,isError=false){$("playerMessage").textContent=text;$("playerMessage").style.color=isError?"#ff9b8e":""}
-function getLocalHistory(){try{const rows=JSON.parse(localStorage.getItem(PLAYER_HISTORY_KEY)||"[]");return Array.isArray(rows)?rows:[]}catch(e){return[]}}
-function renderPlayerAuth(){
- const logged=!!playerProfile?.display_name;
- $("playerAuthForm").classList.toggle("hidden",logged);
- $("playerSignedIn").classList.toggle("hidden",!logged);
- $("playerStatus").textContent=logged?playerName():"Sin apodo";
- if(logged)$("playerName").value=playerName();
-}
 function savePlayerProfile(name){
  const display_name=String(name||"").trim().slice(0,24);
  if(display_name.length<2)throw new Error("El apodo debe tener al menos dos caracteres.");
  playerProfile={display_name,updated_at:new Date().toISOString()};
  localStorage.setItem(PLAYER_LOCAL_KEY,JSON.stringify(playerProfile));
- renderPlayerAuth();setPlayerMessage("Apodo guardado en este móvil. Ya puedes jugar sin registrarte.");
+ $("playerPanel").classList.remove("profile-editing");
+ renderPlayerAuth();setPlayerMessage("Apodo guardado en este móvil.");
 }
 function doPlayerAuth(){
  try{savePlayerProfile($("playerName").value)}catch(e){setPlayerMessage(e.message,true)}
@@ -1299,6 +1309,9 @@ function loadPlayerHistory(){
 $("playerSignup").addEventListener("click",doPlayerAuth);
 $("playerRename").addEventListener("click",()=>{const name=prompt("Nuevo apodo LQDD:",playerName());if(name===null)return;try{savePlayerProfile(name)}catch(e){setPlayerMessage(e.message,true)}});
 renderPlayerAuth();loadPlayerHistory();
+$("profileEditToggle").addEventListener("click",()=>{const panel=$("playerPanel");panel.classList.toggle("profile-editing");if(panel.classList.contains("profile-editing"))$("playerName").focus()});
+$("profileEditCancel").addEventListener("click",()=>{renderPlayerAuth()});
+$("profileHistoryToggle").addEventListener("click",()=>{const panel=$("playerPanel");panel.classList.toggle("profile-history-open");$("profileHistoryToggle").textContent=panel.classList.contains("profile-history-open")?"Cerrar historial":"Mi historial"});
 
 try{paint()}catch(initError){console.error("LQDD paint error",initError)}try{start()}catch(initError){console.error("LQDD start error",initError);$("quiz").classList.remove("hidden");$("question").textContent="Error al iniciar el test. Pulsa «Reintentar test»."; $("answers").replaceChildren();$("restart").textContent="Reintentar test";}
 if("serviceWorker" in navigator){window.addEventListener("load",()=>{navigator.serviceWorker.register("./sw.js").catch(()=>{});});}
