@@ -1319,7 +1319,7 @@ async function doPlayerAuth(mode){
 async function savePlayerHistory(entry){
  if(!playerSession?.access_token)return;
  try{
-  await playerFetch(PLAYER_REST_URL+"/player_game_history",{method:"POST",headers:{"Prefer":"return=minimal"},body:JSON.stringify({...entry,user_id:playerSession.user.id})});
+  await playerFetch(PLAYER_REST_URL+"/player_game_history?on_conflict=user_id,duel_code",{method:"POST",headers:{"Prefer":"resolution=ignore-duplicates,return=minimal"},body:JSON.stringify({...entry,user_id:playerSession.user.id})});
   await loadPlayerHistory();
  }catch(e){console.warn("No se pudo guardar el historial LQDD:",e);setPlayerMessage("Partida jugada, pero no se pudo sincronizar el historial: "+e.message,true)}
 }
