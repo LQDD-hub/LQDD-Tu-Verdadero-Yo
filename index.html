@@ -774,7 +774,8 @@ async function enableDuelPush(roomCode){
 }
 
 let activeDuelRoom=null,roomResultShown=false,roomPollHandle=null;
-async function duelRequest(payload){
+function getDuelPlayerName(){try{const p=JSON.parse(localStorage.getItem("lqdd_tvy_player_profile_v1")||"{}");const n=typeof p.nickname==="string"?p.nickname.trim().replace(/\s+/g," ").slice(0,24):"";return n.length>=2?n:"Jugador LQDD"}catch(e){return "Jugador LQDD"}}
+ async function duelRequest(payload){
  const response=await fetch(DUEL_API_URL,{method:"POST",headers:{"Content-Type":"application/json","apikey":DUEL_API_KEY,"Authorization":"Bearer "+DUEL_API_KEY},body:JSON.stringify(payload),cache:"no-store"});
  let data={};try{data=await response.json()}catch(e){}
  if(!response.ok)throw new Error(data.error||"No se pudo conectar con el duelo.");
@@ -952,7 +953,7 @@ $("meaningChallenge").onclick=async()=>{
  const old=button.textContent;button.disabled=true;button.textContent="Creando duelo…";
  let roomCreated=false;
  try{
-  const room=await duelRequest({action:"create",creatorAnimal:id});
+  const room=await duelRequest({action:"create",creatorAnimal:id,playerName:getDuelPlayerName()});
   activeDuelRoom=room;roomResultShown=false;enableDuelPush(room.code);
   const u=new URL(location.href);u.search="";u.searchParams.set("compat",id);u.searchParams.set("pct",String(animalPercent(id)));u.searchParams.set("duel",room.code);
   history.replaceState(null,"",u.href);watchDuelRoom(room.code);roomCreated=true;
@@ -1063,8 +1064,11 @@ function openAnimalDuel(mineId,friendId,minePct,friendPct){
  const mineRank=animalPercent(mineId),friendRank=animalPercent(friendId);const mineWins=mineRank>friendRank,friendWins=friendRank>mineRank;
  const challengerId=duelCode&&activeDuelRoom?activeDuelRoom.creator_animal:mineId;
  const challengedId=duelCode&&activeDuelRoom?activeDuelRoom.guest_animal:friendId;
- const mineLabel=challengerId===mineId?"ATACANTE":"DEFENSOR";
- const friendLabel=challengedId===friendId?"DEFENSOR":"ATACANTE";
+ const room=duelCode&&activeDuelRoom?activeDuelRoom:null;
+ const creatorName=room&&room.creator_name?room.creator_name:"Atacante";
+ const guestName=room&&room.guest_name?room.guest_name:"Defensor";
+ const mineLabel=room?(mineId===room.creator_animal?creatorName:mineId===room.guest_animal?guestName:"Jugador"):(challengerId===mineId?"ATACANTE":"DEFENSOR");
+ const friendLabel=room?(friendId===room.creator_animal?creatorName:friendId===room.guest_animal?guestName:"Jugador"):(challengedId===friendId?"DEFENSOR":"ATACANTE");
  const setCard=(side,pct,p,isWinner,role)=>{
   const card=$("duel"+side),img=$( "duel"+side+"Img"),name=$("duel"+side+"Name"),percent=$("duel"+side+"Percent"),bar=$("duel"+side+"Bar");
   img.src=p.img;img.alt=p.title;name.textContent=p.title;percent.textContent=pct+"%";bar.style.width=pct+"%";card.classList.toggle("is-winner",isWinner);card.querySelector(".duel-winner").classList.toggle("hidden",!isWinner);
@@ -1072,10 +1076,10 @@ function openAnimalDuel(mineId,friendId,minePct,friendPct){
  };
  setCard("Mine",minePct,mine,mineWins,mineLabel);setCard("Friend",friendPct,friend,friendWins,friendLabel);
  const verdict=$("duelVerdict");
- if(mineRank===friendRank){$("duelTitle").textContent="¡Duelo igualado!";verdict.textContent="🤝 ¡EMPATE! "+mine.title+" y "+friend.title+" tienen la misma afinidad."}
+ if(mineRank===friendRank){$("duelTitle").textContent="¡Duelo igualado!";verdict.textContent="🤝 ¡EMPATE! "+(room?creatorName:"Tú")+" ("+mine.title+") y "+(room?guestName:"tu rival")+" ("+friend.title+") tienen la misma afinidad."}
  else if(mineWins){$("duelTitle").textContent="¡Tenemos ganador!";verdict.textContent="🏆 ¡GANA "+mine.title.toLocaleUpperCase("es-ES")+"!"; }
  else{$("duelTitle").textContent="¡Tenemos ganador!";verdict.textContent="🏆 ¡GANA "+friend.title.toLocaleUpperCase("es-ES")+"!";}
- $("duelSubtitle").textContent=mine.title+" vs. "+friend.title;
+ $("duelSubtitle").textContent=room?creatorName+" · "+profiles[room.creator_animal].title+" vs. "+guestName+" · "+profiles[room.guest_animal].title:mine.title+" vs. "+friend.title;
  const mineBase=duelSkillBases[mineId]||[70,70,70,70,70],friendBase=duelSkillBases[friendId]||[70,70,70,70,70];
  const skillRoot=$("duelSkills");skillRoot.replaceChildren();const winnerReasons=[];
  duelSkillNames.forEach((skill,i)=>{
@@ -1097,7 +1101,7 @@ $("duelClose").addEventListener("click",closeAnimalDuel);$("duelOk").addEventLis
 $("duelOverlay").addEventListener("click",e=>{if(e.target===$("duelOverlay"))closeAnimalDuel()});
 async function finish(){const winner=correctAnswers<=3?"inventor":correctAnswers<=5?"creator":correctAnswers<=7?"freeSpirit":correctAnswers<=9?"strategist":correctAnswers<=11?"visionary":correctAnswers<=13?"leader":correctAnswers===14?"guardian":"protector";last=winner;applyResultRarity(winner);try{const day=todayKey(),count=Math.min(dailyLimit,playsToday()+1),game={date:day,number:count,winner:winner,correctAnswers:correctAnswers,totalQuestions:qs.length,answers:chosen.slice(),time:new Date().toLocaleTimeString("es-ES",{hour:"2-digit",minute:"2-digit"})};let history=JSON.parse(localStorage.getItem(dailyHistoryKey)||"[]");if(!Array.isArray(history))history=[];history=history.filter(g=>g&&g.date===day);history.push(game);localStorage.setItem(dailyHistoryKey,JSON.stringify(history.slice(-dailyLimit)));localStorage.setItem(dailyPlayKey,day);localStorage.setItem(dailyCountKey,JSON.stringify({date:day,count:count}));localStorage.setItem(dailyResultKey,JSON.stringify({date:day,winner:winner,plays:count,limit:dailyLimit,pointsAwarded:game.pointsAwarded,answers:game.answers,number:count}))}catch(e){}let p=profiles[winner],d=getData(),fresh=!d.unlocked.includes(winner);if(fresh)d.unlocked.push(winner);streak();putData(d);paint();$("quiz").classList.add("hidden");$("result").classList.remove("hidden");currentMusicPhase=winner==="protector"?"supreme":chooseNormalMusic();musicEnabled=true;updateMusicButton();setMusicPhase(currentMusicPhase);$("result").classList.remove("reveal-active");void $("result").offsetWidth;$("result").classList.add("reveal-active");setTimeout(()=>$("result").classList.remove("reveal-active"),3200);$("symbol").classList.add("hidden");const rv=$("resultVideo");rv.pause();rv.removeAttribute("src");rv.classList.remove("hidden");rv.onerror=()=>{rv.classList.add("hidden")};rv.loop=false;rv.muted=false;rv.defaultMuted=false;rv.currentTime=0;rv.src=animalVideos[winner];rv.load();rv.play().catch(()=>{});setRarityBadge(winner,fresh);$("resultTitle").textContent=p.title;const resultPoints=$("resultPoints");if(resultPoints){resultPoints.textContent=correctAnswers+"/"+qs.length;resultPoints.style.display="block";}const correctList=$("correctQuestions");if(correctList)correctList.remove();$("shareLine").textContent="";$("shareLine").classList.add("hidden");$("resultText").textContent=p.text;$("strengths").replaceChildren(...(p.strengths||[]).map(s=>{let li=document.createElement("li");li.textContent=s;return li}));$("second").textContent="";$("bars").replaceChildren();const ownRow=document.createElement("div");ownRow.className="row discovered-result-row";ownRow.innerHTML="<span></span><div class='bar'><i></i></div><b></b>";const affinity=affinityPercent(winner,score[winner]??score[a]??0,qs.length);ownRow.children[0].textContent="Afinidad";ownRow.children[1].firstChild.style.width=affinity+"%";ownRow.children[2].textContent=affinity+" %";$("bars").append(ownRow);$("collectionMessage").textContent=fresh?"¡Nuevo perfil añadido a tu colección!":"Ya lo habías descubierto. Prueba otra combinación.";if(duelCode&&challengeAnimal&&profiles[challengeAnimal]){
  try{
-  const room=await duelRequest({action:"complete",code:duelCode,guestAnimal:winner});
+  const room=await duelRequest({action:"complete",code:duelCode,guestAnimal:winner,playerName:getDuelPlayerName()});
   activeDuelRoom=room;
   $("compatibility").textContent="";
   $("shareLine").textContent="Duelo LQDD: "+profiles[room.creator_animal].title+" contra "+profiles[room.guest_animal].title;
