@@ -583,7 +583,17 @@ input,textarea,[contenteditable="true"]{
 .player-panel input{display:block;width:100%;min-width:0;padding:13px 14px;border:1px solid #51452c;border-radius:12px;background:#111;color:#fff;font:inherit}
 .player-panel input:focus{outline:2px solid var(--gold);outline-offset:1px}
 .player-history{display:grid;gap:10px}.history-entry{border:1px solid #34312a;border-radius:13px;padding:12px;background:#111}.history-entry strong{color:var(--gold2)}.history-meta{color:var(--muted);font-size:.82rem;margin-top:5px}.player-status-ok{color:#a8d6a0}
-</style></head><body><main><header><img class="brand-logo" src="logo-lqdd.png" alt="Logotipo oficial LQDD con lobo, corona, laureles y cruz"><div class="kicker">Autoconocimiento · LQDD</div><h1>Tu Verdadero Yo Animal</h1><p class="subtitle">¿Eres un Lobo que lidera, un Búho que calcula o un Zorro que encuentra caminos? Responde y descubre el animal que representa tu forma de ser.</p></header>
+
+/* Pantalla de bienvenida: no se muestra el juego hasta iniciar sesión. */
+body.auth-required main> :not(header):not(#playerPanel){display:none!important}
+body.auth-required .duel-overlay,body.auth-required .meaning-overlay{display:none!important}
+body.auth-required #playerPanel{display:block!important;max-width:540px;margin:0 auto 40px;border-color:#80652e;box-shadow:0 16px 60px #0009,0 0 30px #e7bd5710}
+body.auth-required #playerPanel .topline{font-family:Georgia,serif;font-size:1.2rem;color:var(--gold2)}
+body.auth-required #playerMessage{font-size:1rem;line-height:1.6}
+body.auth-required #playerAuthForm .actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+body.auth-required #playerName,body.auth-required #playerEmail,body.auth-required #playerPassword{padding:14px}
+@media(max-width:430px){body.auth-required #playerAuthForm .actions{grid-template-columns:1fr}}
+</style></head><body class="auth-required"><main><header><img class="brand-logo" src="logo-lqdd.png" alt="Logotipo oficial LQDD con lobo, corona, laureles y cruz"><div class="kicker">Autoconocimiento · LQDD</div><h1>Tu Verdadero Yo Animal</h1><p class="subtitle">¿Eres un Lobo que lidera, un Búho que calcula o un Zorro que encuentra caminos? Responde y descubre el animal que representa tu forma de ser.</p></header>
 <section class="panel player-panel" id="playerPanel">
  <div class="topline"><span>👤 PERFIL LQDD</span><span id="playerStatus">Sin iniciar sesión</span></div>
  <p class="note" id="playerMessage">Crea tu perfil para conservar tus tests y duelos aunque cambies de móvil.</p>
@@ -1283,6 +1293,7 @@ async function savePlayerProfile(name){
 }
 function renderPlayerAuth(){
  const logged=!!playerSession?.access_token;
+ document.body.classList.toggle("auth-required",!logged);
  $("playerAuthForm").classList.toggle("hidden",logged);
  $("playerSignedIn").classList.toggle("hidden",!logged);
  $("playerStatus").textContent=logged?playerName():"Sin iniciar sesión";
