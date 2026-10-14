@@ -776,8 +776,10 @@ function duelPercent(id,rawScore,total){return animalPercent(id)}
 
 function watchDuelRoom(code){
  if(!code)return;
+ if(roomPollHandle){clearInterval(roomPollHandle);roomPollHandle=null;}
+ roomResultShown=false;
  refreshDuelRoom(code);
- if(!roomPollHandle)roomPollHandle=setInterval(()=>{if(document.visibilityState!=="hidden")refreshDuelRoom(code)},8000);
+ roomPollHandle=setInterval(()=>{if(document.visibilityState!=="hidden")refreshDuelRoom(code)},3000);
 }
 function setupDuelInvite(){
  const invite=$("duelInvite");if(!invite||(!challengeAnimal&&!duelCode))return;
@@ -902,6 +904,7 @@ $("meaningChallenge").onclick=async()=>{
   const room=await duelRequest({action:"create",creatorAnimal:id});
   activeDuelRoom=room;roomResultShown=false;
   const u=new URL(location.href);u.search="";u.searchParams.set("compat",id);u.searchParams.set("pct",String(animalPercent(id)));u.searchParams.set("duel",room.code);
+  history.replaceState(null,"",u.href);
   watchDuelRoom(room.code);
   const msg="⚔️ ¡Te reto a un duelo LQDD! Mi animal elegido es "+p.title+". Abre el enlace, completa el test y compara tu resultado conmigo.";
   if(navigator.share){
@@ -1129,9 +1132,10 @@ $("share").onclick=async()=>{
  let roomCreated=false;
  try{
   const created=await duelRequest({action:"create",creatorAnimal:last});
-  activeDuelRoom=created;
+  activeDuelRoom=created;roomResultShown=false;
   enableDuelPush(created.code);
   u.searchParams.set("duel",created.code);
+  history.replaceState(null,"",u.href);
   watchDuelRoom(created.code);
   roomCreated=true;
   // Los PNG nuevos ya son tarjetas completas: se comparten tal cual, sin incrustarlas en otra tarjeta.
