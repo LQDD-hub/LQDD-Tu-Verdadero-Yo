@@ -968,6 +968,7 @@ $("meaningChallenge").onclick=async()=>{
  }catch(e){if(!roomCreated)alert("No se pudo crear la sala de duelo. Inténtalo de nuevo en unos segundos.");else if(!e||e.name!=="AbortError")prompt("Copia este enlace para retar a un amigo:",location.href);}
  finally{button.disabled=false;if(button.textContent==="Creando duelo…")button.textContent=old;}
 };
+document.addEventListener("click",e=>{const b=e.target&&e.target.closest?e.target.closest("#meaningChallenge"):null;if(!b)return;e.preventDefault();e.stopImmediatePropagation();if(typeof b.onclick==="function")b.onclick.call(b,e);},true);
 function closeMeaning(){
  const mv=$("meaningVideo");
  if(mv){mv.pause();mv.muted=true;mv.currentTime=0;mv.removeAttribute("src");mv.load();mv.classList.add("hidden");}
