@@ -584,26 +584,26 @@ input,textarea,[contenteditable="true"]{
 .player-panel input:focus{outline:2px solid var(--gold);outline-offset:1px}
 .player-history{display:grid;gap:10px}.history-entry{border:1px solid #34312a;border-radius:13px;padding:12px;background:#111}.history-entry strong{color:var(--gold2)}.history-meta{color:var(--muted);font-size:.82rem;margin-top:5px}.player-status-ok{color:#a8d6a0}
 
-/* Pantalla de bienvenida: no se muestra el juego hasta iniciar sesión. */
-body.auth-required main> :not(header):not(#playerPanel){display:none!important}
-body.auth-required .duel-overlay,body.auth-required .meaning-overlay{display:none!important}
-body.auth-required #playerPanel{display:block!important;max-width:540px;margin:0 auto 40px;border-color:#80652e;box-shadow:0 16px 60px #0009,0 0 30px #e7bd5710}
-body.auth-required #playerPanel .topline{font-family:Georgia,serif;font-size:1.2rem;color:var(--gold2)}
-body.auth-required #playerMessage{font-size:1rem;line-height:1.6}
-body.auth-required #playerAuthForm .actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-body.auth-required #playerName,body.auth-required #playerEmail,body.auth-required #playerPassword{padding:14px}
-@media(max-width:430px){body.auth-required #playerAuthForm .actions{grid-template-columns:1fr}}
-</style></head><body class="auth-required"><main><header><img class="brand-logo" src="logo-lqdd.png" alt="Logotipo oficial LQDD con lobo, corona, laureles y cruz"><div class="kicker">Autoconocimiento · LQDD</div><h1>Tu Verdadero Yo Animal</h1><p class="subtitle">¿Eres un Lobo que lidera, un Búho que calcula o un Zorro que encuentra caminos? Responde y descubre el animal que representa tu forma de ser.</p></header>
+/* Perfil e historial locales: sin registro ni bloqueo del juego. */
+#playerPanel{max-width:540px;margin:0 auto 16px}
+#playerPanel .topline{font-family:Georgia,serif;font-size:1.05rem;color:var(--gold2)}
+#playerMessage{font-size:.92rem;line-height:1.5}
+#playerAuthForm .actions{display:flex;gap:10px;flex-wrap:wrap}
+#playerName{padding:12px}
+#playerEmail,#playerPassword{display:none!important}
+
+</style></head><body><main><header><img class="brand-logo" src="logo-lqdd.png" alt="Logotipo oficial LQDD con lobo, corona, laureles y cruz"><div class="kicker">Autoconocimiento · LQDD</div><h1>Tu Verdadero Yo Animal</h1><p class="subtitle">¿Eres un Lobo que lidera, un Búho que calcula o un Zorro que encuentra caminos? Responde y descubre el animal que representa tu forma de ser.</p></header>
 <section class="panel player-panel" id="playerPanel">
- <div class="topline"><span>👤 PERFIL LQDD</span><span id="playerStatus">Sin iniciar sesión</span></div>
- <p class="note" id="playerMessage">Crea tu perfil para conservar tus tests y duelos aunque cambies de móvil.</p>
+ <div class="topline"><span>👤 PERFIL LQDD</span><span id="playerStatus">Jugador local</span></div>
+ <p class="note" id="playerMessage">Tu apodo, tus tests y tu historial se guardan solo en este móvil y navegador. No necesitas registrarte.</p>
  <div id="playerAuthForm">
   <label for="playerName">Nombre o apodo</label><input id="playerName" maxlength="24" autocomplete="nickname" placeholder="Tu nombre en LQDD">
-  <label for="playerEmail">Correo electrónico</label><input id="playerEmail" type="email" autocomplete="email" placeholder="tu@correo.com">
-  <label for="playerPassword">Contraseña</label><input id="playerPassword" type="password" minlength="8" autocomplete="current-password" placeholder="Mínimo 8 caracteres">
-  <div class="actions"><button class="action" id="playerSignup">Crear perfil</button><button class="action secondary" id="playerLogin">Ya tengo perfil</button></div>
+  <div class="actions"><button class="action" id="playerSignup">Guardar apodo</button></div>
  </div>
- <div class="actions hidden" id="playerSignedIn"><button class="action secondary" id="playerRename">Cambiar apodo</button><button class="action secondary" id="playerLogout">Cerrar sesión</button></div>
+ <div class="actions hidden" id="playerSignedIn"><button class="action secondary" id="playerRename">Cambiar apodo</button></div>
+ <div class="topline" style="margin-top:18px"><span>📜 HISTORIAL</span><span id="historyCount">0 partidas</span></div>
+ <p class="note" id="historyMessage">Tus partidas aparecerán aquí en este dispositivo.</p>
+ <div class="player-history" id="playerHistory"></div>
 </section>
 <div class="stats"><div class="pill">🔥 Racha: <strong id="streak">0 días</strong></div><div class="pill">🏆 Colección: <strong id="collectionCount">0 de 8</strong></div></div>
 
@@ -1252,115 +1252,60 @@ function setMusicPhase(phase){
 
 
 
-const PLAYER_AUTH_URL="https://ghsbkpetgsfixpjeuroa.supabase.co/auth/v1";
-const PLAYER_REST_URL="https://ghsbkpetgsfixpjeuroa.supabase.co/rest/v1";
-const PLAYER_SESSION_KEY="lqdd_player_session_v1";
-let playerSession=null,playerProfile=null,historyLoaded=false;
-try{playerSession=JSON.parse(localStorage.getItem(PLAYER_SESSION_KEY)||"null")}catch(e){playerSession=null}
-function playerHeaders(extra={}){return{"apikey":DUEL_API_KEY,"Authorization":"Bearer "+(playerSession?.access_token||DUEL_API_KEY),"Content-Type":"application/json",...extra}}
-async function playerAuth(path,body){
- const r=await fetch(PLAYER_AUTH_URL+path,{method:"POST",headers:{"apikey":DUEL_API_KEY,"Content-Type":"application/json"},body:JSON.stringify(body)});
- const d=await r.json().catch(()=>({}));
- if(!r.ok)throw new Error(d.msg||d.message||d.error_description||d.error||"No se pudo completar el acceso.");
- return d;
-}
-async function refreshPlayerSession(){
- if(!playerSession?.refresh_token)return false;
- try{const d=await playerAuth("/token?grant_type=refresh_token",{refresh_token:playerSession.refresh_token});playerSession=d;localStorage.setItem(PLAYER_SESSION_KEY,JSON.stringify(d));return true}catch(e){playerSession=null;localStorage.removeItem(PLAYER_SESSION_KEY);return false}
-}
-async function playerFetch(url,options={}){
- let r=await fetch(url,{...options,headers:{...playerHeaders(),...(options.headers||{})}});
- if(r.status===401&&await refreshPlayerSession())r=await fetch(url,{...options,headers:{...playerHeaders(),...(options.headers||{})}});
- if(!r.ok){const d=await r.json().catch(()=>({}));throw new Error(d.message||d.error_description||d.error||"No se pudo guardar la información.");}
- return r.status===204?null:r.json();
-}
+const PLAYER_LOCAL_KEY="lqdd_player_local_v1";
+const PLAYER_HISTORY_KEY="lqdd_player_history_v1";
+let playerProfile=null,historyLoaded=false;
+try{playerProfile=JSON.parse(localStorage.getItem(PLAYER_LOCAL_KEY)||"null")}catch(e){playerProfile=null}
+function playerName(){return playerProfile?.display_name||"Jugador LQDD"}
 function setPlayerMessage(text,isError=false){$("playerMessage").textContent=text;$("playerMessage").style.color=isError?"#ff9b8e":""}
-function playerName(){return playerProfile?.display_name||playerSession?.user?.user_metadata?.display_name||$("playerName").value.trim()||"Jugador LQDD"}
-async function loadPlayerProfile(){
- if(!playerSession?.access_token){renderPlayerAuth();return}
- try{
-  const rows=await playerFetch(PLAYER_REST_URL+"/player_profiles?select=user_id,display_name&limit=1");
-  playerProfile=rows?.[0]||null;
-  if(!playerProfile){const n=playerSession.user?.user_metadata?.display_name||"Jugador LQDD";await savePlayerProfile(n)}
-  renderPlayerAuth();await loadPlayerHistory();
- }catch(e){setPlayerMessage("No se pudo cargar el perfil: "+e.message,true);renderPlayerAuth()}
-}
-async function savePlayerProfile(name){
- const display_name=String(name||"").trim().slice(0,24);
- if(display_name.length<2)throw new Error("El apodo debe tener al menos dos caracteres.");
- await playerFetch(PLAYER_REST_URL+"/player_profiles?on_conflict=user_id",{method:"POST",headers:{"Prefer":"resolution=merge-duplicates,return=representation"},body:JSON.stringify({user_id:playerSession.user.id,display_name,updated_at:new Date().toISOString()})});
- playerProfile={user_id:playerSession.user.id,display_name};
-}
+function getLocalHistory(){try{const rows=JSON.parse(localStorage.getItem(PLAYER_HISTORY_KEY)||"[]");return Array.isArray(rows)?rows:[]}catch(e){return[]}}
 function renderPlayerAuth(){
- const logged=!!playerSession?.access_token;
- document.body.classList.toggle("auth-required",!logged);
+ const logged=!!playerProfile?.display_name;
  $("playerAuthForm").classList.toggle("hidden",logged);
  $("playerSignedIn").classList.toggle("hidden",!logged);
- $("playerStatus").textContent=logged?playerName():"Sin iniciar sesión";
- $("playerStatus").classList.toggle("player-status-ok",logged);
- if(logged){$("playerName").value=playerName();setPlayerMessage("Perfil guardado. Tus tests y duelos se sincronizan con tu cuenta.")}else{$("historyMessage").textContent="Inicia sesión para guardar y consultar tu historial en cualquier dispositivo."}
+ $("playerStatus").textContent=logged?playerName():"Sin apodo";
+ if(logged)$("playerName").value=playerName();
 }
-async function doPlayerAuth(mode){
- const name=$("playerName").value.trim(),email=$("playerEmail").value.trim(),password=$("playerPassword").value;
- if(!email||!password){setPlayerMessage("Escribe tu correo y contraseña.",true);return}
- if(mode==="signup"&&name.length<2){setPlayerMessage("Escribe el apodo que verán tus amigos (mínimo dos caracteres).",true);return}
- try{
-  setPlayerMessage(mode==="signup"?"Creando perfil…":"Iniciando sesión…");
-  if(mode==="signup"){
-   const d=await playerAuth("/signup",{email,password,data:{display_name:name}});
-   if(!d.access_token){
-    setPlayerMessage("Cuenta creada. Si Supabase pide confirmar el correo, confirma el mensaje recibido y después pulsa «Ya tengo perfil».");
-    return;
-   }
-   playerSession=d;
-  }else{
-   playerSession=await playerAuth("/token?grant_type=password",{email,password});
-  }
-  localStorage.setItem(PLAYER_SESSION_KEY,JSON.stringify(playerSession));
-  if(mode==="signup"){
-   await savePlayerProfile(name||playerSession.user?.user_metadata?.display_name||"Jugador LQDD");
-  }else{
-   const existing=await playerFetch(PLAYER_REST_URL+"/player_profiles?select=user_id,display_name&limit=1");
-   playerProfile=existing?.[0]||null;
-   if(!playerProfile)await savePlayerProfile(playerSession.user?.user_metadata?.display_name||name||"Jugador LQDD");
-  }
-  renderPlayerAuth();await loadPlayerHistory();
- }catch(e){setPlayerMessage(e.message||"No se pudo iniciar sesión.",true)}
+function savePlayerProfile(name){
+ const display_name=String(name||"").trim().slice(0,24);
+ if(display_name.length<2)throw new Error("El apodo debe tener al menos dos caracteres.");
+ playerProfile={display_name,updated_at:new Date().toISOString()};
+ localStorage.setItem(PLAYER_LOCAL_KEY,JSON.stringify(playerProfile));
+ renderPlayerAuth();setPlayerMessage("Apodo guardado en este móvil. Ya puedes jugar sin registrarte.");
 }
-async function savePlayerHistory(entry){
- if(!playerSession?.access_token)return;
- try{
-  await playerFetch(PLAYER_REST_URL+"/player_game_history?on_conflict=user_id,duel_code",{method:"POST",headers:{"Prefer":"resolution=ignore-duplicates,return=minimal"},body:JSON.stringify({...entry,user_id:playerSession.user.id})});
-  await loadPlayerHistory();
- }catch(e){console.warn("No se pudo guardar el historial LQDD:",e);setPlayerMessage("Partida jugada, pero no se pudo sincronizar el historial: "+e.message,true)}
+function doPlayerAuth(){
+ try{savePlayerProfile($("playerName").value)}catch(e){setPlayerMessage(e.message,true)}
 }
-async function loadPlayerHistory(){
- if(!playerSession?.access_token){$("playerHistory").replaceChildren();$("historyCount").textContent="0 partidas";return}
- try{
-  const rows=await playerFetch(PLAYER_REST_URL+"/player_game_history?select=id,mode,animal_id,opponent_name,opponent_animal,winner_animal,correct_answers,total_questions,created_at&order=created_at.desc&limit=100");
-  const host=$("playerHistory");host.replaceChildren();
-  rows.forEach(item=>{
-   const card=document.createElement("article");card.className="history-entry";
-   const title=document.createElement("strong");title.textContent=item.mode==="duel"?"⚔️ Duelo contra "+(item.opponent_name||"Amigo"):"🧠 Test individual";
-   const detail=document.createElement("div");detail.textContent=(profiles[item.animal_id]?.title||item.animal_id)+(item.mode==="duel"?" vs. "+(profiles[item.opponent_animal]?.title||item.opponent_animal||"pendiente"):" · "+(item.correct_answers??"—")+"/"+(item.total_questions??"—")+" aciertos");
-   const meta=document.createElement("div");meta.className="history-meta";meta.textContent=new Date(item.created_at).toLocaleString("es-ES",{dateStyle:"medium",timeStyle:"short"})+(item.winner_animal?" · Ganador: "+(profiles[item.winner_animal]?.title||item.winner_animal):"");
-   card.append(title,detail,meta);host.append(card);
-  });
-  $("historyCount").textContent=rows.length+" partidas";
-  $("historyMessage").textContent=rows.length?"Tu historial está sincronizado con tu perfil.":"Todavía no hay partidas guardadas. Completa un test o un duelo.";
- }catch(e){$("historyMessage").textContent="No se pudo cargar el historial: "+e.message}
+function savePlayerHistory(entry){
+ const rows=getLocalHistory();
+ const duelCode=entry.duel_code||null;
+ if(duelCode&&rows.some(row=>row.duel_code===duelCode&&row.mode==="duel"))return;
+ rows.unshift({...entry,id:(crypto.randomUUID?crypto.randomUUID():String(Date.now())+Math.random()),player_name:playerName(),created_at:new Date().toISOString()});
+ localStorage.setItem(PLAYER_HISTORY_KEY,JSON.stringify(rows.slice(0,100)));
+ loadPlayerHistory();
 }
-$("playerSignup").addEventListener("click",()=>doPlayerAuth("signup"));
-$("playerLogin").addEventListener("click",()=>doPlayerAuth("login"));
-$("playerLogout").addEventListener("click",()=>{playerSession=null;playerProfile=null;localStorage.removeItem(PLAYER_SESSION_KEY);renderPlayerAuth();loadPlayerHistory();setPlayerMessage("Has cerrado sesión. Tus partidas guardadas seguirán vinculadas a tu cuenta.")});
-$("playerRename").addEventListener("click",async()=>{const name=prompt("Nuevo apodo LQDD:",playerName());if(name===null)return;try{await savePlayerProfile(name);renderPlayerAuth()}catch(e){setPlayerMessage(e.message,true)}});
+function loadPlayerHistory(){
+ const rows=getLocalHistory(),host=$("playerHistory");host.replaceChildren();
+ rows.forEach(item=>{
+  const card=document.createElement("article");card.className="history-entry";
+  const title=document.createElement("strong");title.textContent=item.mode==="duel"?"⚔️ Duelo contra "+(item.opponent_name||"Amigo"):"🧠 Test individual";
+  const detail=document.createElement("div");detail.textContent=(profiles[item.animal_id]?.title||item.animal_id||"Animal por descubrir")+(item.mode==="duel"?" vs. "+(profiles[item.opponent_animal]?.title||item.opponent_animal||"pendiente"):" · "+(item.correct_answers??"—")+"/"+(item.total_questions??"—")+" aciertos");
+  const meta=document.createElement("div");meta.className="history-meta";meta.textContent=new Date(item.created_at||Date.now()).toLocaleString("es-ES",{dateStyle:"medium",timeStyle:"short"})+(item.winner_animal?" · Ganador: "+(profiles[item.winner_animal]?.title||item.winner_animal):"");
+  card.append(title,detail,meta);host.append(card);
+ });
+ $("historyCount").textContent=rows.length+" partidas";
+ $("historyMessage").textContent=rows.length?"Historial guardado solo en este móvil.":"Tus partidas aparecerán aquí en este dispositivo.";
+}
+$("playerSignup").addEventListener("click",doPlayerAuth);
+$("playerRename").addEventListener("click",()=>{const name=prompt("Nuevo apodo LQDD:",playerName());if(name===null)return;try{savePlayerProfile(name)}catch(e){setPlayerMessage(e.message,true)}});
+renderPlayerAuth();loadPlayerHistory();
 
 try{paint()}catch(initError){console.error("LQDD paint error",initError)}try{start()}catch(initError){console.error("LQDD start error",initError);$("quiz").classList.remove("hidden");$("question").textContent="Error al iniciar el test. Pulsa «Reintentar test»."; $("answers").replaceChildren();$("restart").textContent="Reintentar test";}
 if("serviceWorker" in navigator){window.addEventListener("load",()=>{navigator.serviceWorker.register("./sw.js").catch(()=>{});});}
 
 /* Sin tonos artificiales al pulsar botones. */
 setupDuelInvite();
-loadPlayerProfile();
+renderPlayerAuth();loadPlayerHistory();
 
 /* La protección de copia se limita a CSS para no interferir con la X, los botones ni el menú de compartir. */
 </script>
