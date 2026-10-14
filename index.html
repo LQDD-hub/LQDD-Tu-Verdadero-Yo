@@ -724,13 +724,18 @@ function saveDuelToTodayHistory(room){
 function showRoomResult(room){
  if(!room||!room.guest_animal||roomResultShown)return;
  roomResultShown=true;
+ activeDuelRoom=room;
  saveDuelToTodayHistory(room);
  $("duelInvite").classList.add("hidden");
- const sharedButton=$("viewSharedDuel");if(sharedButton){sharedButton.classList.remove("hidden");sharedButton.onclick=()=>openAnimalDuel(room.creator_animal,room.guest_animal,animalPercent(room.creator_animal),animalPercent(room.guest_animal));}
+ const showResult=()=>openAnimalDuel(room.creator_animal,room.guest_animal,animalPercent(room.creator_animal),animalPercent(room.guest_animal));
+ const sharedButton=$("viewSharedDuel");if(sharedButton){sharedButton.classList.remove("hidden");sharedButton.onclick=showResult;}
+ const resultButton=$("viewDuel");if(resultButton){resultButton.classList.remove("hidden");resultButton.onclick=showResult;}
  $("quiz").classList.add("hidden");
  if($("result").classList.contains("hidden"))$("result").classList.add("hidden");
  const dailyBox=$("dailyLimit");
  if(dailyBox){dailyBox.classList.remove("hidden");const host=$("todayHistory");if(host){host.classList.remove("hidden");showDailyHistory();}}
+ // Mostrar el resultado al creador en cuanto el invitado termina la partida.
+ setTimeout(showResult,150);
 }
 async function refreshDuelRoom(){
  if(!duelCode)return;
