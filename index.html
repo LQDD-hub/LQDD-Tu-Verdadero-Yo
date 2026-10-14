@@ -950,20 +950,21 @@ $("meaningChallenge").onclick=async()=>{
  const id=currentMeaningId,p=profiles[id],button=$("meaningChallenge");if(!p)return;
  requestDuelNotificationPermission();
  const old=button.textContent;button.disabled=true;button.textContent="Creando duelo…";
+ let roomCreated=false;
  try{
   const room=await duelRequest({action:"create",creatorAnimal:id});
-  activeDuelRoom=room;roomResultShown=false;
+  activeDuelRoom=room;roomResultShown=false;enableDuelPush(room.code);
   const u=new URL(location.href);u.search="";u.searchParams.set("compat",id);u.searchParams.set("pct",String(animalPercent(id)));u.searchParams.set("duel",room.code);
-  history.replaceState(null,"",u.href);
-  watchDuelRoom(room.code);
-  const msg="⚔️ ¡Te reto a un duelo LQDD! Mi animal elegido es "+p.title+". Abre el enlace, completa el test y compara tu resultado conmigo.";
+  history.replaceState(null,"",u.href);watchDuelRoom(room.code);roomCreated=true;
+  const msg="⚔️ ¡Te reto a un duelo LQDD! Mi animal elegido es "+p.title+". Abre el enlace, completa tu test y compara tu resultado conmigo. "+u.href;
   if(navigator.share){
-   await navigator.share({title:"Duelo LQDD",text:msg,url:u.href});
-   closeMeaning();
+   try{await navigator.share({title:"Duelo LQDD",text:msg,url:u.href});closeMeaning();}
+   catch(e){if(e&&e.name==="AbortError")return;try{await navigator.clipboard.writeText(msg);alert("El enlace del duelo está copiado. Envíalo a tu amigo para jugar.");closeMeaning();}catch(err){prompt("Copia este enlace para retar a un amigo:",u.href);}}
   }else{
-   alert("Tu navegador no permite abrir el menú de compartir. Abre el juego en Chrome actualizado para compartir el duelo directamente.");
+   try{await navigator.clipboard.writeText(msg);alert("El enlace del duelo está copiado. Envíalo a tu amigo para jugar.");closeMeaning();}
+   catch(e){prompt("Copia este enlace para retar a un amigo:",u.href);}
   }
- }catch(e){if(!e||e.name!=="AbortError")alert("No se pudo crear el duelo: "+(e.message||"error de conexión"));}
+ }catch(e){if(!roomCreated)alert("No se pudo crear la sala de duelo. Inténtalo de nuevo en unos segundos.");else if(!e||e.name!=="AbortError")prompt("Copia este enlace para retar a un amigo:",location.href);}
  finally{button.disabled=false;if(button.textContent==="Creando duelo…")button.textContent=old;}
 };
 function closeMeaning(){
