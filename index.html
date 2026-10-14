@@ -704,6 +704,20 @@ const challengePercent=(()=>{try{const raw=new URLSearchParams(location.search).
 let duelCode=(()=>{try{return new URLSearchParams(location.search).get("duel")||null}catch(e){return null}})();
 const DUEL_API_URL="https://ghsbkpetgsfixpjeuroa.supabase.co/functions/v1/duel-room";
 const DUEL_API_KEY="sb_publishable_e7CAiA9eSMcxyh9wDOb78g_SqXQQsqh";
+const DUEL_PUSH_PUBLIC_KEY="BIonz6mdf5twsOJG9YzO0Vb3uJeoHx871oRnrIop0xyBynuyjX4Skbh7dyKL5UOnEdwQXWOaYy2Mqr6aTHgqaxA";
+function base64UrlBytes(value){const pad="=".repeat((4-value.length%4)%4);const raw=atob((value+pad).replace(/-/g,"+").replace(/_/g,"/"));return Uint8Array.from(raw,c=>c.charCodeAt(0));}
+async function enableDuelPush(roomCode){
+ try{
+  if(!("serviceWorker" in navigator)||!("PushManager" in window)||!("Notification" in window))return false;
+  if(await Notification.requestPermission()!=="granted")return false;
+  const registration=await navigator.serviceWorker.register("./sw.js");
+  let subscription=await registration.pushManager.getSubscription();
+  if(!subscription)subscription=await registration.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:base64UrlBytes(DUEL_PUSH_PUBLIC_KEY)});
+  await duelRequest({action:"subscribe",code:roomCode,subscription:subscription.toJSON()});
+  return true;
+ }catch(error){console.warn("No se pudo activar el aviso push:",error);return false;}
+}
+
 let activeDuelRoom=null,roomResultShown=false,roomPollHandle=null;
 async function duelRequest(payload){
  const response=await fetch(DUEL_API_URL,{method:"POST",headers:{"Content-Type":"application/json","apikey":DUEL_API_KEY,"Authorization":"Bearer "+DUEL_API_KEY},body:JSON.stringify(payload),cache:"no-store"});
@@ -1095,6 +1109,7 @@ $("share").onclick=async()=>{
  try{
   const created=await duelRequest({action:"create",creatorAnimal:last});
   duelCode=created.code;activeDuelRoom=created;
+  enableDuelPush(created.code);
   u.searchParams.set("duel",created.code);
   history.replaceState(null,"",u.href);
   setupDuelInvite();
