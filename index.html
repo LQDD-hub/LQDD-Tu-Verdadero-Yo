@@ -624,6 +624,11 @@ input,textarea,[contenteditable="true"]{
   <button class="action" type="submit">Guardar perfil</button>
  </form>
  <p id="playerProfileMessage" class="note" role="status" aria-live="polite" style="margin:8px 0 0"></p>
+ <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:12px">
+  <div style="padding:10px 6px;border:1px solid #514321;border-radius:10px;text-align:center"><strong id="profileAnimalCount" style="display:block;color:#ffdf8a;font-size:1.2rem">0/8</strong><span class="note">Animales</span></div>
+  <div style="padding:10px 6px;border:1px solid #514321;border-radius:10px;text-align:center"><strong id="profileGameCount" style="display:block;color:#ffdf8a;font-size:1.2rem">0</strong><span class="note">Partidas</span></div>
+  <div style="padding:10px 6px;border:1px solid #514321;border-radius:10px;text-align:center"><strong id="profileDuelCount" style="display:block;color:#ffdf8a;font-size:1.2rem">0</strong><span class="note">Duelos</span></div>
+ </div>
 
  
 
@@ -1311,28 +1316,19 @@ setupDuelInvite();
   historyToggle.textContent=opening?"✕ Cerrar historial ▴":"📜 Historial ▾";
   if(!opening)return;
   historyPanel.replaceChildren();
-  const allHistory=historyItems().filter(g=>g&&((g.type==="duel"&&profiles[g.creator_animal]&&profiles[g.guest_animal])||(g.type!=="duel"&&profiles[g.winner]))).sort((a,b)=>String(b.date||"").localeCompare(String(a.date||""))||String(b.time||"").localeCompare(String(a.time||"")));
-  const gameCount=allHistory.filter(g=>g.type!=="duel").length,duelCount=allHistory.filter(g=>g.type==="duel").length;
-  const summary=document.createElement("div");summary.style.cssText="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin-bottom:10px";
-  const unlocked=(()=>{try{const d=typeof getData==="function"?getData():{};return Array.isArray(d.unlocked)?d.unlocked.length:0}catch(e){return 0}})();
-  [[""+Math.min(8,unlocked)+"/8","Animales"],[String(gameCount),"Partidas"],[String(duelCount),"Duelos"]].forEach(([value,label])=>{const card=document.createElement("div");card.style.cssText="padding:9px 4px;border:1px solid #514321;border-radius:10px;text-align:center";const strong=document.createElement("strong");strong.style.cssText="display:block;color:#ffdf8a;font-size:1.1rem";strong.textContent=value;const span=document.createElement("span");span.className="note";span.textContent=label;card.append(strong,span);summary.append(card)});historyPanel.append(summary);
-  if(!allHistory.length){const empty=document.createElement("p");empty.className="note";empty.textContent="Todavía no hay partidas ni duelos guardados en este dispositivo.";historyPanel.append(empty);return;}
-  allHistory.forEach(g=>{
+  const duels=historyItems().filter(g=>g&&g.type==="duel"&&profiles[g.creator_animal]&&profiles[g.guest_animal]).sort((a,b)=>String(b.date||"").localeCompare(String(a.date||""))||String(b.time||"").localeCompare(String(a.time||"")));
+  if(!duels.length){const empty=document.createElement("p");empty.className="note";empty.textContent="Todavía no hay duelos guardados en este dispositivo.";historyPanel.append(empty);return;}
+  duels.forEach(g=>{
    const row=document.createElement("button");row.type="button";row.style.cssText="display:block;width:100%;text-align:left;padding:12px 4px;border:0;border-top:1px solid #514321;background:transparent;color:#f5d98d;font:inherit;cursor:pointer";
-   if(g.type==="duel"){
-    const a=profiles[g.creator_animal],b=profiles[g.guest_animal];
-    row.textContent="⚔️ Duelo "+(g.number||g.gameNumber||"—")+" · "+(g.creator_nickname||"Atacante")+" · "+a.title+" vs. "+(g.guest_nickname||"Defensor")+" · "+b.title+" — "+(g.date||"");
-    row.addEventListener("click",async()=>{
-     if(g.code){try{const room=await duelRequest({action:"get",code:g.code});if(room&&room.guest_animal){activeDuelRoom=room;duelCode=g.code;openAnimalDuel(room.creator_animal,room.guest_animal,animalPercent(room.creator_animal),animalPercent(room.guest_animal));return;}}catch(e){}}
-     activeDuelRoom=g;duelCode=g.code||"";openAnimalDuel(g.creator_animal,g.guest_animal,animalPercent(g.creator_animal),animalPercent(g.guest_animal));
-    });
-   }else{
-    const animal=profiles[g.winner];const points=Number(g.pointsAwarded)||pointsForAnimal(g.winner);
-    row.textContent="🏆 Partida · "+animal.title+" · "+(g.date||"Fecha no disponible")+" · "+points+" puntos";
-    row.addEventListener("click",()=>{const result=document.getElementById("result");if(result)result.scrollIntoView({behavior:"smooth",block:"start"});});
-   }
+   const a=profiles[g.creator_animal],b=profiles[g.guest_animal];
+   row.textContent="⚔️ Duelo "+(g.number||g.gameNumber||"—")+" · "+(g.creator_nickname||"Atacante")+" · "+a.title+" vs. "+(g.guest_nickname||"Defensor")+" · "+b.title+" — "+(g.date||"");
+   row.addEventListener("click",async()=>{
+    if(g.code){try{const room=await duelRequest({action:"get",code:g.code});if(room&&room.guest_animal){activeDuelRoom=room;duelCode=g.code;openAnimalDuel(room.creator_animal,room.guest_animal,animalPercent(room.creator_animal),animalPercent(room.guest_animal));return;}}catch(e){}}
+    activeDuelRoom=g;duelCode=g.code||"";openAnimalDuel(g.creator_animal,g.guest_animal,animalPercent(g.creator_animal),animalPercent(g.guest_animal));
+   });
    historyPanel.append(row);
   });
+;
  });
  refreshProfile();
  document.addEventListener("click",e=>{if(e.target&&e.target.id==="restart")setTimeout(refreshProfile,300);});
