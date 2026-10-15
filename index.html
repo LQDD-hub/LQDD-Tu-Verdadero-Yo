@@ -948,7 +948,7 @@ $("meaningChallenge").addEventListener("click",async(event)=>{
  const id=currentMeaningId,p=profiles[id],button=$("meaningChallenge");
  if(!p){alert("Abre primero la tarjeta de un animal desbloqueado y vuelve a pulsar «Retar a un amigo».");return;}
  if(button.disabled)return;
- requestDuelNotificationPermission();
+ if(typeof requestDuelNotificationPermission==="function")requestDuelNotificationPermission();
  const old=button.textContent;button.disabled=true;button.textContent="Creando duelo…";
  let roomCreated=false;
  try{
