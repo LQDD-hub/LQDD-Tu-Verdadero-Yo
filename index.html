@@ -819,7 +819,7 @@ function saveDuelToTodayHistory(room){
   const day=todayKey();let history=JSON.parse(localStorage.getItem(dailyHistoryKey)||"[]");
   if(!Array.isArray(history))history=[];
   history=history.filter(g=>g&&!(g.type==="duel"&&g.code===room.code));
-  history.push({type:"duel",code:room.code,date:day,number:Math.max(1,history.filter(g=>g&&g.type==="duel").length+1),creator_animal:room.creator_animal,guest_animal:room.guest_animal,local_animal:localAnimal,opponent_animal:otherAnimal,outcome,winner_animal:diff>0?localAnimal:diff<0?otherAnimal:null,role,creator_nickname:room.creator_name||getDuelPlayerName(),guest_nickname:room.guest_name||"Jugador LQDD",time:new Date().toLocaleTimeString("es-ES",{hour:"2-digit",minute:"2-digit"})});
+  history.push({type:"duel",code:room.code,date:day,number:Math.max(1,history.filter(g=>g&&g.type==="duel").length+1),creator_animal:room.creator_animal,guest_animal:room.guest_animal,local_animal:localAnimal,opponent_animal:otherAnimal,outcome,winner_animal:diff>0?localAnimal:diff<0?otherAnimal:null,role,creator_nickname:(room.creator_name&&room.creator_name!=="Jugador LQDD")?room.creator_name:(role==="creator"?getDuelPlayerName():"Jugador LQDD"),guest_nickname:(room.guest_name&&room.guest_name!=="Jugador LQDD")?room.guest_name:(role==="guest"?getDuelPlayerName():"Jugador LQDD"),time:new Date().toLocaleTimeString("es-ES",{hour:"2-digit",minute:"2-digit"})});
   localStorage.setItem(dailyHistoryKey,JSON.stringify(history.slice(-50)));
  }catch(e){}
  paint();
@@ -1185,7 +1185,7 @@ function openAnimalDuel(mineId,friendId,minePct,friendPct){
  const challengerId=duelCode&&activeDuelRoom?activeDuelRoom.creator_animal:mineId;
  const challengedId=duelCode&&activeDuelRoom?activeDuelRoom.guest_animal:friendId;
  const room=duelCode&&activeDuelRoom?activeDuelRoom:null;
- const creatorName=room&&room.creator_name?room.creator_name:"Atacante";
+ const localDuelNick=getDuelPlayerName();const creatorRoleSaved=(()=>{try{return duelCode?localStorage.getItem("lqdd_tvy_duel_role_"+duelCode)==="creator":false}catch(e){return false}})();const creatorName=room&&room.creator_name&&room.creator_name!=="Jugador LQDD"?room.creator_name:(creatorRoleSaved?localDuelNick:"Atacante");
  const guestName=room&&room.guest_name?room.guest_name:"Defensor";
  const mineLabel=room?(mineId===room.creator_animal?creatorName:mineId===room.guest_animal?guestName:"Jugador"):(challengerId===mineId?"ATACANTE":"DEFENSOR");
  const friendLabel=room?(friendId===room.creator_animal?creatorName:friendId===room.guest_animal?guestName:"Jugador"):(challengedId===friendId?"DEFENSOR":"ATACANTE");
@@ -1448,7 +1448,7 @@ setupDuelInvite();
    const row=document.createElement("button");row.type="button";row.style.cssText="display:flex;align-items:center;gap:8px;width:100%;text-align:left;padding:10px 2px;border:0;border-top:1px solid #514321;background:transparent;color:#f5d98d;font:inherit;cursor:pointer";
    if(g.type==="duel"){
     const a=profiles[g.creator_animal],b=profiles[g.guest_animal];
-    row.textContent="⚔️ Duelo · "+(g.outcome?g.outcome.toUpperCase()+" · ":"")+(g.creator_nickname||"Atacante")+" ("+a.title+") vs. "+(g.guest_nickname||"Defensor")+" ("+b.title+") · "+(g.date||"");
+    const creatorNick=(g.creator_nickname&&g.creator_nickname!=="Jugador LQDD")?g.creator_nickname:(g.code&&(()=>{try{return localStorage.getItem("lqdd_tvy_duel_role_"+g.code)==="creator"}catch(e){return false}})()?getDuelPlayerName():"Atacante");row.textContent="⚔️ Duelo · "+(g.outcome?g.outcome.toUpperCase()+" · ":"")+creatorNick+" ("+a.title+") vs. "+((g.guest_nickname&&g.guest_nickname!=="Jugador LQDD")?g.guest_nickname:"Defensor")+" ("+b.title+") · "+(g.date||"");
     row.addEventListener("click",async()=>{
      if(g.code){try{const room=await duelRequest({action:"get",code:g.code});if(room&&room.guest_animal){activeDuelRoom=room;duelCode=g.code;openAnimalDuel(room.creator_animal,room.guest_animal,animalPercent(room.creator_animal),animalPercent(room.guest_animal));return;}}catch(e){}}
      activeDuelRoom=g;duelCode=g.code||"";openAnimalDuel(g.creator_animal,g.guest_animal,animalPercent(g.creator_animal),animalPercent(g.guest_animal));
