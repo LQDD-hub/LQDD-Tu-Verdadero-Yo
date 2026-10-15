@@ -1193,7 +1193,7 @@ $("share").onclick=async()=>{
  stopResultMusic();
  if(!last)return;
  const p=profiles[last],u=new URL(location.href);u.search="";u.searchParams.set("compat",last);u.searchParams.set("pct",String(animalPercent(last)));
- const msg="⚔️ ¡TE RETO A UN DUELO LQDD! Mi animal es "+p.title+" "+p.symbol+". Abre el enlace y completa tu test. ¡Abre el enlace, completa el test y demuestra quién gana el duelo! ";
+ const msg="⚔️ ¡TE RETO A UN DUELO LQDD! Mi animal es "+p.title+" "+p.symbol+". ¡Abre el enlace, completa el test y demuestra si puedes vencerme! ";
  const btn=$("share"),old=btn.textContent;btn.disabled=true;btn.textContent="Preparando tarjeta…";
  let roomCreated=false;
  try{
