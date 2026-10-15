@@ -809,7 +809,7 @@ function saveDuelToTodayHistory(room){
   history.push({type:"duel",code:room.code,date:day,number:Math.max(1,history.filter(g=>g&&g.type==="duel").length+1),creator_animal:room.creator_animal,guest_animal:room.guest_animal,local_animal:localAnimal,opponent_animal:otherAnimal,outcome,winner_animal:diff>0?localAnimal:diff<0?otherAnimal:null,role,creator_nickname:room.creator_name||getDuelPlayerName(),guest_nickname:room.guest_name||"Jugador LQDD",time:new Date().toLocaleTimeString("es-ES",{hour:"2-digit",minute:"2-digit"})});
   localStorage.setItem(dailyHistoryKey,JSON.stringify(history.slice(-50)));
  }catch(e){}
- paint();refreshProfile();
+ paint();
 }
 function showRoomResult(room){
  if(!room||!room.guest_animal||roomResultShown)return;
@@ -933,6 +933,7 @@ function paint(){
  $("nextLevel").textContent=level===8?"Nivel máximo alcanzado":"Siguiente: nivel "+(level+1);
  $("levelMessage").textContent=level===8?"¡Has alcanzado el nivel 8! Pronto podrás descubrir nuevos animales y seguir avanzando.":level===0?"Empiezas en el nivel 0. Descubre tu primer animal o gana un duelo para empezar a subir.":"Descubre animales o gana duelos para seguir avanzando. Victorias: "+d.duelWins+".";
  renderDuelCollection(d);
+ const duelStat=$("profileDuelCount");if(duelStat){try{const h=JSON.parse(localStorage.getItem("lqdd_tvy_daily_history_v1")||"[]");duelStat.textContent=String(Array.isArray(h)?h.filter(g=>g&&g.type==="duel").length:0)}catch(e){duelStat.textContent="0"}}
 }
 let currentMeaningId=null;
 function openMeaning(id){
