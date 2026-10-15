@@ -786,9 +786,8 @@ function saveDuelToTodayHistory(room){
   const day=todayKey();let history=JSON.parse(localStorage.getItem(dailyHistoryKey)||"[]");
   if(!Array.isArray(history))history=[];
   history=history.filter(g=>g&&!(g.type==="duel"&&g.code===room.code));
-  const mineId=challengeAnimal?room.guest_animal:room.creator_animal;const otherId=challengeAnimal?room.creator_animal:room.guest_animal;const minePct=animalPercent(mineId),otherPct=animalPercent(otherId);const duelOutcome=minePct===otherPct?"draw":minePct>otherPct?"won":"lost";
-  history.push({type:"duel",code:room.code,date:day,number:Math.max(1,history.filter(g=>g&&g.type==="duel").length+1),creator_animal:room.creator_animal,guest_animal:room.guest_animal,creator_nickname:room.creator_name||getDuelPlayerName(),guest_nickname:room.guest_name||"Jugador LQDD",my_animal:mineId,opponent_animal:otherId,my_nickname:getDuelPlayerName(),opponent_nickname:challengeAnimal?(room.creator_name||"Tu rival"):(room.guest_name||"Tu rival"),outcome:duelOutcome,my_percent:minePct,opponent_percent:otherPct,time:new Date().toLocaleTimeString("es-ES",{hour:"2-digit",minute:"2-digit"})});
-  localStorage.setItem(dailyHistoryKey,JSON.stringify(history.slice(-50)));window.dispatchEvent(new Event("lqdd-duel-history-updated"));
+  history.push({type:"duel",code:room.code,date:day,number:Math.max(1,history.filter(g=>g&&g.type==="duel").length+1),creator_animal:room.creator_animal,guest_animal:room.guest_animal,creator_nickname:room.creator_name||getDuelPlayerName(),guest_nickname:room.guest_name||"Jugador LQDD",time:new Date().toLocaleTimeString("es-ES",{hour:"2-digit",minute:"2-digit"})});
+  localStorage.setItem(dailyHistoryKey,JSON.stringify(history.slice(-10)));
  }catch(e){}
 }
 function showRoomResult(room){
