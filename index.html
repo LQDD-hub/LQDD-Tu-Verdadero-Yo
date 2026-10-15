@@ -640,7 +640,6 @@ input,textarea,[contenteditable="true"]{
 .animal-collection-panel .track{height:3px!important;margin-bottom:5px!important}
 .animal-collection-grid{grid-template-columns:repeat(8,minmax(0,1fr))!important;gap:2px!important}
 .animal-collection-item{position:relative;gap:2px!important;padding:3px 1px!important;border-radius:5px!important;min-height:0!important;overflow:hidden!important}
-.animal-collection-item .collection-rank{align-self:center;font-size:.52rem!important;line-height:1!important;color:#ffdf8a!important;font-weight:900!important;border:1px solid #705724;border-radius:3px;padding:2px 3px;margin-bottom:1px}
 .animal-collection-item img{width:100%!important;aspect-ratio:1/1!important;border-radius:3px!important}
 .animal-collection-item strong{font-size:.48rem!important;line-height:1.02!important;overflow-wrap:anywhere!important}
 .animal-collection-item small{font-size:.43rem!important;line-height:1!important;overflow-wrap:anywhere!important}
@@ -968,7 +967,7 @@ function renderAnimalCollection(data=getData()){
  const orderedIds=collectionOrder.filter(id=>profiles[id]);
  $("animalCollectionProgress").textContent=unlocked.size+" de "+ids.length+" conseguidos";$("animalCollectionFill").style.width=(unlocked.size/ids.length*100)+"%";grid.replaceChildren();
  orderedIds.forEach((id,index)=>{const p=profiles[id];if(!p)return;const earned=unlocked.has(id),card=document.createElement("button");card.type="button";card.className="animal-collection-item"+(earned?"":" locked");card.setAttribute("aria-label",earned?"Puesto "+(index+1)+", ver tarjeta de "+p.title:"Puesto "+(index+1)+", animal bloqueado: "+p.title);
- const rank=document.createElement("span");rank.className="collection-rank";rank.textContent="#"+(index+1);const img=document.createElement("img");img.src=p.img;img.alt=earned?p.title:"Animal aún bloqueado";img.loading="lazy";const title=document.createElement("strong");title.textContent=p.title;const status=document.createElement("small");status.textContent=earned?"✓ Conseguido":"🔒 Bloqueado";card.append(rank,img,title,status);
+ const img=document.createElement("img");img.src=p.img;img.alt=earned?p.title:"Animal aún bloqueado";img.loading="lazy";const title=document.createElement("strong");title.textContent=p.title;const status=document.createElement("small");status.textContent=earned?"✓ Conseguido":"🔒 Bloqueado";card.append(img,title,status);
  if(earned){card.addEventListener("click",()=>openMeaning(id));const share=document.createElement("span");share.className="collection-share";share.textContent="Compartir tarjeta";share.addEventListener("click",e=>{e.stopPropagation();shareAnimalProfile(id,share)});card.append(share)}else card.addEventListener("click",()=>alert("🔒 "+p.title+" aún está bloqueado. Juega nuevas partidas para descubrirlo."));grid.append(card)});
 }
 function paint(){
