@@ -638,13 +638,13 @@ input,textarea,[contenteditable="true"]{
 .animal-collection-head{gap:4px!important;margin-bottom:4px!important;font-size:.72rem!important}
 .animal-collection-head .pill{font-size:.62rem!important;padding:3px 5px!important}
 .animal-collection-panel .track{height:3px!important;margin-bottom:5px!important}
-.animal-collection-grid{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:4px!important}
-.animal-collection-item{position:relative;gap:2px!important;padding:4px 3px!important;border-radius:6px!important;min-height:0!important}
-.animal-collection-item .collection-rank{align-self:flex-start;font-size:.58rem!important;line-height:1!important;color:#ffdf8a!important;font-weight:900!important;border:1px solid #705724;border-radius:4px;padding:2px 4px;margin-bottom:1px}
-.animal-collection-item img{width:100%!important;aspect-ratio:1/1!important;border-radius:4px!important}
-.animal-collection-item strong{font-size:.62rem!important;line-height:1.05!important}
-.animal-collection-item small{font-size:.55rem!important;line-height:1.05!important}
-.animal-collection-item .collection-share{font-size:.53rem!important;padding:2px!important}
+.animal-collection-grid{grid-template-columns:repeat(8,minmax(0,1fr))!important;gap:2px!important}
+.animal-collection-item{position:relative;gap:2px!important;padding:3px 1px!important;border-radius:5px!important;min-height:0!important;overflow:hidden!important}
+.animal-collection-item .collection-rank{align-self:center;font-size:.52rem!important;line-height:1!important;color:#ffdf8a!important;font-weight:900!important;border:1px solid #705724;border-radius:3px;padding:2px 3px;margin-bottom:1px}
+.animal-collection-item img{width:100%!important;aspect-ratio:1/1!important;border-radius:3px!important}
+.animal-collection-item strong{font-size:.48rem!important;line-height:1.02!important;overflow-wrap:anywhere!important}
+.animal-collection-item small{font-size:.43rem!important;line-height:1!important;overflow-wrap:anywhere!important}
+.animal-collection-item .collection-share{font-size:.42rem!important;line-height:1!important;padding:2px 1px!important;border-radius:4px!important;overflow-wrap:anywhere!important}
 .animal-collection-panel>.note{font-size:.58rem!important;line-height:1.15!important;margin:4px 0 0!important}
 </style></head><body><main><header><img class="brand-logo" src="logo-lqdd.png" alt="Logotipo oficial LQDD con lobo, corona, laureles y cruz"><div class="kicker">Autoconocimiento · LQDD</div><h1>Tu Verdadero Yo Animal</h1><p class="subtitle">¿Eres un Lobo que lidera, un Búho que calcula o un Zorro que encuentra caminos? Responde y descubre el animal que representa tu forma de ser.</p></header>
 <div class="stats"><div class="pill">🔥 Racha: <strong id="streak">0 días</strong></div><div class="pill">🏆 Colección: <strong id="collectionCount">0 de 8</strong></div></div>
@@ -964,8 +964,10 @@ function renderDuelCollection(d){
 }
 function renderAnimalCollection(data=getData()){
  const grid=$("animalCollectionGrid");if(!grid)return;const unlocked=new Set(data.unlocked||[]);
+ const collectionOrder=["inventor","creator","strategist","freeSpirit","visionary","leader","guardian","protector"];
+ const orderedIds=collectionOrder.filter(id=>profiles[id]);
  $("animalCollectionProgress").textContent=unlocked.size+" de "+ids.length+" conseguidos";$("animalCollectionFill").style.width=(unlocked.size/ids.length*100)+"%";grid.replaceChildren();
- ids.forEach((id,index)=>{const p=profiles[id];if(!p)return;const earned=unlocked.has(id),card=document.createElement("button");card.type="button";card.className="animal-collection-item"+(earned?"":" locked");card.setAttribute("aria-label",earned?"Puesto "+(index+1)+", ver tarjeta de "+p.title:"Puesto "+(index+1)+", animal bloqueado: "+p.title);
+ orderedIds.forEach((id,index)=>{const p=profiles[id];if(!p)return;const earned=unlocked.has(id),card=document.createElement("button");card.type="button";card.className="animal-collection-item"+(earned?"":" locked");card.setAttribute("aria-label",earned?"Puesto "+(index+1)+", ver tarjeta de "+p.title:"Puesto "+(index+1)+", animal bloqueado: "+p.title);
  const rank=document.createElement("span");rank.className="collection-rank";rank.textContent="#"+(index+1);const img=document.createElement("img");img.src=p.img;img.alt=earned?p.title:"Animal aún bloqueado";img.loading="lazy";const title=document.createElement("strong");title.textContent=p.title;const status=document.createElement("small");status.textContent=earned?"✓ Conseguido":"🔒 Bloqueado";card.append(rank,img,title,status);
  if(earned){card.addEventListener("click",()=>openMeaning(id));const share=document.createElement("span");share.className="collection-share";share.textContent="Compartir tarjeta";share.addEventListener("click",e=>{e.stopPropagation();shareAnimalProfile(id,share)});card.append(share)}else card.addEventListener("click",()=>alert("🔒 "+p.title+" aún está bloqueado. Juega nuevas partidas para descubrirlo."));grid.append(card)});
 }
