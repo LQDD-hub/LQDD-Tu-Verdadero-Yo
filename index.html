@@ -622,8 +622,19 @@ input,textarea,[contenteditable="true"]{
 /* Mantener el feedback verde/rojo incluso cuando el dedo o ratón sigue encima. */
 .answer.answer-correct,.answer.answer-correct:hover,.answer.answer-correct:focus-visible{border-color:#32c766!important;background:linear-gradient(120deg,#173d27,#102719)!important;box-shadow:0 0 0 2px #32c76666,0 0 22px #32c76635!important;color:#eaffef!important}
 .answer.answer-wrong,.answer.answer-wrong:hover,.answer.answer-wrong:focus-visible{border-color:#f05252!important;background:linear-gradient(120deg,#4a1c1c,#291313)!important;box-shadow:0 0 0 2px #f0525266,0 0 22px #f0525230!important;color:#fff0f0!important}
+
+.animal-collection-panel{margin:12px 0 16px;padding:14px;border:1px solid #514321;border-radius:18px;background:rgba(24,23,24,.94)}
+.animal-collection-head{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+.animal-collection-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}
+.animal-collection-item{display:flex;flex-direction:column;align-items:center;gap:5px;min-width:0;padding:7px 5px;border:1px solid #514321;border-radius:12px;background:#111113;color:#ffdf8a;font:inherit;cursor:pointer;text-align:center}
+.animal-collection-item img{width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:9px;border:1px solid #80652e}
+.animal-collection-item.locked img{filter:grayscale(1) brightness(.22);opacity:.8}.animal-collection-item.locked{color:#aaa39a;border-style:dashed}
+.animal-collection-item strong{font-size:.78rem;line-height:1.2;overflow-wrap:anywhere}.animal-collection-item small{font-size:.67rem;color:#a8f0c9}.animal-collection-item.locked small{color:#aaa39a}
+.animal-collection-item .collection-share{font-size:.68rem;color:#ffdf8a;border:1px solid #80652e;border-radius:999px;padding:4px 6px;background:#211b11}
+@media(max-width:360px){.animal-collection-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}.animal-collection-item{padding:5px 3px}.animal-collection-item strong{font-size:.68rem}}
 </style></head><body><main><header><img class="brand-logo" src="logo-lqdd.png" alt="Logotipo oficial LQDD con lobo, corona, laureles y cruz"><div class="kicker">Autoconocimiento · LQDD</div><h1>Tu Verdadero Yo Animal</h1><p class="subtitle">¿Eres un Lobo que lidera, un Búho que calcula o un Zorro que encuentra caminos? Responde y descubre el animal que representa tu forma de ser.</p></header>
 <div class="stats"><div class="pill">🔥 Racha: <strong id="streak">0 días</strong></div><div class="pill">🏆 Colección: <strong id="collectionCount">0 de 8</strong></div></div>
+<section class="animal-collection-panel" id="animalCollectionPanel" aria-label="Mi colección de animales"><div class="animal-collection-head"><strong>🏆 Mi colección de animales</strong><span class="pill" id="animalCollectionProgress">0 de 8 conseguidos</span></div><div class="track" style="margin-bottom:12px"><div class="fill" id="animalCollectionFill" style="width:0%"></div></div><div class="animal-collection-grid" id="animalCollectionGrid"></div><p class="note" style="margin:10px 0 0">Los animales descubiertos se guardan en este dispositivo. Toca uno conseguido para ver su tarjeta o compartirla.</p></section>
 <section class="panel profile-level-window" aria-label="Perfil y progreso LQDD">
  <div class="profile-level-top"><div class="profile-level-title"><span>👤 Mi perfil LQDD</span><span id="profileSummaryNickname" class="profile-summary-nick">Este dispositivo</span></div><div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:flex-end"><button type="button" id="profileDropdownToggle" class="profile-mini-toggle" aria-expanded="false" aria-controls="profileDropdown">Editar perfil ✎</button></div></div><section class="panel level-panel" aria-label="Progreso de nivel">
  <div class="level-heading"><span class="kicker">PROGRESO LQDD</span><strong id="levelNumber">NIVEL 0</strong></div>
@@ -935,8 +946,15 @@ function renderDuelCollection(d){
   host.append(card);
  });
 }
+function renderAnimalCollection(data=getData()){
+ const grid=$("animalCollectionGrid");if(!grid)return;const unlocked=new Set(data.unlocked||[]);
+ $("animalCollectionProgress").textContent=unlocked.size+" de "+ids.length+" conseguidos";$("animalCollectionFill").style.width=(unlocked.size/ids.length*100)+"%";grid.replaceChildren();
+ ids.forEach(id=>{const p=profiles[id];if(!p)return;const earned=unlocked.has(id),card=document.createElement("button");card.type="button";card.className="animal-collection-item"+(earned?"":" locked");card.setAttribute("aria-label",earned?"Ver tarjeta de "+p.title:"Animal bloqueado: "+p.title);
+ const img=document.createElement("img");img.src=p.img;img.alt=earned?p.title:"Animal aún bloqueado";img.loading="lazy";const title=document.createElement("strong");title.textContent=p.title;const status=document.createElement("small");status.textContent=earned?"✓ Conseguido":"🔒 Bloqueado";card.append(img,title,status);
+ if(earned){card.addEventListener("click",()=>openMeaning(id));const share=document.createElement("span");share.className="collection-share";share.textContent="Compartir tarjeta";share.addEventListener("click",e=>{e.stopPropagation();shareAnimalProfile(id,share)});card.append(share)}else card.addEventListener("click",()=>alert("🔒 "+p.title+" aún está bloqueado. Juega nuevas partidas para descubrirlo."));grid.append(card)});
+}
 function paint(){
- let d=getData();const level=Math.min(8,d.unlocked.length+Math.max(0,Number(d.duelWins)||0)),pct=level/8*100;
+ let d=getData();renderAnimalCollection(d);const level=Math.min(8,d.unlocked.length+Math.max(0,Number(d.duelWins)||0)),pct=level/8*100;
  $("streak").textContent=(d.streak||0)+" "+(d.streak===1?"día":"días");
  $("collectionCount").textContent=d.unlocked.length+" de 8";
  $("levelNumber").textContent="NIVEL "+level;
