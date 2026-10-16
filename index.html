@@ -1225,8 +1225,9 @@ function openAnimalDuel(mineId,friendId,minePct,friendPct){
  const challengerId=duelCode&&activeDuelRoom?activeDuelRoom.creator_animal:mineId;
  const challengedId=duelCode&&activeDuelRoom?activeDuelRoom.guest_animal:friendId;
  const room=duelCode&&activeDuelRoom?activeDuelRoom:null;
- const localDuelNick=getDuelPlayerName();const creatorRoleSaved=(()=>{try{const code=(room&&room.code)||duelCode;return code?localStorage.getItem("lqdd_tvy_duel_role_"+code)==="creator":false}catch(e){return false}})();const creatorName=room&&room.creator_name&&!["Jugador LQDD","Atacante","Defensor"].includes(room.creator_name)?room.creator_name:(creatorRoleSaved?localDuelNick:(room&&room.creator_name==="Atacante"?localDuelNick:"Atacante"));
- const guestName=room&&room.guest_name?room.guest_name:"Defensor";
+ const localDuelNick=getDuelPlayerName();const savedRole=(()=>{try{const code=(room&&room.code)||duelCode;return code?localStorage.getItem("lqdd_tvy_duel_role_"+code)||"":""}catch(e){return ""}})();const localRole=savedRole==="creator"||savedRole==="guest"?savedRole:(challengeAnimal?"guest":"creator");
+ const creatorName=room&&room.creator_name&&!["Jugador LQDD","Atacante","Defensor"].includes(room.creator_name.trim())?room.creator_name.trim():(localRole==="creator"?localDuelNick:"El retador");
+ const guestName=room&&room.guest_name&&!["Jugador LQDD","Atacante","Defensor"].includes(room.guest_name.trim())?room.guest_name.trim():(localRole==="guest"?localDuelNick:"El rival");
  const mineLabel=room?(mineId===room.creator_animal?creatorName:mineId===room.guest_animal?guestName:"Jugador"):(challengerId===mineId?"ATACANTE":"DEFENSOR");
  const friendLabel=room?(friendId===room.creator_animal?creatorName:friendId===room.guest_animal?guestName:"Jugador"):(challengedId===friendId?"DEFENSOR":"ATACANTE");
  const setCard=(side,pct,p,isWinner,role)=>{
