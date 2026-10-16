@@ -1378,7 +1378,7 @@ $("share").onclick=async()=>{
   }
  }finally{btn.disabled=false;if(btn.textContent==="Preparando tarjeta…")btn.textContent=old}
 };
-$("restart").onclick=start;/* Música LQDD por fases: misterio, revelación y resultado legendario. */
+$("restart").onclick=()=>{if(duelCode||challengeAnimal){const cleanUrl=new URL(location.href);cleanUrl.searchParams.delete("duel");cleanUrl.searchParams.delete("compat");cleanUrl.searchParams.delete("pct");location.replace(cleanUrl.href);return;}start();};/* Música LQDD por fases: misterio, revelación y resultado legendario. */
 const lqddTracks = {
  normalMystery: new Audio("audio/misterio/%E7%AD%89%E5%BE%85%E9%BB%8E%E6%98%8E.mp3"),
  normalReveal: new Audio("audio/revelacion/Triumph%20des%20%C3%89toiles.mp3"),
