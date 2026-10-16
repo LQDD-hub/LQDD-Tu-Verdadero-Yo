@@ -1090,8 +1090,13 @@ $("meaningChallenge").addEventListener("click",async(event)=>{
   const u=new URL(location.href);u.search="";u.searchParams.set("compat",id);u.searchParams.set("pct",String(animalPercent(id)));u.searchParams.set("duel",room.code);
   history.replaceState(null,"",u.href);watchDuelRoom(room.code);roomCreated=true;
   const msg="⚔️ ¡Te reto a un duelo LQDD! Mi animal elegido es "+p.title+". Abre el enlace, completa tu test y compara tu resultado conmigo. "+u.href;
-  if(navigator.share){
-   try{await navigator.share({title:"Duelo LQDD",text:msg,url:u.href});closeMeaning();}
+  const cardUrl=new URL(p.shareImg||p.img,location.href).href;
+  const response=await fetch(cardUrl,{cache:"no-store"});
+  if(!response.ok)throw new Error("No se pudo cargar la tarjeta del animal.");
+  const blob=await response.blob();
+  const file=new File([blob],"LQDD-"+id+"-tarjeta.png",{type:blob.type||"image/png"});
+  if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){
+   try{await navigator.share({title:"Duelo LQDD",text:msg,url:u.href,files:[file]});closeMeaning();}
    catch(e){if(e&&e.name==="AbortError")return;try{await navigator.clipboard.writeText(msg);alert("El enlace del duelo está copiado. Envíalo a tu amigo para jugar.");closeMeaning();}catch(err){prompt("Copia este enlace para retar a un amigo:",u.href);}}
   }else{
    try{await navigator.clipboard.writeText(msg);alert("El enlace del duelo está copiado. Envíalo a tu amigo para jugar.");closeMeaning();}
