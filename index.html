@@ -1146,8 +1146,8 @@ function showSavedResult(){let saved=null;try{saved=JSON.parse(localStorage.getI
    const animalName=document.createElement("strong");animalName.style.cssText="font-size:.72rem;line-height:1.2;color:#f5d98d;overflow-wrap:anywhere";animalName.textContent=p.title;
    labels.append(roleText,animalName);card.append(animalImg,labels);duelCards.append(card);
   });
-  const savedNick=(()=>{try{return (JSON.parse(localStorage.getItem("lqdd_tvy_player_profile_v1")||"{}").nickname||"").trim()}catch(e){return ""}})();const opponentNick=g.creator_nickname||g.guest_nickname||"";title.textContent="⚔️ "+(savedNick||"Tú")+" · "+(opponentNick||"Amigo")+" · "+(g.date===todayKey()?"Hoy":g.date||"Otro día")+" · "+(g.time||"");
-  pts.textContent="Toca para ver la comparación";
+  const creatorNick=g.creator_nickname||"El retador",guestNick=g.guest_nickname||"El rival";const resultLabel=g.outcome==="victoria"?"🏆 VICTORIA":g.outcome==="derrota"?"❌ DERROTA":g.outcome==="empate"?"🤝 EMPATE":"Duelo finalizado";title.textContent="⚔️ "+creatorNick+" vs. "+guestNick+" · "+(g.date===todayKey()?"Hoy":g.date||"Otro día")+" · "+(g.time||"");
+  pts.textContent=resultLabel+" · Toca para ver la comparación";
   info.append(title,pts);row.append(duelCards,info);host.append(row);return;
  }else{
   const p=profiles[g.winner];row.setAttribute("aria-label","Abrir tarjeta de "+p.title+" de la partida "+g.number);row.onclick=()=>openShareCard(g.winner);
