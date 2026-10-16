@@ -1341,7 +1341,7 @@ $("share").onclick=async()=>{
  const btn=$("share"),old=btn.textContent;btn.disabled=true;btn.textContent="Preparando tarjeta…";
  let roomCreated=false;
  try{
-  const created=await duelRequest({action:"create",creatorAnimal:last});
+  const created=await duelRequest({action:"create",creatorAnimal:last,playerName:getDuelPlayerName()});
   activeDuelRoom=created;roomResultShown=false;
   enableDuelPush(created.code);
   u.searchParams.set("duel",created.code);
