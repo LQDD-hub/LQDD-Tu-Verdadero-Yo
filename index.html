@@ -798,7 +798,7 @@ const challengePercent=(()=>{try{const raw=new URLSearchParams(location.search).
 let duelCode=(()=>{try{return new URLSearchParams(location.search).get("duel")||null}catch(e){return null}})();
 const DUEL_API_URL="https://ghsbkpetgsfixpjeuroa.supabase.co/functions/v1/duel-room";
 const DUEL_API_KEY="sb_publishable_e7CAiA9eSMcxyh9wDOb78g_SqXQQsqh";
-const DUEL_PUSH_PUBLIC_KEY="BPsYm9I_TTbLqIeTR_G2Jq7JaLZ-KP16IRIo2Kt7gIWHE2KXAcVqs4VbIG-0n2mflfxx5za5YuidNGpgiPcUMRA";
+const DUEL_PUSH_PUBLIC_KEY="BK95y7gSCbW_YzHpDmAWoGPQciEj8Oe7k-45P1SVUFdnoCZttM2SRgNthESozmLyZ7C8_AWIhYh32jAuwrl4ELk";
 function base64UrlBytes(value){const pad="=".repeat((4-value.length%4)%4);const raw=atob((value+pad).replace(/-/g,"+").replace(/_/g,"/"));return Uint8Array.from(raw,c=>c.charCodeAt(0));}
 async function enableDuelPush(roomCode){
  try{
