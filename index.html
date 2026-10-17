@@ -1502,13 +1502,13 @@ setupDuelInvite();
   const historyGroups={victoria:document.getElementById("historyWinsEntries"),derrota:document.getElementById("historyLossesEntries"),empate:document.getElementById("historyTiesEntries")};
   Object.values(historyGroups).forEach(group=>{if(group){group.replaceChildren();group.classList.add("hidden");}});
   document.querySelectorAll(".history-filter").forEach(button=>{button.setAttribute("aria-expanded","false");});
-  document.querySelectorAll(".history-filter").forEach(button=>button.addEventListener("click",()=>{
+  document.querySelectorAll(".history-filter").forEach(button=>button.onclick=()=>{
    const target=document.getElementById(button.getAttribute("aria-controls"));
    const opening=target&&target.classList.contains("hidden");
    Object.values(historyGroups).forEach(group=>{if(group)group.classList.add("hidden");});
    document.querySelectorAll(".history-filter").forEach(other=>other.setAttribute("aria-expanded","false"));
    if(target&&opening){target.classList.remove("hidden");button.setAttribute("aria-expanded","true");}
-  }));
+  });
   if(!history.length){const empty=document.createElement("p");empty.className="note";empty.textContent="Todavía no hay partidas ni duelos guardados en este dispositivo.";entries.append(empty);return;}
   history.forEach(g=>{
    const row=document.createElement("button");row.type="button";row.style.cssText="display:flex;align-items:center;gap:8px;width:100%;text-align:left;padding:10px 2px;border:0;border-top:1px solid #514321;background:transparent;color:#f5d98d;font:inherit;cursor:pointer";
@@ -1527,7 +1527,6 @@ setupDuelInvite();
     row.textContent="🏆 Partida · "+(animal?animal.title:"Resultado")+" · "+(g.date||"")+" · "+(Number(g.pointsAwarded)||pointsForAnimal(g.winner))+" puntos";
     row.addEventListener("click",()=>{const result=document.getElementById("result");if(result)result.scrollIntoView({behavior:"smooth",block:"start"});});
    }
-   entries.append(row);
   });
 ;
  });
